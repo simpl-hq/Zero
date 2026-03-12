@@ -1,0 +1,8 @@
+.stack-work/
+*~
+.vscode/
+*.hp
+*.prof
+*.svg
+# *.cabal
+dist-newstyle

@@ -1,0 +1,29 @@
+resolver: lts-21.11
+packages:
+- ./recv
+- ./auto-update
+- ./mime-types
+- ./wai
+- ./wai-extra
+- ./warp
+- ./warp-tls
+- ./wai-app-static
+- ./wai-frontend-monadcgi
+- ./wai-http2-extra
+- ./wai-websockets
+- ./wai-conduit
+- ./time-manager
+flags:
+  wai-extra:
+    build-example: true
+nix:
+  enable: false
+  packages:
+  - fcgi
+  - zlib
+extra-deps:
+  - crypton-0.33
+  - crypton-x509-1.7.6
+  - crypton-x509-store-1.6.9
+  - crypton-x509-validation-1.6.12
+  - tls-1.8.0
