@@ -1,0 +1,26 @@
+module Zero.Messaging.Version.Internal
+  ( Version (..),
+  ) where
+
+import Data.Aeson (FromJSON (..), ToJSON (..))
+import Data.Word (Word16)
+import Zero.Messaging.Encoding
+import Zero.Messaging.Encoding.String
+
+newtype Version v = Version Word16
+  deriving (Eq, Ord, Show)
+
+instance Encoding (Version v) where
+  smpEncode (Version v) = smpEncode v
+  smpP = Version <$> smpP
+
+instance StrEncoding (Version v) where
+  strEncode (Version v) = strEncode v
+  strP = Version <$> strP
+
+instance ToJSON (Version v) where
+  toEncoding (Version v) = toEncoding v
+  toJSON (Version v) = toJSON v
+
+instance FromJSON (Version v) where
+  parseJSON v = Version <$> parseJSON v

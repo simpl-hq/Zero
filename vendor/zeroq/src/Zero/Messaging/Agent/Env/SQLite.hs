@@ -1,0 +1,342 @@
+{-# LANGUAGE ConstraintKinds #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE NamedFieldPuns #-}
+{-# LANGUAGE NumericUnderscores #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE TypeApplications #-}
+{-# OPTIONS_GHC -fno-warn-unticked-promoted-constructors #-}
+
+module Zero.Messaging.Agent.Env.SQLite
+  ( AM',
+    AM,
+    AgentConfig (..),
+    InitialAgentServers (..),
+    ServerCfg (..),
+    ServerRoles (..),
+    OperatorId,
+    UserServers (..),
+    NetworkConfig (..),
+    presetServerCfg,
+    allRoles,
+    mkUserServers,
+    serverHosts,
+    defaultAgentConfig,
+    defaultReconnectInterval,
+    Env (..),
+    newSMPAgentEnv,
+    createAgentStore,
+    NtfSupervisor (..),
+    NtfSupervisorCommand (..),
+    XFTPAgent (..),
+    Worker (..),
+    RestartCount (..),
+    updateRestartCount,
+  )
+where
+
+import Control.Concurrent (ThreadId)
+import Control.Monad.Except
+import Control.Monad.IO.Unlift
+import Control.Monad.Reader
+import Crypto.Random
+import Data.Aeson (FromJSON (..), ToJSON (..))
+import qualified Data.Aeson.TH as JQ
+import Data.Int (Int64)
+import Data.List.NonEmpty (NonEmpty)
+import qualified Data.List.NonEmpty as L
+import Data.Map.Strict (Map)
+import Data.Maybe (fromMaybe)
+import Data.Set (Set)
+import qualified Data.Set as S
+import Data.Time.Clock (NominalDiffTime, nominalDay)
+import Data.Time.Clock.System (SystemTime (..))
+import Data.Word (Word16)
+import Network.Socket
+import Numeric.Natural
+import Zero.FileTransfer.Client (XFTPClientConfig (..), defaultXFTPClientConfig)
+import Zero.Messaging.Agent.Protocol
+import Zero.Messaging.Agent.RetryInterval
+import Zero.Messaging.Agent.Store (createStore)
+import Zero.Messaging.Agent.Store.Common (DBStore)
+import Zero.Messaging.Agent.Store.Interface (DBOpts)
+import Zero.Messaging.Agent.Store.Shared (MigrationConfig (..), MigrationError (..))
+import Zero.Messaging.Client
+import qualified Zero.Messaging.Crypto as C
+import Zero.Messaging.Crypto.Ratchet (VersionRangeE2E, supportedE2EEncryptVRange)
+import Zero.Messaging.Notifications.Client (defaultNTFClientConfig)
+import Zero.Messaging.Notifications.Transport (NTFVersion)
+import Zero.Messaging.Notifications.Types
+import Zero.Messaging.Parsers (defaultJSON)
+import Zero.Messaging.Protocol (NtfServer, ProtoServerWithAuth (..), ProtocolServer (..), ProtocolType (..), ProtocolTypeI, VersionRangeSMPC, XFTPServer, supportedSMPClientVRange)
+import Zero.Messaging.TMap (TMap)
+import qualified Zero.Messaging.TMap as TM
+import Zero.Messaging.Transport (SMPVersion)
+import Zero.Messaging.Transport.Client (TransportHost)
+import System.Mem.Weak (Weak)
+import System.Random (StdGen, newStdGen)
+import UnliftIO.STM
+
+type AM' a = ReaderT Env IO a
+
+type AM a = ExceptT AgentErrorType (ReaderT Env IO) a
+
+data InitialAgentServers = InitialAgentServers
+  { smp :: Map UserId (NonEmpty (ServerCfg 'PSMP)),
+    ntf :: [NtfServer],
+    xftp :: Map UserId (NonEmpty (ServerCfg 'PXFTP)),
+    netCfg :: NetworkConfig,
+    useServices :: Map UserId Bool,
+    presetDomains :: [HostName],
+    presetServers :: [SMPServer]
+  }
+
+data ServerCfg p = ServerCfg
+  { server :: ProtoServerWithAuth p,
+    operator :: Maybe OperatorId,
+    enabled :: Bool,
+    roles :: ServerRoles
+  }
+  deriving (Show)
+
+data ServerRoles = ServerRoles
+  { storage :: Bool,
+    proxy :: Bool,
+    names :: Bool
+  }
+  deriving (Show)
+
+allRoles :: ServerRoles
+allRoles = ServerRoles True True True
+
+presetServerCfg :: Bool -> ServerRoles -> Maybe OperatorId -> ProtoServerWithAuth p -> ServerCfg p
+presetServerCfg enabled roles operator server =
+  ServerCfg {server, operator, enabled, roles}
+
+data UserServers p = UserServers
+  { storageSrvs :: NonEmpty (Maybe OperatorId, ProtoServerWithAuth p),
+    proxySrvs :: NonEmpty (Maybe OperatorId, ProtoServerWithAuth p),
+    nameSrvs :: [(Maybe OperatorId, ProtoServerWithAuth p)],
+    knownHosts :: Set TransportHost
+  }
+
+type OperatorId = Int64
+
+mkUserServers :: NonEmpty (ServerCfg p) -> UserServers p
+mkUserServers srvs = UserServers {storageSrvs = filterSrvs storage, proxySrvs = filterSrvs proxy, nameSrvs, knownHosts}
+  where
+    filterSrvs role = L.map (\ServerCfg {operator, server} -> (operator, server)) $ fromMaybe srvs $ L.nonEmpty $ L.filter (\ServerCfg {enabled, roles} -> enabled && role roles) srvs
+    nameSrvs = map (\ServerCfg {operator, server} -> (operator, server)) $ L.filter (\ServerCfg {enabled, roles} -> enabled && names roles) srvs
+    knownHosts = S.unions $ L.map (\ServerCfg {server = ProtoServerWithAuth srv _} -> serverHosts srv) srvs
+
+serverHosts :: ProtocolServer p -> Set TransportHost
+serverHosts ProtocolServer {host} = S.fromList $ L.toList host
+
+data AgentConfig = AgentConfig
+  { tcpPort :: Maybe ServiceName,
+    rcvAuthAlg :: C.AuthAlg,
+    sndAuthAlg :: C.AuthAlg,
+    connIdBytes :: Int,
+    tbqSize :: Natural,
+    smpCfg :: ProtocolClientConfig SMPVersion,
+    ntfCfg :: ProtocolClientConfig NTFVersion,
+    xftpCfg :: XFTPClientConfig,
+    reconnectInterval :: RetryInterval,
+    messageRetryInterval :: RetryInterval2,
+    userNetworkInterval :: Int,
+    userOfflineDelay :: NominalDiffTime,
+    messageTimeout :: NominalDiffTime,
+    connDeleteDeliveryTimeout :: NominalDiffTime,
+    helloTimeout :: NominalDiffTime,
+    quotaExceededTimeout :: NominalDiffTime,
+    persistErrorInterval :: NominalDiffTime,
+    initialCleanupDelay :: Int64,
+    cleanupInterval :: Int64,
+    cleanupBatchSize :: Int,
+    initialLogStatsDelay :: Int64,
+    logStatsInterval :: Int64,
+    cleanupStepInterval :: Int,
+    maxWorkerRestartsPerMin :: Int,
+    storedMsgDataTTL :: NominalDiffTime,
+    rcvFilesTTL :: NominalDiffTime,
+    sndFilesTTL :: NominalDiffTime,
+    xftpConsecutiveRetries :: Int,
+    xftpMaxRecipientsPerRequest :: Int,
+    deleteErrorCount :: Int,
+    ntfCron :: Word16,
+    ntfBatchSize :: Int,
+    ntfSubFirstCheckInterval :: NominalDiffTime,
+    ntfSubCheckInterval :: NominalDiffTime,
+    subsBatchSize :: Int,
+    caCertificateFile :: FilePath,
+    privateKeyFile :: FilePath,
+    certificateFile :: FilePath,
+    rcvExpireCount :: Int,
+    rcvExpireInterval :: NominalDiffTime,
+    e2eEncryptVRange :: VersionRangeE2E,
+    smpAgentVRange :: VersionRangeSMPA,
+    smpClientVRange :: VersionRangeSMPC
+  }
+
+defaultReconnectInterval :: RetryInterval
+defaultReconnectInterval =
+  RetryInterval
+    { initialInterval = 2_000000,
+      increaseAfter = 10_000000,
+      maxInterval = 180_000000
+    }
+
+defaultMessageRetryInterval :: RetryInterval2
+defaultMessageRetryInterval =
+  RetryInterval2
+    { riFast =
+        RetryInterval
+          { initialInterval = 2_000000,
+            increaseAfter = 10_000000,
+            maxInterval = 120_000000
+          },
+      riSlow =
+        RetryInterval
+          { initialInterval = 300_000000,
+            increaseAfter = 60_000000,
+            maxInterval = 6 * 3600_000000
+          }
+    }
+
+defaultAgentConfig :: AgentConfig
+defaultAgentConfig =
+  AgentConfig
+    { tcpPort = Just "5224",
+      rcvAuthAlg = C.AuthAlg C.SEd25519,
+      sndAuthAlg = C.AuthAlg C.SEd25519,
+      connIdBytes = 12,
+      tbqSize = 128,
+      smpCfg = defaultSMPClientConfig,
+      ntfCfg = defaultNTFClientConfig,
+      xftpCfg = defaultXFTPClientConfig,
+      reconnectInterval = defaultReconnectInterval,
+      messageRetryInterval = defaultMessageRetryInterval,
+      userNetworkInterval = 1800_000000,
+      userOfflineDelay = 2,
+      messageTimeout = 2 * nominalDay,
+      connDeleteDeliveryTimeout = 2 * nominalDay,
+      helloTimeout = 2 * nominalDay,
+      quotaExceededTimeout = 7 * nominalDay,
+      persistErrorInterval = 3,
+      initialCleanupDelay = 30 * 1000000,
+      cleanupInterval = 5 * 60 * 1000000,
+      cleanupBatchSize = 10000,
+      initialLogStatsDelay = 10 * 1000000,
+      logStatsInterval = 10 * 1000000,
+      cleanupStepInterval = 200000,
+      maxWorkerRestartsPerMin = 5,
+      storedMsgDataTTL = 21 * nominalDay,
+      rcvFilesTTL = 2 * nominalDay,
+      sndFilesTTL = nominalDay,
+      xftpConsecutiveRetries = 3,
+      xftpMaxRecipientsPerRequest = 200,
+      deleteErrorCount = 10,
+      ntfCron = 20,
+      ntfBatchSize = 150,
+      ntfSubFirstCheckInterval = nominalDay,
+      ntfSubCheckInterval = 3 * nominalDay,
+      subsBatchSize = 1350,
+      caCertificateFile = "/etc/opt/zero-agent/ca.crt",
+      privateKeyFile = "/etc/opt/zero-agent/agent.key",
+      certificateFile = "/etc/opt/zero-agent/agent.crt",
+      rcvExpireCount = 8,
+      rcvExpireInterval = nominalDay,
+      e2eEncryptVRange = supportedE2EEncryptVRange,
+      smpAgentVRange = supportedSMPAgentVRange,
+      smpClientVRange = supportedSMPClientVRange
+    }
+
+data Env = Env
+  { config :: AgentConfig,
+    store :: DBStore,
+    random :: TVar ChaChaDRG,
+    randomServer :: TVar StdGen,
+    ntfSupervisor :: NtfSupervisor,
+    xftpAgent :: XFTPAgent,
+    multicastSubscribers :: TMVar Int
+  }
+
+newSMPAgentEnv :: AgentConfig -> DBStore -> IO Env
+newSMPAgentEnv config store = do
+  random <- C.newRandom
+  randomServer <- newTVarIO =<< liftIO newStdGen
+  ntfSupervisor <- newNtfSubSupervisor $ tbqSize config
+  xftpAgent <- newXFTPAgent
+  multicastSubscribers <- newTMVarIO 0
+  pure Env {config, store, random, randomServer, ntfSupervisor, xftpAgent, multicastSubscribers}
+
+createAgentStore :: DBOpts -> MigrationConfig -> IO (Either MigrationError DBStore)
+createAgentStore = createStore
+
+data NtfSupervisor = NtfSupervisor
+  { ntfTkn :: TVar (Maybe NtfToken),
+    ntfSubQ :: TBQueue (NtfSupervisorCommand, NonEmpty ConnId),
+    ntfWorkers :: TMap NtfServer Worker,
+    ntfSMPWorkers :: TMap SMPServer Worker,
+    ntfTknDelWorkers :: TMap NtfServer Worker
+  }
+
+data NtfSupervisorCommand = NSCCreate | NSCSmpDelete | NSCDeleteSub
+  deriving (Show)
+
+newNtfSubSupervisor :: Natural -> IO NtfSupervisor
+newNtfSubSupervisor qSize = do
+  ntfTkn <- newTVarIO Nothing
+  ntfSubQ <- newTBQueueIO qSize
+  ntfWorkers <- TM.emptyIO
+  ntfSMPWorkers <- TM.emptyIO
+  ntfTknDelWorkers <- TM.emptyIO
+  pure NtfSupervisor {ntfTkn, ntfSubQ, ntfWorkers, ntfSMPWorkers, ntfTknDelWorkers}
+
+data XFTPAgent = XFTPAgent
+  {
+    xftpWorkDir :: TVar (Maybe FilePath),
+    xftpRcvWorkers :: TMap (Maybe XFTPServer) Worker,
+    xftpSndWorkers :: TMap (Maybe XFTPServer) Worker,
+    xftpDelWorkers :: TMap XFTPServer Worker
+  }
+
+newXFTPAgent :: IO XFTPAgent
+newXFTPAgent = do
+  xftpWorkDir <- newTVarIO Nothing
+  xftpRcvWorkers <- TM.emptyIO
+  xftpSndWorkers <- TM.emptyIO
+  xftpDelWorkers <- TM.emptyIO
+  pure XFTPAgent {xftpWorkDir, xftpRcvWorkers, xftpSndWorkers, xftpDelWorkers}
+
+data Worker = Worker
+  { workerId :: Int,
+    doWork :: TMVar (),
+    action :: TMVar (Maybe (Weak ThreadId)),
+    restarts :: TVar RestartCount
+  }
+
+data RestartCount = RestartCount
+  { restartMinute :: Int64,
+    restartCount :: Int
+  }
+
+updateRestartCount :: SystemTime -> RestartCount -> RestartCount
+updateRestartCount t (RestartCount minute count) = do
+  let min' = systemSeconds t `div` 60
+   in RestartCount min' $ if minute == min' then count + 1 else 1
+
+$(pure [])
+
+$(JQ.deriveJSON defaultJSON ''ServerRoles)
+
+instance ProtocolTypeI p => ToJSON (ServerCfg p) where
+  toEncoding = $(JQ.mkToEncoding defaultJSON ''ServerCfg)
+  toJSON = $(JQ.mkToJSON defaultJSON ''ServerCfg)
+
+instance ProtocolTypeI p => FromJSON (ServerCfg p) where
+  parseJSON = $(JQ.mkParseJSON defaultJSON ''ServerCfg)
