@@ -1,0 +1,12 @@
+#ifndef objc_h
+#define objc_h
+
+#import <Foundation/Foundation.h>
+
+@interface ObjC : NSObject
+
++ (BOOL)catchException:(void(^)(void))tryBlock error:(__autoreleasing NSError **)error;
+
+@end
+
+#endif /* objc_h */

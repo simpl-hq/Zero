@@ -1,0 +1,37 @@
+import SwiftUI
+
+struct NavStackCompat <C: View, D: View>: View {
+    let isActive: Binding<Bool>
+    let destination: () -> D
+    let content: () -> C
+
+    var body: some View {
+        if #available(iOS 16, *) {
+            NavigationStack(path: Binding(
+                get: { isActive.wrappedValue ? [true] : [] },
+                set: { path in
+                    if path.isEmpty { isActive.wrappedValue = false }
+                }
+            )) {
+                ZStack {
+                    NavigationLink(value: true) { EmptyView() }
+                    content()
+                }
+                .navigationDestination(for: Bool.self) { show in
+                    if show { destination() }
+                }
+            }
+        } else {
+            NavigationView {
+                ZStack {
+                    NavigationLink(
+                        destination: destination(),
+                        isActive: isActive
+                    ) { EmptyView() }
+                    content()
+                }
+            }
+            .navigationViewStyle(.stack)
+        }
+    }
+}
