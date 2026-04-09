@@ -1,0 +1,9 @@
+/* Bundle display name */
+"CFBundleDisplayName" = "Zero NSE";
+
+/* Bundle name */
+"CFBundleName" = "Zero NSE";
+
+/* Copyright (human-readable) */
+"NSHumanReadableCopyright" = "Copyright © 2026 Zero. Tutti i diritti riservati.";
+

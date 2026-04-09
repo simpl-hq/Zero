@@ -1,0 +1,9 @@
+/* Bundle display name */
+"CFBundleDisplayName" = "Zero SE";
+
+/* Bundle name */
+"CFBundleName" = "Zero SE";
+
+/* Copyright (human-readable) */
+"NSHumanReadableCopyright" = "Telif Hakkı © 2024 Zero. Tüm hakları saklıdır.";
+
