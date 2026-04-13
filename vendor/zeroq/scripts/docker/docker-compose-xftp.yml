@@ -1,0 +1,16 @@
+name: Zero - xftp-server
+
+services:
+  xftp-server:
+    image: ${ZERO_XFTP_IMAGE:-simplhq/xftp-server:latest}
+    environment:
+      ADDR: ${ADDR?"Please specify the domain."}
+      QUOTA: ${QUOTA?"Please specify disk quota."}
+      PASS: ${PASS:-}
+    volumes:
+      - ./xftp_configs:/etc/opt/zero-xftp
+      - ./xftp_state:/var/opt/zero-xftp
+      - ./xftp_files:/srv/xftp
+    ports:
+      - 443:443
+    restart: unless-stopped
