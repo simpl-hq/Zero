@@ -1,0 +1,74 @@
+package app.zero.core.common.views.chat.item
+
+import android.os.Build
+import android.view.View
+import androidx.compose.foundation.Image
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.*
+import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.view.isVisible
+import app.zero.core.common.platform.VideoPlayer
+import app.zero.core.common.platform.androidAppContext
+import app.zero.core.res.MR
+import coil.ImageLoader
+import coil.compose.rememberAsyncImagePainter
+import coil.decode.GifDecoder
+import coil.decode.ImageDecoderDecoder
+import coil.request.ImageRequest
+import coil.size.Size
+import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
+import com.google.android.exoplayer2.ui.StyledPlayerView
+import dev.icerock.moko.resources.compose.stringResource
+
+@Composable
+actual fun FullScreenImageView(modifier: Modifier, data: ByteArray, imageBitmap: ImageBitmap) {
+  Image(
+    rememberAsyncImagePainter(
+      ImageRequest.Builder(LocalContext.current).data(data = data).size(Size.ORIGINAL).build(),
+      placeholder = BitmapPainter(imageBitmap),
+      imageLoader = imageLoader
+    ),
+    contentDescription = stringResource(MR.strings.image_descr),
+    contentScale = ContentScale.Fit,
+    modifier = modifier,
+  )
+}
+
+@Composable
+actual fun FullScreenVideoView(player: VideoPlayer, modifier: Modifier, close: () -> Unit) {
+  AndroidView(
+    factory = { ctx ->
+      StyledPlayerView(ctx).apply {
+        resizeMode = if (ctx.resources.configuration.screenWidthDp > ctx.resources.configuration.screenHeightDp) {
+          AspectRatioFrameLayout.RESIZE_MODE_FIXED_HEIGHT
+        } else {
+          AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH
+        }
+        setShowPreviousButton(false)
+        setShowNextButton(false)
+        setShowSubtitleButton(false)
+        setShowVrButton(false)
+        controllerAutoShow = false
+        findViewById<View>(com.google.android.exoplayer2.R.id.exo_controls_background).setBackgroundColor(Color.Black.copy(alpha = 0.3f).toArgb())
+        findViewById<View>(com.google.android.exoplayer2.R.id.exo_settings).isVisible = false
+        this.player = player.player
+      }
+    },
+    modifier
+  )
+}
+
+private val imageLoader = ImageLoader.Builder(androidAppContext)
+  .networkObserverEnabled(false)
+  .components {
+    if (Build.VERSION.SDK_INT >= 28) {
+      add(ImageDecoderDecoder.Factory())
+    } else {
+      add(GifDecoder.Factory())
+    }
+  }
+  .build()

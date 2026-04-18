@@ -1,0 +1,27 @@
+LIBRARY libzero
+EXPORTS
+    hs_init
+    hs_init_with_rtsopts
+    zero_core_runtime_init
+    zero_core_runtime_migrate_init
+    zero_core_runtime_close_store
+    zero_core_runtime_send_cmd
+    zero_core_runtime_send_cmd_retry
+    zero_core_runtime_send_remote_cmd
+    zero_core_runtime_send_remote_cmd_retry
+    zero_core_runtime_recv_msg
+    zero_core_runtime_recv_msg_wait
+    zero_core_runtime_parse_markdown
+    zero_core_runtime_parse_server
+    zero_core_runtime_parse_uri
+    zero_core_runtime_password_hash
+    zero_core_runtime_valid_name
+    zero_core_runtime_json_length
+    zero_core_runtime_badge_keygen
+    zero_core_runtime_badge_issue
+    zero_core_runtime_encrypt_media
+    zero_core_runtime_decrypt_media
+    zero_core_runtime_write_file
+    zero_core_runtime_read_file
+    zero_core_runtime_encrypt_file
+    zero_core_runtime_decrypt_file

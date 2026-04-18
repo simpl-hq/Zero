@@ -1,0 +1,24 @@
+package app.zero.core.common.views.chat.item
+
+import androidx.compose.desktop.ui.tooling.preview.Preview
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.*
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.*
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import app.zero.core.common.ui.theme.*
+
+@Composable
+fun CIEventView(text: AnnotatedString) {
+  Text(text, Modifier.padding(horizontal = 6.dp, vertical = 6.dp), style = MaterialTheme.typography.body1.copy(lineHeight = 22.sp), maxLines = 4)
+}
+@Preview
+
+@Composable
+fun CIEventViewPreview() {
+  ZeroTheme {
+    CIEventView(buildAnnotatedString { append("event happened") })
+  }
+}

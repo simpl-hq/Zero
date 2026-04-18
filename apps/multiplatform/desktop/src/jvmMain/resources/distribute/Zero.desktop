@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Zero
+Comment=Private and secure open-source messenger - no user IDs (not even random numbers)
+Exec=/opt/zero/bin/zero
+Icon=/opt/zero/lib/zero
+Categories=Network;Chat;

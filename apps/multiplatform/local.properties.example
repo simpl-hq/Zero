@@ -1,0 +1,12 @@
+compression.level=0
+enable_debuggable=true
+application_id.suffix=.debug
+app.name=Zero Debug
+
+#zero.assets.dir=path/to/assets
+
+#desktop.mac.signing.identity=Zero
+#desktop.mac.signing.keychain=/path/to/zero.keychain
+#desktop.mac.notarization.apple_id=example@example.com
+#desktop.mac.notarization.password=12345678
+#desktop.mac.notarization.team_id=XXXXXXXXXX

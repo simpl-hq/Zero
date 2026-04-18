@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>app.zero.chat</id>
+  <launchable type="desktop-id">app.zero.chat.desktop</launchable>
+  <metadata_license>FSFAP</metadata_license>
+  <project_license>AGPL-3.0</project_license>
+  <name>Zero</name>
+  <summary>Post-quantum end-to-end encrypted messenger with zero user identifiers</summary>
+
+  <description>
+    <p>Zero is an open-source, post-quantum end-to-end encrypted messenger with no phone numbers, no email addresses, and no persistent user IDs.</p>
+    <p>Core capabilities:</p>
+    <ul>
+      <li>End-to-end encrypted messaging combining Curve448 and sntrup761 post-quantum key encapsulation on every ratchet step.</li>
+      <li>Unidirectional pairwise SMP queues with fixed 16 KB traffic padding and optional 2-hop onion routing.</li>
+      <li>Encrypted file and media transfers up to 1 GiB via chunked XFTP relays.</li>
+      <li>One-time invitation links, 4-word contact phrases, 6-digit in-person pairing codes, and QR verification.</li>
+      <li>End-to-end encrypted WebRTC audio and video calls with TURN relay privacy options.</li>
+      <li>SQLCipher 256-bit AES local storage encryption with full offline device sovereignty.</li>
+    </ul>
+  </description>
+
+  <screenshots>
+    <screenshot type="default">
+      <image>https://raw.githubusercontent.com/simpl-hq/zero/main/media-logos/simpl-logo.png</image>
+    </screenshot>
+  </screenshots>
+
+  <url type="homepage">https://simpl.global</url>
+  <url type="bugtracker">https://github.com/simpl-hq/zero/issues</url>
+  <url type="translate">https://github.com/simpl-hq/zero</url>
+  <url type="contact">mailto:support@simpl.global</url>
+  <url type="donation">https://simpl.global/donate</url>
+
+  <content_rating type="oars-1.1"/>
+
+  <releases>
+    <release version="1.0.0" date="2026-11-16">
+      <description>
+        <p>- Initial v1.0.0 open-source release across macOS, Windows, Linux, Android (APK), CLI, and iOS/mobile store review builds</p>
+        <p>- Argon2id PoW profile calibration across mobile and desktop clients</p>
+        <p>- Broker deep-link validation and automated regression test coverage</p>
+      </description>
+    </release>
+    <release version="0.9.6" date="2026-11-04">
+      <description>
+        <p>- Desktop focus handling and notification activation fixes</p>
+        <p>- Broker rate limiting and strict security headers</p>
+      </description>
+    </release>
+    <release version="0.9.3" date="2026-09-18">
+      <description>
+        <p>- Ephemeral 4-word and 6-digit contact pairing broker</p>
+        <p>- Reproducible core builds pinned to GHC 9.6.3</p>
+      </description>
+    </release>
+    <release version="0.4.0" date="2026-04-26">
+      <description>
+        <p>- Initial Compose Multiplatform desktop app release (Linux, macOS, Windows)</p>
+        <p>- XFTP encrypted file transfers and remote device control over C11 JNI bridge</p>
+      </description>
+    </release>
+  </releases>
+</component>
