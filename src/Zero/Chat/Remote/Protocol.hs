@@ -1,0 +1,309 @@
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE NamedFieldPuns #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE PatternSynonyms #-}
+{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE TupleSections #-}
+{-# LANGUAGE TypeApplications #-}
+
+module Zero.Chat.Remote.Protocol where
+
+import qualified Codec.Compression.Zstd as Z1
+import Control.Monad
+import Control.Monad.Except
+import Control.Monad.Reader
+import Crypto.Hash (SHA512)
+import qualified Crypto.Hash as CH
+import Data.Aeson (FromJSON (..), ToJSON (..), (.=))
+import qualified Data.Aeson as J
+import qualified Data.Aeson.Key as JK
+import qualified Data.Aeson.KeyMap as JM
+import qualified Data.Aeson.TH as JQ
+import qualified Data.Aeson.Types as JT
+import qualified Data.ByteArray as BA
+import Data.ByteString (ByteString)
+import qualified Data.ByteString as B
+import Data.ByteString.Builder (Builder, byteString, lazyByteString)
+import qualified Data.ByteString.Lazy as LB
+import qualified Data.ByteString.Lazy.Internal as LB
+import Data.String (fromString)
+import Data.Text (Text)
+import Data.Text.Encoding (decodeUtf8)
+import Data.Word (Word32)
+import qualified Network.HTTP.Types as N
+import qualified Network.HTTP2.Client as H
+import Network.Transport.Internal (decodeWord32, encodeWord32)
+import Zero.Chat.Controller
+import Zero.Chat.Remote.Transport
+import Zero.Chat.Remote.Types
+import Zero.Chat.Types (BoolDef (..))
+import Zero.FileTransfer.Description (FileDigest (..))
+import qualified Zero.Messaging.Crypto as C
+import Zero.Messaging.Crypto.File (CryptoFile (..))
+import Zero.Messaging.Crypto.Lazy (LazyByteString)
+import Zero.Messaging.Encoding
+import Zero.Messaging.Parsers (defaultJSON, dropPrefix, taggedObjectJSON, pattern SingleFieldJSONTag, pattern TaggedObjectJSONData, pattern TaggedObjectJSONTag)
+import qualified Zero.Messaging.TMap as TM
+import Zero.Messaging.Transport (TSbChainKeys)
+import Zero.Messaging.Transport.Buffer (getBuffered)
+import Zero.Messaging.Transport.HTTP2 (HTTP2Body (..), HTTP2BodyChunk, getBodyChunk)
+import Zero.Messaging.Transport.HTTP2.Client (HTTP2Client, HTTP2Response (..), closeHTTP2Client, sendRequestDirect)
+import Zero.Messaging.Util (liftError', liftEitherWith, liftError, tshow)
+import Zero.RemoteControl.Client (xrcpBlockSize)
+import qualified Zero.RemoteControl.Client as RC
+import Zero.RemoteControl.Types (CtrlSessKeys (..), HostSessKeys (..), RCErrorType (..), SessionCode)
+import System.FilePath (takeFileName, (</>))
+import UnliftIO
+
+data RemoteCommand
+  = RCSend {command :: Text, retryNumber :: Int}
+  | RCRecv {wait :: Int}
+  |
+    RCStoreFile {fileName :: String, fileSize :: Word32, fileDigest :: FileDigest}
+  | RCGetFile {file :: RemoteFile}
+  deriving (Show)
+
+data RemoteResponse
+  = RRChatResponse {chatResponse :: RRResult ChatResponse}
+  | RRChatEvent {chatEvent :: Maybe (RRResult ChatEvent)}
+  | RRFileStored {filePath :: String}
+  | RRFile {fileSize :: Word32, fileDigest :: FileDigest}
+  | RRProtocolError {remoteProcotolError :: RemoteProtocolError}
+  deriving (Show)
+
+data RRResult r
+  = RRResult {result :: r}
+  | RRError {error :: ChatError}
+  deriving (Show)
+
+resultToEither :: RRResult r -> Either ChatError r
+resultToEither = \case
+  RRResult r -> Right r
+  RRError e -> Left e
+{-# INLINE resultToEither #-}
+
+eitherToResult :: Either ChatError r -> RRResult r
+eitherToResult = either RRError RRResult
+{-# INLINE eitherToResult #-}
+
+$(pure [])
+
+instance ToJSON r => ToJSON (RRResult r) where
+  toEncoding = $(JQ.mkToEncoding (defaultJSON {J.sumEncoding = J.UntaggedValue}) ''RRResult)
+  toJSON = $(JQ.mkToJSON (defaultJSON {J.sumEncoding = J.UntaggedValue}) ''RRResult)
+
+instance FromJSON r => FromJSON (RRResult r) where
+  parseJSON = $(JQ.mkParseJSON (defaultJSON {J.sumEncoding = J.UntaggedValue}) ''RRResult)
+
+$(JQ.deriveJSON (taggedObjectJSON $ dropPrefix "RC") ''RemoteCommand)
+$(JQ.deriveJSON (taggedObjectJSON $ dropPrefix "RR") ''RemoteResponse)
+
+mkRemoteHostClient :: HTTP2Client -> HostSessKeys -> SessionCode -> FilePath -> HostAppInfo -> CM RemoteHostClient
+mkRemoteHostClient httpClient sessionKeys sessionCode storePath HostAppInfo {encoding, deviceName, encryptFiles, compression} = do
+  let HostSessKeys {chainKeys, idPrivKey, sessPrivKey} = sessionKeys
+      signatures = RSSign {idPrivKey, sessPrivKey}
+  encryption <- mkRemoteCrypto sessionCode chainKeys signatures $ isTrue compression
+  pure
+    RemoteHostClient
+      { hostEncoding = encoding,
+        hostDeviceName = deviceName,
+        httpClient,
+        encryption,
+        encryptHostFiles = encryptFiles,
+        storePath
+      }
+
+mkCtrlRemoteCrypto :: CtrlSessKeys -> SessionCode -> Maybe CtrlAppInfo -> CM RemoteCrypto
+mkCtrlRemoteCrypto CtrlSessKeys {chainKeys, idPubKey, sessPubKey} sessionCode ctrlAppInfo_ = do
+  let signatures = RSVerify {idPubKey, sessPubKey}
+      peerCompression = maybe False (\CtrlAppInfo {compression} -> isTrue compression) ctrlAppInfo_
+  mkRemoteCrypto sessionCode chainKeys signatures peerCompression
+
+mkRemoteCrypto :: SessionCode -> TSbChainKeys -> RemoteSignatures -> Bool -> CM RemoteCrypto
+mkRemoteCrypto sessionCode chainKeys signatures peerCompression = do
+  sndCounter <- newTVarIO 0
+  rcvCounter <- newTVarIO 0
+  skippedKeys <- liftIO TM.emptyIO
+  useCompression <- asks $ remoteCompression . config
+  pure RemoteCrypto {sessionCode, sndCounter, rcvCounter, chainKeys, skippedKeys, signatures, compression = peerCompression && useCompression}
+
+closeRemoteHostClient :: RemoteHostClient -> IO ()
+closeRemoteHostClient RemoteHostClient {httpClient} = closeHTTP2Client httpClient
+
+remoteSend :: RemoteHostClient -> ByteString -> Int -> ExceptT RemoteProtocolError IO (Either ChatError ChatResponse)
+remoteSend c cmd retryNumber =
+  sendRemoteCommand' c Nothing RCSend {command = decodeUtf8 cmd, retryNumber} >>= \case
+    RRChatResponse cr -> pure $ resultToEither cr
+    r -> badResponse r
+
+remoteRecv :: RemoteHostClient -> Int -> ExceptT RemoteProtocolError IO (Maybe (Either ChatError ChatEvent))
+remoteRecv c ms =
+  sendRemoteCommand' c Nothing RCRecv {wait = ms} >>= \case
+    RRChatEvent cEvt_ -> pure $ resultToEither <$> cEvt_
+    r -> badResponse r
+
+remoteStoreFile :: RemoteHostClient -> FilePath -> FilePath -> ExceptT RemoteProtocolError IO FilePath
+remoteStoreFile c localPath fileName = do
+  (fileSize, fileDigest) <- getFileInfo localPath
+  let send h = sendRemoteCommand' c (Just (h, fileSize)) RCStoreFile {fileName, fileSize, fileDigest}
+  withFile localPath ReadMode send >>= \case
+    RRFileStored {filePath = filePath'} -> pure filePath'
+    r -> badResponse r
+
+remoteGetFile :: RemoteHostClient -> FilePath -> RemoteFile -> ExceptT RemoteProtocolError IO ()
+remoteGetFile c destDir rf@RemoteFile {fileSource = CryptoFile {filePath}} =
+  sendRemoteCommand c Nothing RCGetFile {file = rf} >>= \case
+    (rfKN, getChunk, RRFile {fileSize, fileDigest}) -> do
+      let localPath = destDir </> takeFileName filePath
+      receiveEncryptedFile rfKN getChunk fileSize fileDigest localPath
+    (_, _, r) -> badResponse r
+
+sendRemoteCommand' :: RemoteHostClient -> Maybe (Handle, Word32) -> RemoteCommand -> ExceptT RemoteProtocolError IO RemoteResponse
+sendRemoteCommand' c attachment_ rc = do
+  (_, _, r) <- sendRemoteCommand c attachment_ rc
+  pure r
+
+sendRemoteCommand :: RemoteHostClient -> Maybe (Handle, Word32) -> RemoteCommand -> ExceptT RemoteProtocolError IO (C.SbKeyNonce, Int -> IO ByteString, RemoteResponse)
+sendRemoteCommand RemoteHostClient {httpClient, hostEncoding, encryption} file_ cmd = do
+  (corrId, cmdKN, sfKN) <- atomically $ getRemoteSndKeys encryption
+  encCmd <- encryptEncodeHTTP2Body corrId cmdKN encryption $ J.encode cmd
+  encFile_ <- mapM (prepareEncryptedFile sfKN) file_
+  let req = httpRequest encFile_ encCmd
+  HTTP2Response {response, respBody} <- liftError' (RPEHTTP2 . tshow) $ sendRequestDirect httpClient req Nothing
+  (rfKN, header, getNext) <- parseDecryptHTTP2Body encryption response respBody
+  rr <- liftEitherWith (RPEInvalidJSON . fromString) $ J.eitherDecodeStrict header >>= JT.parseEither J.parseJSON . convertJSON hostEncoding localEncoding
+  pure (rfKN, getNext, rr)
+  where
+    defaultTransportHeaders :: N.RequestHeaders
+    defaultTransportHeaders = [("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")]
+    httpRequest encFile_ cmdBld = H.requestStreaming N.methodPost "/" defaultTransportHeaders $ \send flush -> do
+      send cmdBld
+      forM_ encFile_ (`sendEncryptedFile` send)
+      flush
+
+badResponse :: RemoteResponse -> ExceptT RemoteProtocolError IO a
+badResponse = \case
+  RRProtocolError e -> throwError e
+  r -> throwError $ RPEUnexpectedResponse $ tshow r
+
+convertJSON :: PlatformEncoding -> PlatformEncoding -> J.Value -> J.Value
+convertJSON _remote@PEKotlin _local@PEKotlin = id
+convertJSON PESwift PESwift = id
+convertJSON PESwift PEKotlin = owsf2tagged
+convertJSON PEKotlin PESwift = Prelude.error "unsupported convertJSON: K/S"
+
+owsf2tagged :: J.Value -> J.Value
+owsf2tagged = fst . convert
+  where
+    convert val = case val of
+      J.Object o
+        | JM.size o == 2 ->
+            case JM.toList o of
+              [OwsfTag, o'] -> tagged o'
+              [o', OwsfTag] -> tagged o'
+              _ -> props
+        | otherwise -> props
+        where
+          props = (J.Object $ fmap owsf2tagged o, False)
+      J.Array a -> (J.Array $ fmap owsf2tagged a, False)
+      _ -> (val, False)
+    tagged (k, v) = (J.Object pairs, True)
+      where
+        (v', innerTag) = convert v
+        pairs = case v' of
+          J.Object o
+            | innerTag -> pair
+            | otherwise -> JM.insert TaggedObjectJSONTag tag o
+          _ -> pair
+        tag = J.String $ JK.toText k
+        pair = JM.fromList [TaggedObjectJSONTag .= tag, TaggedObjectJSONData .= v']
+
+pattern OwsfTag :: (JK.Key, J.Value)
+pattern OwsfTag = (SingleFieldJSONTag, J.Bool True)
+
+encryptEncodeHTTP2Body :: Word32 -> C.SbKeyNonce -> RemoteCrypto -> LazyByteString -> ExceptT RemoteProtocolError IO Builder
+encryptEncodeHTTP2Body corrId cmdKN RemoteCrypto {sessionCode, signatures, compression} s = do
+  let s'
+        | compression = LB.fromStrict $ Z1.compress 3 $ LB.toStrict s
+        | otherwise = s
+  ct <- liftError PRERemoteControl $ RC.rcEncryptBody cmdKN $ LB.Chunk (smpEncode sessionCode) s'
+  let ctLen = encodeWord32 (fromIntegral $ LB.length ct)
+      signed = LB.fromStrict (encodeWord32 corrId <> ctLen) <> ct
+  sigs <- bodySignatures signed
+  pure $ lazyByteString signed <> sigs
+  where
+    bodySignatures :: LazyByteString -> ExceptT RemoteProtocolError IO Builder
+    bodySignatures signed = case signatures of
+      RSSign {idPrivKey, sessPrivKey} -> do
+        let hc = CH.hashUpdates (CH.hashInit @SHA512) (LB.toChunks signed)
+            ssig = sign sessPrivKey hc
+            idsig = sign idPrivKey $ CH.hashUpdate hc ssig
+        pure $ byteString $ smpEncode (ssig, idsig)
+      _ -> pure mempty
+    sign :: C.PrivateKeyEd25519 -> CH.Context SHA512 -> ByteString
+    sign k = C.signatureBytes . C.sign' k . BA.convert . CH.hashFinalize
+
+parseDecryptHTTP2Body :: HTTP2BodyChunk a => RemoteCrypto -> a -> HTTP2Body -> ExceptT RemoteProtocolError IO (C.SbKeyNonce, ByteString, Int -> IO ByteString)
+parseDecryptHTTP2Body rc@RemoteCrypto {sessionCode, signatures, compression} hr HTTP2Body {bodyBuffer} = do
+  (corrId, ct) <- getBody
+  (cmdKN, rfKN) <- ExceptT $ atomically $ getRemoteRcvKeys rc corrId
+  s <- liftError PRERemoteControl $ RC.rcDecryptBody cmdKN ct
+  s' <- decompress =<< parseBody s
+  pure (rfKN, s', getNext)
+  where
+    getBody :: ExceptT RemoteProtocolError IO (Word32, LazyByteString)
+    getBody = do
+      corrIdStr <- liftIO $ getNext 4
+      ctLenStr <- liftIO $ getNext 4
+      let ctLen = decodeWord32 ctLenStr
+      when (ctLen > fromIntegral (maxBound :: Int)) $ throwError RPEInvalidSize
+      chunks <- liftIO $ getLazy $ fromIntegral ctLen
+      let hc = CH.hashUpdates (CH.hashInit @SHA512) [corrIdStr, ctLenStr]
+          hc' = CH.hashUpdates hc chunks
+      verifySignatures hc'
+      pure (decodeWord32 corrIdStr, LB.fromChunks chunks)
+    getLazy :: Int -> IO [ByteString]
+    getLazy 0 = pure []
+    getLazy n = do
+      let sz = min n xrcpBlockSize
+      bs <- getNext sz
+      let n' = if B.length bs < sz then 0 else max 0 (n - xrcpBlockSize)
+      (bs :) <$> getLazy n'
+    verifySignatures :: CH.Context SHA512 -> ExceptT RemoteProtocolError IO ()
+    verifySignatures hc = case signatures of
+      RSVerify {sessPubKey, idPubKey} -> do
+        ssig <- getSig
+        idsig <- getSig
+        verifySig sessPubKey ssig hc
+        verifySig idPubKey idsig $ CH.hashUpdate hc $ C.signatureBytes ssig
+      _ -> pure ()
+      where
+        getSig = do
+          len <- liftIO $ B.head <$> getNext 1
+          liftError' RPEInvalidBody $ C.decodeSignature <$> getNext (fromIntegral len)
+        verifySig key sig hc' = do
+          let signed = BA.convert $ CH.hashFinalize hc'
+          unless (C.verify' key sig signed) $ throwError $ PRERemoteControl RCECtrlAuth
+    parseBody :: LazyByteString -> ExceptT RemoteProtocolError IO LazyByteString
+    parseBody s = case LB.uncons s of
+      Nothing -> throwError $ RPEInvalidBody "empty body"
+      Just (scLen, rest) -> do
+        (sessCode', s') <- takeBytes (fromIntegral scLen) rest
+        unless (sessCode' == sessionCode) $ throwError PRESessionCode
+        pure s'
+      where
+        takeBytes n s' = do
+          let (bs, rest) = LB.splitAt n s'
+          unless (LB.length bs == n) $ throwError PRESessionCode
+          pure (LB.toStrict bs, rest)
+    getNext sz = getBuffered bodyBuffer sz Nothing $ getBodyChunk hr
+    decompress :: LazyByteString -> ExceptT RemoteProtocolError IO ByteString
+    decompress s
+      | compression = case Z1.decompress $ LB.toStrict s of
+          Z1.Error e -> throwError $ RPEInvalidBody e
+          Z1.Skip -> pure B.empty
+          Z1.Decompress s' -> pure s'
+      | otherwise = pure $ LB.toStrict s

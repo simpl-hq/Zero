@@ -1,0 +1,20 @@
+# Funding & Community Support channels for Zero (simpl-hq/zero)
+#
+# All official donation methods (uniform with README.md, CONTRIBUTING.md, and simpl.global/donate):
+#   - Donate portal: https://simpl.global/donate
+#   - Buy Me a Coffee: https://buymeacoffee.com/supportsimpl
+#   - Monero (XMR): 47hCGy2csT1fJXMbsVtstXDqudH2M6tyeVQed9ob4vjgawLMnRqA5sNESBrGsfoiEQNCFWbohXsTG9JDfVWCh5KgVhTcrrL
+#   - Bitcoin (BTC): bc1qwdz5r5vagtqq8mmn0wch2y6q5adk4ms84xj3es
+#   - ETH / USDC (ERC-20, Base, Arbitrum, Polygon): 0x96A103A67cB65c33673275FEFA29C77807E52605
+#
+# Note: GitHub FUNDING.yml accepts supported platform keys and up to 4 https:// URLs under custom:.
+# Non-HTTP wallet URI schemes (monero:, bitcoin:, ethereum:) are rejected by GitHub's FUNDING.yml
+# validator, so Monero and all copyable wallet addresses are provided via simpl.global/donate and README.md.
+
+github: [simpl-hq]
+buy_me_a_coffee: supportsimpl
+custom:
+  - "https://simpl.global/donate"
+  - "https://github.com/simpl-hq/zero#support-zero"
+  - "https://mempool.space/address/bc1qwdz5r5vagtqq8mmn0wch2y6q5adk4ms84xj3es"
+  - "https://etherscan.io/address/0x96A103A67cB65c33673275FEFA29C77807E52605"
