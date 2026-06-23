@@ -1,0 +1,18 @@
+<h1>Zero — Private messaging, made simple</h1>
+<p>Zero is an open-source, post-quantum end-to-end encrypted messenger with no phone numbers, no email addresses, no usernames, and no server user accounts.</p>
+<p>Zero features:</p>
+<ul>
+  <li>End-to-end encrypted messages with editing, replies, reactions, and deletion.</li>
+  <li>3-mode private onboarding: 4-word phrase, 6-digit in-person code, or direct link/QR code backed by Argon2id proof-of-work.</li>
+  <li>End-to-end encrypted file and media transfers up to 5 GB over fixed-block padded relays.</li>
+  <li>Encrypted audio and video calls over WebRTC with ephemeral TURN credentials.</li>
+  <li>Secret groups and local encrypted SQLCipher storage on your device.</li>
+</ul>
+<p>Zero advantages:</p>
+<ul>
+  <li><strong>No user identifiers:</strong> No phone number, email, username, or account table linking you to your contacts.</li>
+  <li><strong>Spam protection without identity:</strong> Client-side Argon2id proof-of-work prevents botnet flooding without collecting identity data.</li>
+  <li><strong>Full local data control:</strong> Messages and keys stay inside an encrypted local database on your device.</li>
+  <li><strong>Open-source & verifiable:</strong> Every component is licensed under AGPL-3.0 at <a href="https://github.com/simpl-hq/zero" target="_blank">github.com/simpl-hq/zero</a>.</li>
+</ul>
+<p>Questions or feedback? Contact <a href="mailto:support@simpl.global">support@simpl.global</a> or visit <a href="https://simpl.global" target="_blank">simpl.global</a>.</p>
