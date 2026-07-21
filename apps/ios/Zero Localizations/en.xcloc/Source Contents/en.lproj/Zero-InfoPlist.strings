@@ -1,0 +1,6 @@
+/* Bundle name */
+"CFBundleName" = "Zero";
+
+/* Copyright (human-readable) */
+"NSHumanReadableCopyright" = "Copyright © 2026 Zero. All rights reserved.";
+
