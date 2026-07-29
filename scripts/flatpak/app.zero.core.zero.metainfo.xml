@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>app.zero.core.zero</id>
+
+  <name>Zero</name>
+  <summary>Post-quantum end-to-end encrypted messenger with zero user identifiers</summary>
+
+  <developer id="global.simpl.zero">
+    <name>Simpl</name>
+  </developer>
+
+  <metadata_license>MIT</metadata_license>
+  <project_license>AGPL-3.0-or-later</project_license>
+
+  <description>
+    <p>Zero is an open-source, post-quantum end-to-end encrypted messenger with no phone numbers, no usernames, and no persistent user IDs.</p>
+    <p>Every conversation uses isolated pairwise unidirectional message queues, fixed 16 KB packet padding, and an augmented double ratchet combining Curve448 with sntrup761.</p>
+    <p>Key features:</p>
+    <ol>
+      <li>End-to-end encrypted direct and group messaging with replies, edits, reactions, and disappearing timers.</li>
+      <li>Chunked encrypted file and media transfer over XFTP relays with SHA-512 verification.</li>
+      <li>One-time invitation links, 4-word contact phrases, 6-digit in-person pairing codes, and QR verification.</li>
+      <li>Optional 2-hop onion private routing and isolated SOCKS5 proxy support.</li>
+      <li>Encrypted peer-to-peer and TURN-relayed WebRTC audio and video calls.</li>
+      <li>Multiple local profiles protected by SQLCipher encryption and portable device linking.</li>
+    </ol>
+  </description>
+
+  <releases>
+    <release version="1.0.0" date="2026-11-16">
+      <url type="details">https://github.com/simpl-hq/zero/blob/main/CHANGELOG.md</url>
+      <description>
+        <p>First public v1.0.0 release across desktop, mobile, CLI, and runtime bindings:</p>
+        <ul>
+          <li>Deep-link scheme normalization and FastAPI contact-code broker test coverage.</li>
+          <li>Calibrated Argon2id (8 MiB) proof-of-work challenge verification and replay protection across clients.</li>
+          <li>Unified documentation, protocol whitepaper, and desktop packaging metadata.</li>
+        </ul>
+      </description>
+    </release>
+    <release version="0.9.6" date="2026-11-04">
+      <url type="details">https://github.com/simpl-hq/zero/blob/main/CHANGELOG.md</url>
+      <description>
+        <p>Rate-limiting hardening, Compose Desktop focus fixes, and dependency-free Android FOSS build variant.</p>
+      </description>
+    </release>
+    <release version="0.9.5" date="2026-10-20">
+      <url type="details">https://github.com/simpl-hq/zero/blob/main/CHANGELOG.md</url>
+      <description>
+        <p>Multi-region NA/EU relay cluster templates, Coturn SSRF peer filters, and C11 JNI bounds audit.</p>
+      </description>
+    </release>
+    <release version="0.9.4" date="2026-10-04">
+      <url type="details">https://github.com/simpl-hq/zero/blob/main/CHANGELOG.md</url>
+      <description>
+        <p>Argon2id replay protection window tuning and SQLCipher background flush race fixes.</p>
+      </description>
+    </release>
+    <release version="0.9.3" date="2026-09-18">
+      <url type="details">https://github.com/simpl-hq/zero/blob/main/CHANGELOG.md</url>
+      <description>
+        <p>Contact-code broker for 4-word and 6-digit ephemeral contact discovery, frozen wire version ranges, and GHC 9.6.3 reproducible build scripts.</p>
+      </description>
+    </release>
+    <release version="0.9.0" date="2026-09-01">
+      <url type="details">https://github.com/simpl-hq/zero/blob/main/CHANGELOG.md</url>
+      <description>
+        <p>Aligned Node.js, Python, and TypeScript runtime packages and directory bot search/approval workflows.</p>
+      </description>
+    </release>
+    <release version="0.8.5" date="2026-08-16">
+      <url type="details">https://github.com/simpl-hq/zero/blob/main/CHANGELOG.md</url>
+      <description>
+        <p>Group and channel role controls, member security codes, signed history checkpoints, and multi-relay roster sync.</p>
+      </description>
+    </release>
+    <release version="0.8.2" date="2026-07-28">
+      <url type="details">https://github.com/simpl-hq/zero/blob/main/CHANGELOG.md</url>
+      <description>
+        <p>Remote device pairing hardening, link tracking sanitization, and Apple CommonCrypto CSPRNG compliance.</p>
+      </description>
+    </release>
+    <release version="0.8.0" date="2026-07-10">
+      <url type="details">https://github.com/simpl-hq/zero/blob/main/CHANGELOG.md</url>
+      <description>
+        <p>Chat list filters, batch message actions, group moderation reports, and SQLite query performance tuning.</p>
+      </description>
+    </release>
+    <release version="0.7.0" date="2026-06-22">
+      <url type="details">https://github.com/simpl-hq/zero/blob/main/CHANGELOG.md</url>
+      <description>
+        <p>Multiple isolated profiles, passcode-hidden profiles, pre-join member review, and group @mentions.</p>
+      </description>
+    </release>
+    <release version="0.6.0" date="2026-06-03">
+      <url type="details">https://github.com/simpl-hq/zero/blob/main/CHANGELOG.md</url>
+      <description>
+        <p>Encrypted WebRTC audio/video calling, local media encryption, and QR cross-device profile migration.</p>
+      </description>
+    </release>
+    <release version="0.5.0" date="2026-05-15">
+      <url type="details">https://github.com/simpl-hq/zero/blob/main/CHANGELOG.md</url>
+      <description>
+        <p>Post-quantum hybrid sntrup761 + X448 double ratchet, 2-hop onion routing, and SOCKS5 proxy isolation.</p>
+      </description>
+    </release>
+    <release version="0.4.0" date="2026-04-26">
+      <url type="details">https://github.com/simpl-hq/zero/blob/main/CHANGELOG.md</url>
+      <description>
+        <p>Initial Compose Multiplatform desktop and Android builds, XFTP chunked encrypted file transfer, reactions, and remote device control.</p>
+      </description>
+    </release>
+    <release version="0.3.0" date="2026-04-08">
+      <url type="details">https://github.com/simpl-hq/zero/blob/main/CHANGELOG.md</url>
+      <description>
+        <p>End-to-end encrypted groups, invitation URIs, delivery receipts, and initial iOS app targets.</p>
+      </description>
+    </release>
+    <release version="0.2.0" date="2026-03-26">
+      <url type="details">https://github.com/simpl-hq/zero/blob/main/CHANGELOG.md</url>
+      <description>
+        <p>Unidirectional SMP queues, fixed 16 KB packet padding, SPKI TLS pinning, and SQLCipher encrypted local database storage.</p>
+      </description>
+    </release>
+    <release version="0.1.0" date="2026-03-16">
+      <url type="details">https://github.com/simpl-hq/zero/blob/main/CHANGELOG.md</url>
+      <description>
+        <p>Initial core runtime, messaging broker libraries, C FFI boundary, and terminal CLI client.</p>
+      </description>
+    </release>
+  </releases>
+
+  <content_rating type="oars-1.1" />
+
+  <url type="homepage">https://simpl.global/</url>
+  <url type="bugtracker">https://github.com/simpl-hq/zero/issues</url>
+  <url type="donation">https://simpl.global/donate</url>
+  <url type="translate">https://github.com/simpl-hq/zero</url>
+  <url type="faq">https://github.com/simpl-hq/zero/blob/main/WHITEPAPER.md</url>
+  <url type="vcs-browser">https://github.com/simpl-hq/zero</url>
+
+  <launchable type="desktop-id">app.zero.core.zero.desktop</launchable>
+
+  <branding>
+    <color type="primary" scheme_preference="light">#a5f0ff</color>
+    <color type="primary" scheme_preference="dark">#110e26</color>
+  </branding>
+
+  <screenshots>
+    <screenshot type="default">
+      <image>https://raw.githubusercontent.com/simpl-hq/zero/main/media-logos/simpl-logo.png</image>
+    </screenshot>
+  </screenshots>
+</component>

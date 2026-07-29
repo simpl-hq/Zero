@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Terminal=false
+Name=Zero
+Comment=A private & encrypted open-source messenger without any user IDs (not even random ones)!
+Keywords=chat;message;private;secure;zero;
+Categories=Utility;Chat;InstantMessaging;
+Exec=zero %U
+Icon=app.zero.core.zero
+StartupWMClass=zero-runtime
