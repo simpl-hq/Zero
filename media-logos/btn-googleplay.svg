@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 138 38" width="138" height="38" text-rendering="geometricPrecision">
+  <defs>
+    <linearGradient id="darkPill" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#18181B"/>
+      <stop offset="100%" stop-color="#09090B"/>
+    </linearGradient>
+  </defs>
+  <rect x="0.75" y="0.75" width="136.5" height="36.5" rx="18.25" fill="url(#darkPill)" stroke="#2E2E32" stroke-width="1"/>
+  <rect x="20" y="1" width="98" height="1" rx="0.5" fill="rgba(255,255,255,0.14)"/>
+  <polygon points="21.5,14 29.5,19 21.5,24" fill="none" stroke="#A1A1AA" stroke-width="1.45" stroke-linejoin="round"/>
+  <text x="78" y="22.5" text-anchor="middle" fill="#FAFAFA" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="10.5" font-weight="700" letter-spacing="0.9">GOOGLE PLAY</text>
+</svg>

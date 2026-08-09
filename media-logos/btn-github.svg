@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108 38" width="108" height="38" text-rendering="geometricPrecision">
+  <defs>
+    <linearGradient id="darkPill" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#18181B"/>
+      <stop offset="100%" stop-color="#09090B"/>
+    </linearGradient>
+  </defs>
+  <rect x="0.75" y="0.75" width="106.5" height="36.5" rx="18.25" fill="url(#darkPill)" stroke="#2E2E32" stroke-width="1"/>
+  <rect x="18" y="1" width="72" height="1" rx="0.5" fill="rgba(255,255,255,0.14)"/>
+  <path d="M23.5 15l-3.5 4 3.5 4M30.5 15l3.5 4-3.5 4M28.2 14l-2.4 10" fill="none" stroke="#A1A1AA" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="64" y="22.5" text-anchor="middle" fill="#FAFAFA" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="10.5" font-weight="700" letter-spacing="0.9">GITHUB</text>
+</svg>

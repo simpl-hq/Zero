@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 364" width="1200" height="364" text-rendering="geometricPrecision">
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.032)" stroke-width="1"/>
+    </pattern>
+    <radialGradient id="topGlow" cx="50%" cy="0%" r="58%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.09"/>
+      <stop offset="55%" stop-color="#FFFFFF" stop-opacity="0.02"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="topGleam" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0"/>
+      <stop offset="50%" stop-color="#FFFFFF" stop-opacity="0.48"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+    <clipPath id="cardClip">
+      <rect x="1" y="1" width="1198" height="362" rx="24"/>
+    </clipPath>
+  </defs>
+
+  <rect x="1" y="1" width="1198" height="362" rx="24" fill="#000000" stroke="#1F1F1F" stroke-width="1.5"/>
+  <g clip-path="url(#cardClip)">
+    <rect width="1200" height="364" fill="url(#grid)"/>
+    <ellipse cx="600" cy="8" rx="520" ry="200" fill="url(#topGlow)"/>
+    <rect x="160" y="1" width="880" height="1.5" fill="url(#topGleam)"/>
+  </g>
+
+  <!-- Simpl. wordmark top-left -->
+  <g transform="translate(28, 22) scale(0.068)">
+    <path fill="#FFFFFF" fill-rule="nonzero" d="M555.29 534.76 C555.29 559.27 548.74 580.62 535.62 598.79 C522.51 616.96 504.12 630.5 480.46 639.42 C456.81 648.33 428.35 652.79 395.09 652.79 C356.52 652.79 321.2 646.28 289.14 633.25 L289.14 532.19 C304.57 543.5 321.63 552.63 340.32 559.57 C359 566.52 376.4 569.99 392.52 569.99 C404.69 569.99 414.12 567.8 420.8 563.43 C427.49 559.06 430.83 552.67 430.83 544.27 C430.83 538.27 429.16 533 425.82 528.46 C422.48 523.91 417.42 519.67 410.65 515.73 C403.88 511.79 391.32 506.39 372.97 499.53 C313.66 476.73 284 439.87 284 388.95 C284 353.29 297.54 324.79 324.63 303.45 C351.72 282.11 388.06 271.43 433.66 271.43 C446.52 271.43 458.35 271.95 469.15 272.98 C479.95 274.01 489.76 275.29 498.59 276.83 C507.42 278.38 519.81 281.29 535.75 285.58 L535.75 379.44 C504.72 362.47 474.21 353.98 444.21 353.98 C431.86 353.98 421.92 356.29 414.38 360.92 C406.83 365.55 403.06 371.9 403.06 379.95 C403.06 387.67 406.1 394.05 412.19 399.11 C418.28 404.17 431 410.73 450.38 418.78 C488.61 434.21 515.65 451.1 531.51 469.44 C547.37 487.78 555.29 509.56 555.29 534.76 Z M685.18 312.06 C685.18 327.49 679.56 340.01 668.33 349.61 C657.1 359.21 642.32 364.01 623.97 364.01 C606.15 364.01 591.53 359.04 580.13 349.09 C568.73 339.15 563.03 326.81 563.03 312.06 C563.03 296.98 568.56 284.76 579.62 275.42 C590.67 266.08 605.46 261.41 623.97 261.41 C642.32 261.41 657.1 266.08 668.33 275.42 C679.56 284.76 685.18 296.98 685.18 312.06 Z M569.2 646.36 L569.2 383.04 L678.75 383.04 L678.75 646.36 Z M1051.9 646.36 L1051.9 494.64 C1051.9 481.96 1049.62 472.48 1045.08 466.23 C1040.54 459.97 1033.12 456.84 1022.84 456.84 C1012.72 456.84 1004.84 460.66 999.18 468.28 C993.52 475.91 990.69 486.5 990.69 500.04 L990.69 646.36 L881.15 646.36 L881.15 497.21 C881.15 470.3 871.98 456.84 853.63 456.84 C842.49 456.84 834.09 460.74 828.43 468.54 C822.77 476.34 819.95 487.53 819.95 502.1 L819.95 646.36 L710.4 646.36 L710.4 383.04 L819.95 383.04 L819.95 424.7 L820.97 424.7 C825.09 417.33 831.65 409.83 840.65 402.2 C849.65 394.57 859.8 388.4 871.12 383.68 C882.43 378.97 894.69 376.61 907.89 376.61 C926.58 376.61 942.31 380.3 955.08 387.67 C967.85 395.04 978.52 406.7 987.09 422.64 C996.35 407.9 1008.69 396.54 1024.12 388.57 C1039.55 380.6 1056.7 376.61 1075.55 376.61 C1103.15 376.61 1124.33 385.61 1139.07 403.61 C1153.81 421.61 1161.19 447.58 1161.19 481.53 L1161.19 646.36 Z M1486.76 506.73 C1486.76 535.53 1481.87 560.99 1472.1 583.1 C1462.33 605.22 1448.53 622.36 1430.7 634.53 C1412.87 646.7 1392.81 652.79 1370.53 652.79 C1339.67 652.79 1316.27 641.56 1300.32 619.1 L1299.3 619.1 L1299.3 767.48 L1189.75 767.48 L1189.75 383.04 L1299.3 383.04 L1299.3 418.78 L1300.32 418.78 C1309.07 405.58 1320.38 395.25 1334.27 387.8 C1348.16 380.34 1363.93 376.61 1381.58 376.61 C1415.53 376.61 1441.54 387.92 1459.63 410.55 C1477.72 433.18 1486.76 465.24 1486.76 506.73 Z M1375.67 510.07 C1375.67 493.44 1372.46 480.41 1366.03 470.98 C1359.6 461.56 1349.7 456.84 1336.33 456.84 C1324.67 456.84 1315.24 461.81 1308.04 471.76 C1300.84 481.7 1297.24 495.33 1297.24 512.64 L1297.24 517.79 C1297.24 534.42 1300.32 547.7 1306.5 557.64 C1312.67 567.59 1321.93 572.56 1334.27 572.56 C1347.47 572.56 1357.67 567.12 1364.87 556.23 C1372.07 545.34 1375.67 529.96 1375.67 510.07 Z M1506.84 646.36 L1506.84 256.52 L1616.38 256.52 L1616.38 646.36 Z"/>
+    <circle cx="1700.8" cy="572.63" r="63.2" fill="#FFFFFF"/>
+  </g>
+
+  <!-- Display headline -->
+  <text x="600" y="136" text-anchor="middle" fill="#FFFFFF" font-family="'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="56" font-weight="900" letter-spacing="-2.2">Nothing to hide.</text>
+  <text x="600" y="196" text-anchor="middle" fill="#86868B" font-family="'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="56" font-weight="900" letter-spacing="-2.2">Everything to protect.</text>
+
+  <!-- Subtitle -->
+  <text x="600" y="240" text-anchor="middle" fill="#A1A1A6" font-family="'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="16.5" font-weight="400" letter-spacing="-0.2">Private messaging with no phone numbers, no emails, and no user accounts. Download and talk.</text>
+
+  <!-- Bottom 4-column spec bar -->
+  <rect x="44" y="272" width="1112" height="60" rx="16" fill="#0A0A0A" stroke="#1F1F1F" stroke-width="1"/>
+  <line x1="322" y1="285" x2="322" y2="319" stroke="#1F1F1F" stroke-width="1"/>
+  <line x1="600" y1="285" x2="600" y2="319" stroke="#1F1F1F" stroke-width="1"/>
+  <line x1="878" y1="285" x2="878" y2="319" stroke="#1F1F1F" stroke-width="1"/>
+
+  <text x="183" y="298" text-anchor="middle" fill="#FFFFFF" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" font-weight="700">0 IDENTIFIERS</text>
+  <text x="183" y="317" text-anchor="middle" fill="#86868B" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="10.5" letter-spacing="1.2">NO PHONE · NO ACCOUNT</text>
+
+  <text x="461" y="298" text-anchor="middle" fill="#FFFFFF" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" font-weight="700">SNTRUP761 + X448</text>
+  <text x="461" y="317" text-anchor="middle" fill="#86868B" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="10.5" letter-spacing="1.2">POST-QUANTUM RATCHET</text>
+
+  <text x="739" y="298" text-anchor="middle" fill="#FFFFFF" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" font-weight="700">ARGON2ID POW</text>
+  <text x="739" y="317" text-anchor="middle" fill="#86868B" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="10.5" letter-spacing="1.2">4-WORD · 6-DIGIT · LINK</text>
+
+  <text x="1017" y="298" text-anchor="middle" fill="#FFFFFF" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" font-weight="700">ZERO SERVER LOGS</text>
+  <text x="1017" y="317" text-anchor="middle" fill="#86868B" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="10.5" letter-spacing="1.2">STATELESS RELAYS</text>
+</svg>

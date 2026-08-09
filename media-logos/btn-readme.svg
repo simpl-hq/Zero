@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 110 38" width="110" height="38" text-rendering="geometricPrecision">
+  <defs>
+    <linearGradient id="darkPill" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#18181B"/>
+      <stop offset="100%" stop-color="#09090B"/>
+    </linearGradient>
+  </defs>
+  <rect x="0.75" y="0.75" width="108.5" height="36.5" rx="18.25" fill="url(#darkPill)" stroke="#2E2E32" stroke-width="1"/>
+  <rect x="18" y="1" width="74" height="1" rx="0.5" fill="rgba(255,255,255,0.14)"/>
+  <path d="M21.5 14.5h4.5c1 0 1.5.5 1.5 1.5v7.5c-.5-.5-1-.7-1.8-.7h-4.2zM27.5 16c0-1 .5-1.5 1.5-1.5h2v8.3h-2c-.8 0-1.3.2-1.5.7" fill="none" stroke="#A1A1AA" stroke-width="1.35" stroke-linejoin="round"/>
+  <text x="66" y="22.5" text-anchor="middle" fill="#FAFAFA" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="10.5" font-weight="700" letter-spacing="0.9">README</text>
+</svg>

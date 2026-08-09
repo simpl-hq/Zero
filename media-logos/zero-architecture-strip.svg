@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 190" width="1200" height="190">
+  <defs>
+    <linearGradient id="cardGleam" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0"/>
+      <stop offset="50%" stop-color="#FFFFFF" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Card 1 -->
+  <rect x="1" y="2" width="382" height="186" rx="22" fill="#0A0A0A" stroke="#1F1F1F" stroke-width="1.5"/>
+  <rect x="44" y="2" width="296" height="1" fill="url(#cardGleam)"/>
+  <text x="192" y="54" text-anchor="middle" fill="#FFFFFF" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="34" font-weight="800">100%</text>
+  <text x="192" y="84" text-anchor="middle" fill="#FFFFFF" font-family="'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="17" font-weight="700">Open Source</text>
+  <text x="192" y="104" text-anchor="middle" fill="#86868B" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="10.5" letter-spacing="1.1">AGPL-3.0 (FOSS)</text>
+  <text x="192" y="136" text-anchor="middle" fill="#A1A1A6" font-family="'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12.5">Client apps, messaging core, and broker code are</text>
+  <text x="192" y="155" text-anchor="middle" fill="#A1A1A6" font-family="'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12.5">public and inspectable on GitHub. Zero backdoors.</text>
+
+  <!-- Card 2 -->
+  <rect x="409" y="2" width="382" height="186" rx="22" fill="#0A0A0A" stroke="#1F1F1F" stroke-width="1.5"/>
+  <rect x="452" y="2" width="296" height="1" fill="url(#cardGleam)"/>
+  <text x="600" y="54" text-anchor="middle" fill="#FFFFFF" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="34" font-weight="800">0</text>
+  <text x="600" y="84" text-anchor="middle" fill="#FFFFFF" font-family="'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="17" font-weight="700">Data Collection</text>
+  <text x="600" y="104" text-anchor="middle" fill="#86868B" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="10.5" letter-spacing="1.1">NO ACCOUNTS · NO LOGS · NO TRACKERS</text>
+  <text x="600" y="136" text-anchor="middle" fill="#A1A1A6" font-family="'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12.5">No phone numbers, emails, or social graphs.</text>
+  <text x="600" y="155" text-anchor="middle" fill="#A1A1A6" font-family="'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12.5">Pairwise queues isolate every conversation.</text>
+
+  <!-- Card 3 -->
+  <rect x="817" y="2" width="382" height="186" rx="22" fill="#0A0A0A" stroke="#1F1F1F" stroke-width="1.5"/>
+  <rect x="860" y="2" width="296" height="1" fill="url(#cardGleam)"/>
+  <text x="1008" y="54" text-anchor="middle" fill="#FFFFFF" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="34" font-weight="800">GLOBAL</text>
+  <text x="1008" y="84" text-anchor="middle" fill="#FFFFFF" font-family="'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="17" font-weight="700">Instant Access</text>
+  <text x="1008" y="104" text-anchor="middle" fill="#86868B" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="10.5" letter-spacing="1.1">DESKTOP · IOS · ANDROID</text>
+  <text x="1008" y="136" text-anchor="middle" fill="#A1A1A6" font-family="'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12.5">Tap once to generate a 4-word phrase, 6-digit code,</text>
+  <text x="1008" y="155" text-anchor="middle" fill="#A1A1A6" font-family="'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12.5">or link—the app guides you through everything.</text>
+</svg>
