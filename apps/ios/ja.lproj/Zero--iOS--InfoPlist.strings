@@ -1,0 +1,15 @@
+/* Bundle name */
+"CFBundleName" = "Zero";
+
+/* Privacy - Camera Usage Description */
+"NSCameraUsageDescription" = "Zeroは他のユーザーに接続したりビデオ通話する際にQRコード読み取りのためにカメラにアクセスする必要があります。";
+
+/* Privacy - Face ID Usage Description */
+"NSFaceIDUsageDescription" = "Zeroはローカル認証にFace IDを使用します";
+
+/* Privacy - Microphone Usage Description */
+"NSMicrophoneUsageDescription" = "Zeroは音声通話やビデオ通話および音声メッセージの録音のためにマイクにアクセスする必要があります。";
+
+/* Privacy - Photo Library Additions Usage Description */
+"NSPhotoLibraryAddUsageDescription" = "Zeroはキャプチャおよび受信したメディアを保存するためにフォトライブラリにアクセスする必要があります";
+

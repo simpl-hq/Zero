@@ -1,0 +1,15 @@
+/* Bundle name */
+"CFBundleName" = "Zero";
+
+/* Privacy - Camera Usage Description */
+"NSCameraUsageDescription" = "Zero tarvitsee pääsyn kameraan, jotta se voi skannata QR-koodeja muodostaakseen yhteyden muihin käyttäjiin ja videopuheluita varten.";
+
+/* Privacy - Face ID Usage Description */
+"NSFaceIDUsageDescription" = "Zero käyttää Face ID:tä paikalliseen todennukseen";
+
+/* Privacy - Microphone Usage Description */
+"NSMicrophoneUsageDescription" = "Zero tarvitsee mikrofonia ääni- ja videopuheluita ja ääniviestien tallentamista varten.";
+
+/* Privacy - Photo Library Additions Usage Description */
+"NSPhotoLibraryAddUsageDescription" = "Zero tarvitsee pääsyn valokuvakirjastoon kuvattujen ja vastaanotettujen medioiden tallentamista varten";
+
