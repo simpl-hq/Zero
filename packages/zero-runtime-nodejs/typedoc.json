@@ -1,0 +1,14 @@
+{
+  "name": "zero-runtime",
+  "plugin": ["typedoc-plugin-markdown"],
+  "entryPoints": [
+    "./src/index.ts",
+    "../zero-runtime-client/types/typescript/src/index.ts"
+  ],
+  "entryPointStrategy": "expand",
+  "tsconfig": "./tsconfig.json",
+  "sourceLinkTemplate": "../{path}#L{line}",
+  "disableGit": true,
+  "flattenOutputFiles": true,
+  "out": "./docs"
+}
