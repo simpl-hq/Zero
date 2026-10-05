@@ -1,0 +1,11 @@
+{
+  "recommendations": [
+    "haskell.haskell",
+    "fwcd.kotlin",
+    "ms-python.python",
+    "ms-vscode.cpptools",
+    "swiftlang.swift-vscode",
+    "redhat.vscode-yaml",
+    "ms-azuretools.vscode-docker"
+  ]
+}

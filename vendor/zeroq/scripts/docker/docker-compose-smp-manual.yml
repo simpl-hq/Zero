@@ -1,0 +1,15 @@
+name: Zero - smp-server
+
+services:
+  smp-server:
+    image: ${ZERO_IMAGE:-simplhq/smp-server:latest}
+    environment:
+      WEB_MANUAL: ${WEB_MANUAL:-1}
+      ADDR: ${ADDR?"Please specify the domain."}
+      PASS: ${PASS:-}
+    volumes:
+      - ./smp_configs:/etc/opt/zero
+      - ./smp_state:/var/opt/zero
+    ports:
+      - 5223:5223
+    restart: unless-stopped

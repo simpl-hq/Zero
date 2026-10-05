@@ -1,0 +1,34 @@
+# syntax=docker/dockerfile:1.7.0-labs
+ARG DISTRO=ubuntu
+ARG TAG=24.04
+FROM ${DISTRO}:${TAG} AS build
+
+### Build stage
+
+ARG GHC=9.6.3
+ARG CABAL=3.14.1.1
+
+# Install curl, git, and zeroq dependencies
+RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
+    apt-get install -y ca-certificates curl libpq-dev git sqlite3 libsqlite3-dev build-essential libgmp-dev zlib1g-dev llvm llvm-dev libnuma-dev libssl-dev && \
+    rm -rf /var/lib/apt/lists/*
+
+# Specify bootstrap Haskell versions
+ENV BOOTSTRAP_HASKELL_GHC_VERSION=${GHC}
+ENV BOOTSTRAP_HASKELL_CABAL_VERSION=${CABAL}
+
+# Do not install Stack
+ENV BOOTSTRAP_HASKELL_INSTALL_NO_STACK=true
+ENV BOOTSTRAP_HASKELL_INSTALL_NO_STACK_HOOK=true
+
+# Install ghcup
+RUN curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | BOOTSTRAP_HASKELL_NONINTERACTIVE=1 sh
+
+# Adjust PATH
+ENV PATH="/root/.cabal/bin:/root/.ghcup/bin:$PATH"
+
+# Set both as default
+RUN ghcup set ghc "${GHC}" && \
+    ghcup set cabal "${CABAL}"
+
+WORKDIR /project

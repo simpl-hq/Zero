@@ -1,0 +1,35 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Broker: Run Unit Tests",
+      "type": "shell",
+      "command": "python -m unittest discover -s apps/zero-pin-broker -p \"test_*.py\" -v",
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Core: Build Haskell Runtime",
+      "type": "shell",
+      "command": "cabal build zero-runtime",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Multiplatform: Desktop Tests",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}/apps/multiplatform"
+      },
+      "command": "./gradlew :common:desktopTest",
+      "group": "test",
+      "problemMatcher": []
+    }
+  ]
+}
