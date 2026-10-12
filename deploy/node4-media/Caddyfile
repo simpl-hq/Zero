@@ -1,0 +1,13 @@
+# Caddy TLS reverse proxy (Media Relay) with access logs disabled.
+{
+	log {
+		output discard
+	}
+}
+
+zerocdn.simpl.global, zeromedia.simpl.global {
+	log {
+		output discard
+	}
+	respond "Zero Media & File Relay (NA) - XFTP on :5223, TURN on :3478/:5349" 200
+}

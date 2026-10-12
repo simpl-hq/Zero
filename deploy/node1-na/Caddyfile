@@ -1,0 +1,30 @@
+# Caddy TLS reverse proxy (NA Edge) with access logs disabled.
+{
+	log {
+		output discard
+	}
+}
+
+zeroapi.simpl.global, zerona.simpl.global {
+	log {
+		output discard
+	}
+	reverse_proxy 127.0.0.1:8000 {
+		header_up -X-Forwarded-For
+		header_up X-Real-IP {remote_host}
+	}
+}
+
+zerorelay.simpl.global {
+	log {
+		output discard
+	}
+	respond "Zero Edge Relay (NA) - connect over TLS on :5223" 200
+}
+
+zeroturn.simpl.global {
+	log {
+		output discard
+	}
+	respond "Zero TURN Edge (NA)" 200
+}

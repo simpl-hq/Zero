@@ -1,0 +1,37 @@
+# Node 1 (NA Edge): Caddy TLS proxy, FastAPI pin broker, and Coturn TURN relay.
+services:
+  caddy:
+    image: caddy:2.8-alpine
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+  zero-broker:
+    build:
+      context: ../../apps/zero-pin-broker
+    image: zero-identity-broker:latest
+    restart: unless-stopped
+    network_mode: host
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    env_file:
+      - .env
+    command: ["uvicorn", "main:app", "--host", "127.0.0.1", "--port", "8000", "--workers", "2", "--no-access-log"]
+
+  coturn:
+    image: coturn/coturn:4.6-alpine
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - ./turnserver.conf:/etc/coturn/turnserver.conf:ro
+      - caddy_data:/certs:ro
+    command: ["-c", "/etc/coturn/turnserver.conf"]
+
+volumes:
+  caddy_data:
+  caddy_config:

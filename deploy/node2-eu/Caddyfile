@@ -1,0 +1,40 @@
+# Caddy TLS reverse proxy (EU Edge) with access logs disabled.
+{
+	log {
+		output discard
+	}
+}
+
+zeroapi.simpl.global, zeroeu.simpl.global {
+	log {
+		output discard
+	}
+	reverse_proxy 127.0.0.1:8000 {
+		header_up -X-Forwarded-For
+		header_up X-Real-IP {remote_host}
+	}
+}
+
+zerorelay.simpl.global {
+	log {
+		output discard
+	}
+	respond "Zero Edge Relay (EU) - connect over TLS on :5223" 200
+}
+
+zeroturn.simpl.global {
+	log {
+		output discard
+	}
+	respond "Zero TURN Edge (EU)" 200
+}
+
+zerostatus.simpl.global {
+	log {
+		output discard
+	}
+	reverse_proxy 127.0.0.1:3001 {
+		header_up -X-Forwarded-For
+		header_up -X-Real-IP
+	}
+}
