@@ -27,7 +27,8 @@ ENV PATH="/root/.cabal/bin:/root/.ghcup/bin:$PATH"
 
 # Set both as default
 RUN ghcup set ghc "${BOOTSTRAP_HASKELL_GHC_VERSION}" && \
-    ghcup set cabal "${BOOTSTRAP_HASKELL_CABAL_VERSION}"
+    ghcup set cabal "${BOOTSTRAP_HASKELL_CABAL_VERSION}" && \
+    sed -i 's/-fuse-ld=gold//g' "$(ghc --print-libdir)/settings"
 
 # Copy only the source code
 COPY apps /project/apps/

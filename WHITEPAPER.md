@@ -8,6 +8,7 @@
   <a href="https://simpl.global"><img src="media-logos/btn-simpl-global.svg" alt="Website — simpl.global" height="38" /></a>
   <a href="README.md"><img src="media-logos/btn-readme.svg" alt="README" height="38" /></a>
   <a href="https://github.com/simpl-hq/zero/releases"><img src="media-logos/btn-releases.svg" alt="Releases" height="38" /></a>
+  <a href="https://simpl.global/donate"><img src="media-logos/btn-donate.svg" alt="Support Zero" height="38" /></a>
 </p>
 
 </div>
@@ -33,7 +34,7 @@ The evolution of secure messaging has largely solved the problem of message payl
 
 Modern end-to-end encrypted (E2EE) protocols successfully secure data in transit and at rest. However, the reliance on central directories to discover and route messages leaves a permanent trail of metadata. This metadata reveals *who* is talking to *whom*, *when*, and *how often*.
 
-Even advanced routing enhancements, such as "Sealed Sender" implementations, remain vulnerable to long-term traffic analysis and temporal correlation attacks. Zero was engineered from the ground up to solve this metadata crisis. Built on an identifier-free, asynchronous relay stack, Zero physicalizes privacy by discarding the centralized identity schema entirely.
+Even advanced routing enhancements, such as "Sealed Sender" implementations, remain vulnerable to long-term traffic analysis and temporal correlation attacks. Zero builds upon the open-source SimpleX unidirectional queue protocol (`AGPL-3.0`, Copyright © 2021–2026 SimpleX Chat Ltd; Zero extensions Copyright © 2026 Simpl LLC) and extends it with an Argon2id identifier-free pairing broker, ephemeral TURN credential isolation, and volatile-key relay architecture—discarding centralized identity schemas entirely.
 
 ## 2. The Zero-Identifier Identity Model
 
@@ -90,7 +91,11 @@ Statistical network analysis can deanonymize users by clustering message sizes. 
 
 ### 4.3 Memory-Hard Proof of Work
 
-To defend against infrastructure DoS attacks and automated contact-code scraping, Zero utilizes **Argon2id** (RFC 9106) with memory-hard parameters ($m=8\text{ MiB}, t=1, p=1$, 32-byte digest, $\pm 300\text{s}$ replay window) across iOS, Android, and Desktop clients during 4-word phrase and 6-digit pairing-code issuance. Memory-hard verification adds computational cost against GPU or ASIC abuse while remaining fast across mobile devices and client environments.
+To defend against infrastructure DoS attacks and automated contact-code scraping, Zero utilizes **Argon2id** (RFC 9106) with memory-hard parameters ($m=8\text{ MiB}, t=1, p=1$, 32-byte digest, 2 leading hex zeros / 8-bit difficulty $\approx 256$ hashes on average, $\pm 300\text{s}$ invite-bound replay window) across iOS, Android, and Desktop clients during 4-word phrase and 6-digit pairing-code issuance. Memory-hard verification adds computational cost against GPU or ASIC abuse while remaining responsive across mobile devices and client environments.
+
+### 4.4 Independent Audit Scope
+
+Zero's underlying `SMP`, `XFTP`, and `PQDR` cryptographic primitives build on the open-source SimpleX protocol stack (`AGPL-3.0`, independently audited upstream by Trail of Bits in 2022 and Cure53 in 2024). Simpl's `v1.0.0` extensions—including the ~1,360-line open-source [`apps/zero-pin-broker`](apps/zero-pin-broker) pairing service, native client `Argon2id` onboarding bridges, and 4-node volatile-storage cluster definitions—have **not yet undergone a separate independent third-party audit** and are published in full for community verification; see [`SECURITY.md`](SECURITY.md) for component-by-component details.
 
 ## 5. Media and Large Payload Routing
 
@@ -116,6 +121,12 @@ Zero represents a convergence of decentralized network theory and post-quantum c
 
 <div align="center">
 
-<sub>**Zero (`v1.0.0`)** · [simpl.global](https://simpl.global) · [Donate](https://simpl.global/donate) · [README](README.md) · [Releases](https://github.com/simpl-hq/zero/releases) · [CHANGELOG](CHANGELOG.md) · [CONTRIBUTING](CONTRIBUTING.md) · Licensed under [AGPL-3.0](LICENSE)</sub>
+<p>
+  <a href="https://simpl.global"><img src="media-logos/btn-simpl-global.svg" alt="Website — simpl.global" height="38" /></a>
+  <a href="README.md"><img src="media-logos/btn-readme.svg" alt="README" height="38" /></a>
+  <a href="https://simpl.global/donate"><img src="media-logos/btn-donate.svg" alt="Support Zero" height="38" /></a>
+</p>
+
+<sub>**© 2026 Simpl.** Zero (`v1.0.0`) is free software licensed under the [GNU Affero General Public License v3.0](LICENSE). · [simpl.global](https://simpl.global) · [Donate](https://simpl.global/donate) · [README](README.md) · [Releases](https://github.com/simpl-hq/zero/releases) · [CHANGELOG](CHANGELOG.md) · [CONTRIBUTING](CONTRIBUTING.md) · `support@simpl.global`</sub>
 
 </div>

@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
-
-# Host bootstrap script: Docker, WireGuard keys, swap, sysctl, journald limits, and UFW rules.
+# Baseline provisioning for Zero cluster nodes: runtime packages, volatile journald, Docker/WireGuard boot ordering, and UFW rules.
 
 set -euo pipefail
 

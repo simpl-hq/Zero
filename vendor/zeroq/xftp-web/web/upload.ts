@@ -17,6 +17,11 @@ const ENCRYPT_MIN_DISPLAY_MS = 1000
 export function initUpload(app: HTMLElement) {
   app.innerHTML = `
     <div class="card">
+      <div class="brand-lockup" aria-label="Zero by Simpl">
+        <span class="brand-mark" aria-hidden="true">Z</span>
+        <span class="brand-wordmark">ZERO</span>
+        <span class="brand-byline">BY SIMPL</span>
+      </div>
       <h1>${t('title', 'Zero File Transfer')}</h1>
       <div id="drop-zone" class="drop-zone">
         <p>${t('dropZone', 'Drag & drop a file here')}</p>
@@ -98,7 +103,7 @@ export function initUpload(app: HTMLElement) {
   }
 
   function showError(msg: string) {
-    errorMsg.innerHTML = msg
+    errorMsg.textContent = msg
     showStage(errorStage)
   }
 

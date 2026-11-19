@@ -3,17 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#000000">
+  <meta name="description" content="Secure, browser-encrypted file transfers from Zero by Simpl.">
   <meta http-equiv="Content-Security-Policy"
     content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval' __CSP_SCRIPT_HASHES__; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; connect-src 'self' __CSP_CONNECT_SRC__;">
   <title>Zero File Transfer</title>
   <link rel="stylesheet" href="./style.css">
 </head>
-<body>
+<body class="xftp-page">
   <!-- Placeholder HTML — styled by CSS immediately, replaced by JS when loaded.
        Eliminates Cumulative Layout Shift (CLS) for module-deferred scripts.
        Embedders should replicate this pattern inside their <div data-xftp-app>. -->
   <div id="app">
     <div class="card">
+      <div class="brand-lockup" aria-label="Zero by Simpl">
+        <span class="brand-mark" aria-hidden="true">Z</span>
+        <span class="brand-wordmark">ZERO</span>
+        <span class="brand-byline">BY SIMPL</span>
+      </div>
       <h1>Zero File Transfer</h1>
       <div class="drop-zone">
         <p>Drag &amp; drop a file here</p>
@@ -25,6 +32,11 @@
   </div>
   <template id="dl-placeholder">
     <div class="card">
+      <div class="brand-lockup" aria-label="Zero by Simpl">
+        <span class="brand-mark" aria-hidden="true">Z</span>
+        <span class="brand-wordmark">ZERO</span>
+        <span class="brand-byline">BY SIMPL</span>
+      </div>
       <h1>Zero File Transfer</h1>
       <div class="stage">
         <p>File available</p>

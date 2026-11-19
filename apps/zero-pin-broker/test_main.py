@@ -1,4 +1,4 @@
-# Unit tests for PoW replay protection, rate limits, code resolution, and TURN credentials.
+# Regression tests for Argon2id invite-bound PoW, EFF wordlist entropy, rate limiting, and TURN tokens.
 import os
 import time
 import unittest
@@ -6,18 +6,22 @@ from fastapi.testclient import TestClient
 from main import (
     app,
     POW_LEADING_HEX_ZEROS,
+    POW_LEADING_ZERO_BITS,
+    WORDLIST,
+    _EPHEMERAL_RL_KEY,
+    _has_leading_zero_bits,
     _mem_records,
     _mem_used_pow,
     _mem_rate_limits,
+    _rate_limit_hmac_key,
     compute_argon2id_pow,
 )
 
-def solve_argon2id_pow_for_test(ip: str, ts: int) -> str:
-    prefix = "0" * POW_LEADING_HEX_ZEROS
+def solve_argon2id_pow_for_test(invite_url: str, ts: int) -> str:
     nonce = 0
     while True:
-        digest = compute_argon2id_pow(ip, str(nonce), ts)
-        if digest.hex().startswith(prefix):
+        digest = compute_argon2id_pow(invite_url, str(nonce), ts)
+        if _has_leading_zero_bits(digest, POW_LEADING_ZERO_BITS):
             return str(nonce)
         nonce += 1
 
@@ -38,10 +42,15 @@ class ZeroIdentityBrokerTests(unittest.TestCase):
             self.assertEqual(resp.headers.get("X-Frame-Options"), "DENY")
             self.assertEqual(resp.headers.get("Referrer-Policy"), "no-referrer")
 
+    def test_eff_7776_wordlist_integrity(self):
+        self.assertEqual(len(WORDLIST), 7776)
+        self.assertEqual(len({w.lower() for w in WORDLIST}), 7776)
+        self.assertTrue(all(w.isalpha() and w.isascii() for w in WORDLIST))
+
     def test_4word_phrase_and_deeplink_roundtrip(self):
         ts = int(time.time())
-        nonce = solve_argon2id_pow_for_test("127.0.0.1", ts)
-        invite = "zero:/contact#/?v=2-7&smp=smp%3A%2F%2Fsmp1.simpl.global"
+        invite = "zero:/contact#/?v=2-7&smp=smp%3A%2F%2Fzerorelay.simpl.global:5223"
+        nonce = solve_argon2id_pow_for_test(invite, ts)
         res = self.client.post(
             "/api/v1/identity/phrase",
             json={"invite_url": invite, "nonce": nonce, "timestamp": ts},
@@ -65,8 +74,8 @@ class ZeroIdentityBrokerTests(unittest.TestCase):
 
     def test_ephemeral_6digit_code_roundtrip(self):
         ts = int(time.time())
-        nonce = solve_argon2id_pow_for_test("127.0.0.1", ts)
-        invite = "zero:/contact#/?v=2-7&smp=smp%3A%2F%2Fsmp1.simpl.global"
+        invite = "zero:/contact#/?v=2-7&smp=smp%3A%2F%2Fzerorelay.simpl.global:5223"
+        nonce = solve_argon2id_pow_for_test(invite, ts)
         res = self.client.post(
             "/api/v1/identity/ephemeral",
             json={"invite_url": invite, "nonce": nonce, "timestamp": ts},
@@ -86,9 +95,10 @@ class ZeroIdentityBrokerTests(unittest.TestCase):
 
     def test_replay_argon2id_pow_rejected(self):
         ts = int(time.time())
-        nonce = solve_argon2id_pow_for_test("127.0.0.1", ts)
+        invite = "zero:/contact#/?v=2-7"
+        nonce = solve_argon2id_pow_for_test(invite, ts)
         payload = {
-            "invite_url": "zero:/contact#/?v=2-7",
+            "invite_url": invite,
             "nonce": nonce,
             "timestamp": ts,
         }
@@ -98,21 +108,34 @@ class ZeroIdentityBrokerTests(unittest.TestCase):
         replay = self.client.post("/api/v1/identity/phrase", json=payload)
         self.assertEqual(replay.status_code, 429)
 
+    def test_pow_bound_to_invite_url_prevents_tampering(self):
+        ts = int(time.time())
+        invite_a = "zero:/contact#/?v=2-7&a=1"
+        invite_b = "zero:/contact#/?v=2-7&b=2"
+        nonce = solve_argon2id_pow_for_test(invite_a, ts)
+        res = self.client.post(
+            "/api/v1/identity/phrase",
+            json={"invite_url": invite_b, "nonce": nonce, "timestamp": ts},
+        )
+        self.assertEqual(res.status_code, 429)
+
     def test_expired_timestamp_rejected(self):
         stale_ts = int(time.time()) - 600
-        nonce = solve_argon2id_pow_for_test("127.0.0.1", stale_ts)
+        invite = "zero:/contact#/?v=2-7"
+        nonce = solve_argon2id_pow_for_test(invite, stale_ts)
         res = self.client.post(
             "/api/v1/identity/ephemeral",
-            json={"invite_url": "zero:/contact#/?v=2-7", "nonce": nonce, "timestamp": stale_ts},
+            json={"invite_url": invite, "nonce": nonce, "timestamp": stale_ts},
         )
         self.assertEqual(res.status_code, 429)
 
     def test_invalid_scheme_rejected(self):
         ts = int(time.time())
-        nonce = solve_argon2id_pow_for_test("127.0.0.1", ts)
+        invite = "javascript:alert(1)"
+        nonce = solve_argon2id_pow_for_test(invite, ts)
         res = self.client.post(
             "/api/v1/identity/phrase",
-            json={"invite_url": "javascript:alert(1)", "nonce": nonce, "timestamp": ts},
+            json={"invite_url": invite, "nonce": nonce, "timestamp": ts},
         )
         self.assertEqual(res.status_code, 400)
 
@@ -141,6 +164,18 @@ class ZeroIdentityBrokerTests(unittest.TestCase):
         try:
             res = self.client.get("/api/v1/turn/credentials")
             self.assertEqual(res.status_code, 503)
+            self.assertEqual(_rate_limit_hmac_key(), _EPHEMERAL_RL_KEY)
+        finally:
+            os.environ.pop("TURN_AUTH_SECRET", None)
+
+    def test_shared_worker_rate_limit_hmac_key(self):
+        os.environ["TURN_AUTH_SECRET"] = "shared-cluster-turn-secret"
+        try:
+            k1 = _rate_limit_hmac_key()
+            k2 = _rate_limit_hmac_key()
+            self.assertEqual(len(k1), 32)
+            self.assertEqual(k1, k2)
+            self.assertNotEqual(k1, _EPHEMERAL_RL_KEY)
         finally:
             os.environ.pop("TURN_AUTH_SECRET", None)
 

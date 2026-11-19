@@ -3198,14 +3198,12 @@ processSMPTransmissions c@AgentClient {subQ} (tSess@(userId, srv, _), THandlePar
                           confId <- withStore c $ \db -> do
                             setConnAgentVersion db connId agentVersion
                             when (pqSupport /= pqSupport') $ setConnPQSupport db connId pqSupport'
-                            --/
                             liftIO $ do
                               createRatchet db connId rc'
                               let RcvQueue {smpClientVersion = v, e2ePrivKey = e2ePrivKey'} = rq
                                   SMPConfirmation {smpClientVersion = v', e2ePubKey = e2ePubKey'} = senderConf
                                   dhSecret = C.dh' e2ePubKey' e2ePrivKey'
                               setRcvQueueConfirmedE2E db rq dhSecret $ min v v'
-                            --/
                             createConfirmation db g newConfirmation
                           let srvs = map qServer $ smpReplyQueues senderConf
                           notify $ CONF confId pqSupport' srvs connInfo

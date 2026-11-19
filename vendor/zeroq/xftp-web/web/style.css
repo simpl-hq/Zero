@@ -1,145 +1,263 @@
-#app, [data-xftp-app] {
-  font-family: system-ui, -apple-system, sans-serif;
-  color: #333;
-  width: 100%;
-  max-width: 480px;
-  padding: 16px;
+.xftp-page {
+  display: grid;
+  min-width: 320px;
+  min-height: 100vh;
+  min-height: 100svh;
+  place-items: center;
   box-sizing: border-box;
-  --xftp-ring-fg: #3b82f6;
+  padding: clamp(16px, 4vw, 40px);
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(255, 255, 255, .055), transparent 42%),
+    #000;
+  color: #f5f5f7;
+}
+
+.xftp-page #app,
+[data-xftp-app] {
+  --xftp-surface: #0a0a0a;
+  --xftp-surface-raised: #111113;
+  --xftp-border: #29292d;
+  --xftp-text: #f5f5f7;
+  --xftp-muted: #a1a1a6;
+  --xftp-subtle: #86868b;
+  --xftp-accent: #fff;
+  --xftp-ring-bg: #29292d;
+  --xftp-ring-fg: #fff;
+  --xftp-ring-text: #f5f5f7;
+  --xftp-ring-done: #4ade80;
+  width: 100%;
+  max-width: 520px;
+  margin: auto;
+  box-sizing: border-box;
+  color: var(--xftp-text);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+:is(#app, [data-xftp-app]) *,
+:is(#app, [data-xftp-app]) *::before,
+:is(#app, [data-xftp-app]) *::after {
+  box-sizing: border-box;
 }
 
 :is(#app, [data-xftp-app]) .card {
-  background: #fff;
-  border-radius: 12px;
-  padding: 32px 24px;
-  box-shadow: 0 1px 3px rgba(0,0,0,.1);
+  padding: clamp(24px, 6vw, 40px);
+  overflow: hidden;
+  border: 1px solid var(--xftp-border);
+  border-radius: 24px;
+  background: linear-gradient(160deg, #101012, var(--xftp-surface) 40%);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, .45);
   text-align: center;
 }
 
-:is(#app, [data-xftp-app]) h1 {
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin-bottom: 24px;
+:is(#app, [data-xftp-app]) .brand-lockup {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  margin: 0 auto 30px;
 }
 
-:is(#app, [data-xftp-app]) .stage { margin-top: 16px; }
-
-/* Drop zone */
-:is(#app, [data-xftp-app]) .drop-zone {
-  border: 2px dashed #ccc;
-  border-radius: 8px;
-  padding: 32px 16px;
-  transition: border-color .15s, background .15s;
-}
-:is(#app, [data-xftp-app]) .drop-zone.drag-over {
-  border-color: #3b82f6;
-  background: #eff6ff;
-}
-
-/* Buttons */
-:is(#app, [data-xftp-app]) .btn {
-  display: inline-block;
-  padding: 10px 24px;
-  border: none;
-  border-radius: 6px;
-  background: #3b82f6;
+:is(#app, [data-xftp-app]) .brand-mark {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border: 1px solid #52525b;
+  border-radius: 9px;
   color: #fff;
-  font-size: .9rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background .15s;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 15px;
+  font-weight: 700;
 }
-:is(#app, [data-xftp-app]) .btn:hover { background: #2563eb; }
-:is(#app, [data-xftp-app]) .btn-secondary { background: #6b7280; }
-:is(#app, [data-xftp-app]) .btn-secondary:hover { background: #4b5563; }
 
-/* Hints */
-:is(#app, [data-xftp-app]) .hint { color: #999; font-size: .85rem; margin-top: 8px; }
-:is(#app, [data-xftp-app]) .expiry { margin-top: 12px; }
+:is(#app, [data-xftp-app]) .brand-wordmark {
+  color: #fff;
+  font-size: 14px;
+  font-weight: 750;
+  letter-spacing: .16em;
+}
 
-/* Progress */
-:is(#app, [data-xftp-app]) .progress-ring { display: block; margin: 0 auto 12px; }
-:is(#app, [data-xftp-app]) #upload-status,
-:is(#app, [data-xftp-app]) #dl-status { font-size: .9rem; color: #666; margin-bottom: 12px; }
+:is(#app, [data-xftp-app]) .brand-byline {
+  align-self: flex-end;
+  padding-bottom: 2px;
+  color: var(--xftp-subtle);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 9px;
+  letter-spacing: .12em;
+}
 
-/* Share link row */
+:is(#app, [data-xftp-app]) h1 {
+  margin: 0 0 24px;
+  color: var(--xftp-text);
+  font-size: clamp(1.35rem, 5vw, 1.65rem);
+  font-weight: 650;
+  letter-spacing: -.035em;
+  line-height: 1.2;
+}
+
+:is(#app, [data-xftp-app]) .stage {
+  margin-top: 20px;
+}
+
+:is(#app, [data-xftp-app]) .drop-zone {
+  padding: 32px 18px;
+  border: 1px dashed #52525b;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, .015);
+  transition: border-color .18s ease, background-color .18s ease;
+}
+
+:is(#app, [data-xftp-app]) .drop-zone.drag-over {
+  border-color: #fff;
+  background: rgba(255, 255, 255, .07);
+}
+
+:is(#app, [data-xftp-app]) .btn {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  padding: 11px 22px;
+  border: 1px solid #fff;
+  border-radius: 999px;
+  background: #fff;
+  color: #000;
+  font: inherit;
+  font-size: .88rem;
+  font-weight: 700;
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform .16s ease, background-color .16s ease, border-color .16s ease;
+}
+
+:is(#app, [data-xftp-app]) .btn:hover {
+  transform: translateY(-1px);
+  background: #e4e4e7;
+  border-color: #e4e4e7;
+}
+
+:is(#app, [data-xftp-app]) .btn:active {
+  transform: translateY(0);
+}
+
+:is(#app, [data-xftp-app]) .btn-secondary {
+  border-color: var(--xftp-border);
+  background: var(--xftp-surface-raised);
+  color: var(--xftp-text);
+}
+
+:is(#app, [data-xftp-app]) .btn-secondary:hover {
+  border-color: #52525b;
+  background: #1c1c1f;
+}
+
+:is(#app, [data-xftp-app]) :is(button, a, input, label[for]):focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+
+:is(#app, [data-xftp-app]) .hint {
+  margin: 9px 0 0;
+  color: var(--xftp-subtle);
+  font-size: .82rem;
+}
+
+:is(#app, [data-xftp-app]) .expiry {
+  margin-top: 14px;
+}
+
+:is(#app, [data-xftp-app]) .progress-ring {
+  display: block;
+  margin: 0 auto 16px;
+}
+
+:is(#app, [data-xftp-app]) :is(#upload-status, #dl-status) {
+  margin: 0 0 16px;
+  color: var(--xftp-muted);
+  font-size: .9rem;
+}
+
 :is(#app, [data-xftp-app]) .link-row {
   display: flex;
   gap: 8px;
-  margin-top: 12px;
+  margin-top: 16px;
 }
+
 :is(#app, [data-xftp-app]) .link-row input {
+  min-width: 0;
   flex: 1;
-  padding: 8px 10px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: .85rem;
-  background: #f9fafb;
+  padding: 0 12px;
+  border: 1px solid var(--xftp-border);
+  border-radius: 12px;
+  background: var(--xftp-surface-raised);
+  color: var(--xftp-text);
+  font: 500 .78rem ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
-/* Upload link */
 :is(#app, [data-xftp-app]) .upload-link {
-  margin-top: 12px;
-  color: #3b82f6;
-  font-size: .9rem;
-  text-decoration: none;
-  cursor: pointer;
-}
-:is(#app, [data-xftp-app]) .upload-link:not([hidden]) {
   display: inline-block;
+  margin-top: 14px;
+  color: var(--xftp-text);
+  font-size: .9rem;
+  text-decoration-color: #86868b;
+  text-underline-offset: 4px;
 }
-:is(#app, [data-xftp-app]) .upload-link:hover { text-decoration: underline; }
 
-/* Messages */
-:is(#app, [data-xftp-app]) .success { color: #16a34a; font-weight: 600; }
-:is(#app, [data-xftp-app]) .error { color: #dc2626; font-weight: 500; margin-bottom: 12px; }
+:is(#app, [data-xftp-app]) .success {
+  color: #4ade80;
+  font-weight: 650;
+}
 
-/* Security note */
+:is(#app, [data-xftp-app]) .error {
+  margin: 0 0 16px;
+  color: #fca5a5;
+  font-size: .9rem;
+  overflow-wrap: anywhere;
+}
+
 :is(#app, [data-xftp-app]) .security-note {
-  margin-top: 20px;
-  padding: 12px;
-  background: #f0fdf4;
-  border-radius: 6px;
-  font-size: .8rem;
-  color: #555;
+  margin-top: 24px;
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, .07);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, .035);
+  color: var(--xftp-muted);
+  font-size: .78rem;
+  line-height: 1.55;
   text-align: left;
 }
-:is(#app, [data-xftp-app]) .security-note p + p { margin-top: 6px; }
-:is(#app, [data-xftp-app]) .security-note a { color: #3b82f6; text-decoration: none; }
-:is(#app, [data-xftp-app]) .security-note a:hover { text-decoration: underline; }
 
-/* ── Dark mode ─────────────────────────────────── */
-.dark :is(#app, [data-xftp-app]) {
-  color: #e5e7eb;
-  --xftp-ring-bg: #374151;
-  --xftp-ring-fg: #60a5fa;
-  --xftp-ring-text: #e5e7eb;
-  --xftp-ring-done: #4ade80;
+:is(#app, [data-xftp-app]) .security-note p {
+  margin: 0;
 }
-.dark :is(#app, [data-xftp-app]) .card {
-  background: #1f2937;
-  box-shadow: 0 1px 3px rgba(0,0,0,.4);
+
+:is(#app, [data-xftp-app]) .security-note p + p {
+  margin-top: 8px;
 }
-.dark :is(#app, [data-xftp-app]) .drop-zone { border-color: #4b5563; }
-.dark :is(#app, [data-xftp-app]) .drop-zone.drag-over {
-  border-color: #60a5fa;
-  background: rgba(59,130,246,.15);
+
+:is(#app, [data-xftp-app]) .security-note a {
+  color: var(--xftp-text);
+  text-decoration-color: #86868b;
+  text-underline-offset: 3px;
 }
-.dark :is(#app, [data-xftp-app]) .btn-secondary { background: #4b5563; }
-.dark :is(#app, [data-xftp-app]) .btn-secondary:hover { background: #374151; }
-.dark :is(#app, [data-xftp-app]) .hint { color: #9ca3af; }
-.dark :is(#app, [data-xftp-app]) #upload-status,
-.dark :is(#app, [data-xftp-app]) #dl-status { color: #9ca3af; }
-.dark :is(#app, [data-xftp-app]) .link-row input {
-  background: #374151;
-  border-color: #4b5563;
-  color: #e5e7eb;
+
+@media (max-width: 380px) {
+  :is(#app, [data-xftp-app]) .link-row {
+    flex-direction: column;
+  }
+
+  :is(#app, [data-xftp-app]) .link-row input {
+    min-height: 44px;
+  }
 }
-.dark :is(#app, [data-xftp-app]) .success { color: #4ade80; }
-.dark :is(#app, [data-xftp-app]) .error { color: #f87171; }
-.dark :is(#app, [data-xftp-app]) .security-note {
-  background: rgba(34,197,94,.1);
-  color: #d1d5db;
+
+@media (prefers-reduced-motion: reduce) {
+  :is(#app, [data-xftp-app]) *,
+  :is(#app, [data-xftp-app]) *::before,
+  :is(#app, [data-xftp-app]) *::after {
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+  }
 }
-.dark :is(#app, [data-xftp-app]) .upload-link { color: #60a5fa; }
-.dark :is(#app, [data-xftp-app]) .security-note a { color: #60a5fa; }

@@ -45,10 +45,14 @@ function initApp() {
 
 ;(window as any).__xftp_initApp = async () => { await wasmReady; initApp() }
 
-main().catch(err => {
+main().catch(error => {
   const app = getAppElement()
   if (app) {
-    app.innerHTML = `<div class="error"><p>${t('initError', 'Failed to initialize: %error%').replace('%error%', err.message)}</p></div>`
+    const message = error instanceof Error ? error.message : String(error)
+    const errorMessage = document.createElement('p')
+    errorMessage.className = 'error'
+    errorMessage.textContent = t('initError', 'Failed to initialize: %error%').replace('%error%', message)
+    app.replaceChildren(errorMessage)
   }
-  console.error(err)
+  console.error(error)
 })

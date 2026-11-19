@@ -8,9 +8,9 @@ name:           zero-runtime
 version:        1.0.0.0
 category:       Web, System, Services, Cryptography
 homepage:       https://github.com/simpl-hq/zero#readme
-author:         Simpl
+author:         SimpleX Chat Ltd, Simpl LLC
 maintainer:     support@simpl.global
-copyright:      2026 Zero
+copyright:      2021-2026 SimpleX Chat Ltd, 2026 Simpl LLC
 license:        AGPL-3
 license-file:   LICENSE
 build-type:     Simple

@@ -46,8 +46,8 @@ validateServersTest = describe "validate user servers" $ do
     validateUserServers [invalidNoStorage] [] `shouldBe` ([USEStorageMissing aSMP Nothing], [])
   it "should fail with duplicate host" $ do
     validateUserServers [invalidDuplicateSrv] []
-      `shouldBe` ( [ USEDuplicateServer aSMP "smp://0YuTwO05YJWS8rkjn9eLJDjQhFKvIYd8d4xG8X1blIU=@smp8.zero.im,beccx4yfxxbvyhqypaavemqurytl6hozr47wfc7uuecacjqdvwpw2xid.onion" "smp8.zero.im",
-                     USEDuplicateServer aSMP "smp://abcd@smp8.zero.im" "smp8.zero.im"
+      `shouldBe` ( [ USEDuplicateServer aSMP "smp://0YuTwO05YJWS8rkjn9eLJDjQhFKvIYd8d4xG8X1blIU=@smp8.simpl.global,beccx4yfxxbvyhqypaavemqurytl6hozr47wfc7uuecacjqdvwpw2xid.onion" "smp8.simpl.global",
+                     USEDuplicateServer aSMP "smp://abcd@smp8.simpl.global" "smp8.simpl.global"
                    ],
                    []
                  )
@@ -184,7 +184,7 @@ perServerRolesTest = describe "per-server roles" $ do
     selfHostedSMP :: ServerRolesOverride -> NewUserServer 'PSMP
     selfHostedSMP r = (newUserServer "smp://abcd@self.example.com" :: NewUserServer 'PSMP) {roles = r}
     opMatchedSMP :: ServerRolesOverride -> NewUserServer 'PSMP
-    opMatchedSMP r = (newUserServer "smp://abcd@smp8.zero.im" :: NewUserServer 'PSMP) {roles = r}
+    opMatchedSMP r = (newUserServer "smp://abcd@smp8.simpl.global" :: NewUserServer 'PSMP) {roles = r}
     selfHostedUser :: ServerRolesOverride -> UpdatedUserOperatorServers
     selfHostedUser r =
       UpdatedUserOperatorServers
@@ -235,7 +235,7 @@ invalidNoStorage =
 invalidDuplicateSrv :: UpdatedUserOperatorServers
 invalidDuplicateSrv =
   (valid :: UpdatedUserOperatorServers)
-    { smpServers = map (AUS SDBNew) $ zeroChatSMPServers <> [presetServer True "smp://abcd@smp8.zero.im"]
+    { smpServers = map (AUS SDBNew) $ zeroChatSMPServers <> [presetServer True "smp://abcd@smp8.simpl.global"]
     }
 
 invalidNoChatRelays :: UpdatedUserOperatorServers
@@ -244,14 +244,14 @@ invalidNoChatRelays = (valid :: UpdatedUserOperatorServers) {chatRelays = []}
 duplicateChatRelayName :: UpdatedUserOperatorServers
 duplicateChatRelayName =
   (valid :: UpdatedUserOperatorServers)
-    { chatRelays = map (AUCR SDBNew) $ zeroChatRelays <> [presetChatRelay True (mkRelayProfile "chat_relay_1" Nothing) ["zero.im"] (either error id $ strDecode "https://smp444.zero.im/r#Pz9qz7ZVljMofoRxiDDpL_w2DZSazK8IgafxqnWKv6Y")]
+    { chatRelays = map (AUCR SDBNew) $ zeroChatRelays <> [presetChatRelay True (mkRelayProfile "chat_relay_1" Nothing) ["simpl.global"] (either error id $ strDecode "https://smp444.simpl.global/r#Pz9qz7ZVljMofoRxiDDpL_w2DZSazK8IgafxqnWKv6Y")]
     }
 
 invalidDuplicateChatRelayAddress :: UpdatedUserOperatorServers
 invalidDuplicateChatRelayAddress =
   (valid :: UpdatedUserOperatorServers)
-    { chatRelays = map (AUCR SDBNew) $ zeroChatRelays <> [presetChatRelay True (mkRelayProfile "chat_relay_4" Nothing) ["zero.im"] duplicateAddr]
+    { chatRelays = map (AUCR SDBNew) $ zeroChatRelays <> [presetChatRelay True (mkRelayProfile "chat_relay_4" Nothing) ["simpl.global"] duplicateAddr]
     }
 
 duplicateAddr :: ShortLinkContact
-duplicateAddr = either error id $ strDecode "https://smp6.zero.im/r#_qlQfogHGDJ8MAF2wKmkglRBM-xHR142gDJstKiGRQQ"
+duplicateAddr = either error id $ strDecode "https://smp6.simpl.global/r#_qlQfogHGDJ8MAF2wKmkglRBM-xHR142gDJstKiGRQQ"

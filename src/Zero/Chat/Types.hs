@@ -1382,7 +1382,7 @@ memberPending m = case memberStatus m of
 memberCurrentOrPending :: GroupMember -> Bool
 memberCurrentOrPending m = memberCurrent m || memberPending m
 
---***
+-- ***
 memberCurrent' :: GroupMemberStatus -> Bool
 memberCurrent' = \case
   GSMemRejected -> False

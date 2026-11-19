@@ -11,9 +11,9 @@ description:    Messaging server, client, and agent library for Zero:
                 See <https://github.com/simpl-hq/zero> for the Zero repository.
 category:       Chat, Network, Web, System, Cryptography
 homepage:       https://github.com/simpl-hq/zero#readme
-author:         Simpl
+author:         SimpleX Chat Ltd, Simpl LLC
 maintainer:     support@simpl.global
-copyright:      2026 Simpl / Zero
+copyright:      2021-2026 SimpleX Chat Ltd, 2026 Simpl LLC
 license:        AGPL-3.0-only
 license-file:   LICENSE
 build-type:     Simple

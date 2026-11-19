@@ -17,8 +17,16 @@ export function initDownload(app: HTMLElement, hash: string) {
   let fd: ReturnType<typeof decodeDescriptionURI>
   try {
     fd = decodeDescriptionURI(hash)
-  } catch (err: any) {
-    app.innerHTML = `<div class="card"><p class="error">${t('invalidLink', 'Invalid or corrupted link.')}</p></div>`
+  } catch {
+    app.innerHTML = `
+      <div class="card">
+        <div class="brand-lockup" aria-label="Zero by Simpl">
+          <span class="brand-mark" aria-hidden="true">Z</span>
+          <span class="brand-wordmark">ZERO</span>
+          <span class="brand-byline">BY SIMPL</span>
+        </div>
+        <p class="error">${t('invalidLink', 'Invalid or corrupted link.')}</p>
+      </div>`
     return
   }
 
@@ -27,6 +35,11 @@ export function initDownload(app: HTMLElement, hash: string) {
   const size = fd.redirect ? fd.redirect.size : fd.size
   app.innerHTML = `
     <div class="card">
+      <div class="brand-lockup" aria-label="Zero by Simpl">
+        <span class="brand-mark" aria-hidden="true">Z</span>
+        <span class="brand-wordmark">ZERO</span>
+        <span class="brand-byline">BY SIMPL</span>
+      </div>
       <h1>${t('title', 'Zero File Transfer')}</h1>
       <div id="dl-ready" class="stage">
         <p>${t('fileAvailable', 'File available (~%size%)').replace('%size%', formatSize(size))}</p>
@@ -64,7 +77,7 @@ export function initDownload(app: HTMLElement, hash: string) {
   }
 
   function showError(msg: string) {
-    errorMsg.innerHTML = msg
+    errorMsg.textContent = msg
     showStage(errorStage)
   }
 

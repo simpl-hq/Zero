@@ -29,12 +29,12 @@ Installers and direct binaries are published via **[simpl.global](https://simpl.
 
 | Platform | Target | Channels |
 | :--- | :--- | :--- |
-| **`iOS`** | `iPhone & iPad` | App Store *(pending review)* · [simpl.global](https://simpl.global) · [GitHub Releases](https://github.com/simpl-hq/zero/releases) |
-| **`Android`** | `ARM64 / ARMv7` | [Direct APK](https://github.com/simpl-hq/zero/releases) · Google Play *(pending review)* · [F-Droid](https://simpl.global) · [simpl.global](https://simpl.global) |
-| **`macOS`** | `Apple Silicon & Intel` | [simpl.global](https://simpl.global) · [GitHub Releases (`.dmg`)](https://github.com/simpl-hq/zero/releases) |
-| **`Windows`** | `Windows 10 / 11 x64` | [simpl.global](https://simpl.global) · [GitHub Releases (`.msi`)](https://github.com/simpl-hq/zero/releases) |
-| **`Linux`** | `x86_64 / aarch64` | [simpl.global](https://simpl.global) · [GitHub Releases (`AppImage` / `.deb`)](https://github.com/simpl-hq/zero/releases) |
-| **`CLI`** | `macOS / Linux / Windows` | [GitHub Releases](https://github.com/simpl-hq/zero/releases) |
+| **`iOS`** | `iPhone & iPad` | [Universal IPA (sideload)](https://github.com/simpl-hq/Zero/releases) · App Store *(pending review)* · [simpl.global](https://simpl.global) |
+| **`Android`** | `ARM64 / ARMv7` | [Signed APK](https://github.com/simpl-hq/Zero/releases) · Google Play *(pending review)* · [F-Droid](https://simpl.global) · [simpl.global](https://simpl.global) |
+| **`macOS`** | `Apple Silicon & Intel` | [simpl.global](https://simpl.global) · [GitHub Releases (`.dmg`)](https://github.com/simpl-hq/Zero/releases) |
+| **`Windows`** | `Windows 10 / 11 x64` | [simpl.global](https://simpl.global) · [GitHub Releases (`Setup .exe` / `.msi`)](https://github.com/simpl-hq/Zero/releases) |
+| **`Linux`** | `x86_64 / aarch64` | [simpl.global](https://simpl.global) · [GitHub Releases (`AppImage` / `.deb`)](https://github.com/simpl-hq/Zero/releases) |
+| **`CLI`** | `macOS / Linux / Windows` | [GitHub Releases](https://github.com/simpl-hq/Zero/releases) |
 
 ---
 
@@ -55,7 +55,7 @@ Zero has no centralized identity database, no phone numbers, and no persistent u
 Zero's threat model assumes network links and relay servers may be hostile:
 
 - **Post-Quantum E2EE:** Augmented Post-Quantum Double Ratchet (`Curve448` + `sntrup761` KEM per ratchet step), `16 KB` fixed-size message padding, and chunked `XFTP` encrypted file transfers (`NaCl secret_box` + `SHA-512` digest verification).
-- **Transport & Key Verification:** `TLS 1.3` with SPKI certificate pinning (`SMP` / `XFTP`), `Ed25519` signatures, `Argon2id` anti-spam proof-of-work, and out-of-band contact security-code verification to defeat MitM attacks.
+- **Transport & Key Verification:** `TLS 1.3` with SPKI certificate pinning across both `SMP`/`XFTP` relays and default `simpl.global` discovery endpoints (`zeroapi`/`zeroeu`/`zerona`), optional/self-hostable or disableable broker (`ZeroDirectoryUrl = off`), `Ed25519` signatures, 10-bit `Argon2id` anti-spam proof-of-work, and out-of-band contact security-code verification to defeat first-contact MitM attacks.
 - **Endpoint Scope:** Protocol and relay cryptography protect data in transit and at rest inside local encrypted storage, but **cannot** protect plaintext if an attacker gains physical access to an unlocked device or root access to the host OS—enable Face ID / App Lock / database passphrase inside Settings.
 
 ### Self-Hosting & Contributing
@@ -65,11 +65,12 @@ Zero's threat model assumes network links and relay servers may be hostile:
 
 ### Whitepaper & Security Review
 
-Zero (`v1.0.0`) has **not yet completed an independent third-party audit**. Every component is open for inspection under `AGPL-3.0`:
+Zero (`v1.0.0`) builds upon upstream [SimpleX protocol](https://github.com/simplex-chat/simplex-chat) primitives (`Curve448` + `sntrup761` Double Ratchet, `SMP`, `XFTP`, `SQLCipher` — Copyright © 2021–2026 SimpleX Chat Ltd under `AGPL-3.0`, independently audited upstream by Trail of Bits in 2022 and Cure53 in 2024). Simpl's `v1.0.0` extensions (stateless Python/FastAPI contact broker, TLS-pinned `ZeroIdentityBridge` PoW onboarding across iOS/Kotlin, monochrome cross-platform UI & native installers, and 4-node volatile-storage cluster configs — Copyright © 2026 Simpl LLC) have **not yet completed a separate independent third-party audit** and are published in full for public inspection. See [`SECURITY.md`](SECURITY.md) for full component audit boundaries and vulnerability disclosure:
 
 | Resource / Component | Location |
 | :--- | :--- |
 | `Whitepaper` | [`WHITEPAPER.md`](WHITEPAPER.md) · [simpl.global](https://simpl.global) |
+| `Security Policy & Audit Scope` | [`SECURITY.md`](SECURITY.md) |
 | `Release Changelog` | [`CHANGELOG.md`](CHANGELOG.md) |
 | `Contributing Guide` | [`CONTRIBUTING.md`](CONTRIBUTING.md) |
 | `Privacy Policy` | [`PRIVACY.md`](PRIVACY.md) |
@@ -100,7 +101,8 @@ Zero collects **zero user data. Ever.** No investors, no ads, no trackers. Devel
 
 <div align="center">
 
-<a href="https://simpl.global/donate"><img src="media-logos/btn-donate.svg" alt="Support Zero on simpl.global" height="40" /></a>
+<a href="https://simpl.global"><img src="media-logos/btn-simpl-global.svg" alt="Website — simpl.global" height="38" /></a>
+<a href="https://simpl.global/donate"><img src="media-logos/btn-donate.svg" alt="Support Zero on simpl.global" height="38" /></a>
 
 </div>
 

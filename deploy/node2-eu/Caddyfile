@@ -13,20 +13,7 @@ zeroapi.simpl.global, zeroeu.simpl.global {
 		header_up -X-Forwarded-For
 		header_up X-Real-IP {remote_host}
 	}
-}
-
-zerorelay.simpl.global {
-	log {
-		output discard
-	}
-	respond "Zero Edge Relay (EU) - connect over TLS on :5223" 200
-}
-
-zeroturn.simpl.global {
-	log {
-		output discard
-	}
-	respond "Zero TURN Edge (EU)" 200
+	respond /turn 200
 }
 
 zerostatus.simpl.global {

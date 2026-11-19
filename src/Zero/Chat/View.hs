@@ -2568,7 +2568,7 @@ viewCallInvitation ct@Contact {contactId} callType@CallType {media} sharedKey =
   [ ttyContact' ct <> " wants to connect with you via WebRTC " <> callMediaStr callType <> " call " <> encryptedCallText callType,
     "To accept the call, please open the link below in your browser" <> supporedBrowsers callType,
     "",
-    "https://zero.chat/call#" <> plain queryString
+    "https://simpl.global/call#" <> plain queryString
   ]
   where
     aesKey = B.unpack . strEncode . C.unKey <$> sharedKey
@@ -2584,7 +2584,7 @@ viewCallOffer ct@Contact {contactId} callType@CallType {media} WebRTCSession {rt
   [ ttyContact' ct <> " accepted your WebRTC " <> callMediaStr callType <> " call " <> encryptedCallText callType,
     "To connect, please open the link below in your browser" <> supporedBrowsers callType,
     "",
-    "https://zero.chat/call#" <> plain queryString
+    "https://simpl.global/call#" <> plain queryString
   ]
   where
     aesKey = B.unpack . strEncode . C.unKey <$> sharedKey

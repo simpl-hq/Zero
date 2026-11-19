@@ -29,6 +29,7 @@ ENV PATH="/root/.cabal/bin:/root/.ghcup/bin:$PATH"
 
 # Set both as default
 RUN ghcup set ghc "${GHC}" && \
-    ghcup set cabal "${CABAL}"
+    ghcup set cabal "${CABAL}" && \
+    sed -i 's/-fuse-ld=gold//g' "$(ghc --print-libdir)/settings"
 
 WORKDIR /project

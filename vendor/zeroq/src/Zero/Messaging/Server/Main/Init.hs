@@ -162,7 +162,7 @@ iniFileContent cfgPath logPath opts host basicAuth controlPortPwds =
         \# Same-host:\n\
         \# resolver_endpoint: http://127.0.0.1:8000\n\
         \# Resolver behind TLS reverse proxy:\n\
-        \# resolver_endpoint: https://names.zero.chat:443\n\
+        \# resolver_endpoint: https://names.simpl.global:443\n\
         \# resolver_auth: basic <username>:<password>\n\
         \# resolver_timeout_ms: 3000\n\
         \# resolver_max_response_bytes: 16000\n\

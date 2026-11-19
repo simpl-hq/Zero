@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
-
-# Hourly cron script purging expired encrypted blobs (>24h) and holding disk usage below 60%.
+# Evict XFTP blobs older than 24h (1440m) and trim oldest entries once volume usage hits 60%.
 
 set -euo pipefail
 

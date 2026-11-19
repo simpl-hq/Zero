@@ -190,9 +190,9 @@ testMediaCApi ps = do
   let keyStr = strEncode key
       reserved = B.replicate (C.authTagSize + C.gcmIVSize) 0
       frame' = frame <> reserved
-  encrypted <- test (cChatEncryptMedia cc) keyStr frame'
+  encrypted <- test (zero_core_runtime_encrypt_media cc) keyStr frame'
   encrypted `shouldNotBe` frame'
-  test cChatDecryptMedia keyStr encrypted `shouldReturn` frame'
+  test zero_core_runtime_decrypt_media keyStr encrypted `shouldReturn` frame'
   where
     test :: HasCallStack => (CString -> Ptr Word8 -> CInt -> IO CString) -> ByteString -> ByteString -> IO ByteString
     test f keyStr frame = do
@@ -221,13 +221,13 @@ testFileCApi fileName ps = do
       cLen = fromIntegral len
   ptr <- mallocBytes $ B.length src
   putByteString ptr src
-  r <- peekCAString =<< cChatWriteFile cc cPath ptr cLen
+  r <- peekCAString =<< zero_core_runtime_write_file cc cPath ptr cLen
   Just (WFResult cfArgs@(CFArgs key nonce)) <- jDecode r
   let encryptedFile = CryptoFile path $ Just cfArgs
   CF.getFileContentsSize encryptedFile `shouldReturn` fromIntegral (B.length src)
   cKey <- encodedCString key
   cNonce <- encodedCString nonce
-  ptr' <- cChatReadFile cPath cKey cNonce
+  ptr' <- zero_core_runtime_read_file cPath cKey cNonce
   peek ptr' `shouldReturn` (0 :: Word8)
   sz :: Word32 <- peek (ptr' `plusPtr` 1)
   let sz' = fromIntegral sz
@@ -243,7 +243,7 @@ testMissingFileCApi ps = do
   CFArgs key nonce <- atomically . CF.randomArgs =<< C.newRandom
   cKey <- encodedCString key
   cNonce <- encodedCString nonce
-  ptr <- cChatReadFile cPath cKey cNonce
+  ptr <- zero_core_runtime_read_file cPath cKey cNonce
   peek ptr `shouldReturn` 1
   err <- peekCAString (ptr `plusPtr` 1)
   err `shouldContain` "missing_file: openBinaryFile: does not exist"
@@ -258,14 +258,14 @@ testFileEncryptionCApi fileName ps = do
   cFromPath <- newCString fromPath
   let toPath = tmp </> (fileName <> ".encrypted.pdf")
   cToPath <- newCString toPath
-  r <- peekCAString =<< cChatEncryptFile cc cFromPath cToPath
+  r <- peekCAString =<< zero_core_runtime_encrypt_file cc cFromPath cToPath
   Just (WFResult cfArgs@(CFArgs key nonce)) <- jDecode r
   CF.getFileContentsSize (CryptoFile toPath $ Just cfArgs) `shouldReturn` fromIntegral (B.length src)
   cKey <- encodedCString key
   cNonce <- encodedCString nonce
   let toPath' = tmp </> (fileName <> ".decrypted.pdf")
   cToPath' <- newCString toPath'
-  "" <- peekCAString =<< cChatDecryptFile cToPath cKey cNonce cToPath'
+  "" <- peekCAString =<< zero_core_runtime_decrypt_file cToPath cKey cNonce cToPath'
   B.readFile toPath' `shouldReturn` src
 
 testMissingFileEncryptionCApi :: TestParams -> IO ()
@@ -276,7 +276,7 @@ testMissingFileEncryptionCApi ps = do
       toPath = tmp </> "missing_file.encrypted.pdf"
   cFromPath <- newCString fromPath
   cToPath <- newCString toPath
-  r <- peekCAString =<< cChatEncryptFile cc cFromPath cToPath
+  r <- peekCAString =<< zero_core_runtime_encrypt_file cc cFromPath cToPath
   Just (WFError err) <- jDecode r
   err `shouldContain` fromPath
   CFArgs key nonce <- atomically . CF.randomArgs =<< C.newRandom
@@ -284,7 +284,7 @@ testMissingFileEncryptionCApi ps = do
   cNonce <- encodedCString nonce
   let toPath' = tmp </> "missing_file.decrypted.pdf"
   cToPath' <- newCString toPath'
-  err' <- peekCAString =<< cChatDecryptFile cToPath cKey cNonce cToPath'
+  err' <- peekCAString =<< zero_core_runtime_decrypt_file cToPath cKey cNonce cToPath'
   err' `shouldContain` toPath
 
 mkCCPtr :: FilePath -> IO (StablePtr ChatController)
@@ -293,16 +293,16 @@ mkCCPtr tmp = either (error . show) newStablePtr =<< chatMigrateInit (tmp </> "1
 testValidNameCApi :: TestParams -> IO ()
 testValidNameCApi _ = do
   let goodName = "Джон Доу 👍"
-  cName1 <- cChatValidName =<< newCString goodName
+  cName1 <- zero_core_runtime_valid_name =<< newCString goodName
   peekCString cName1 `shouldReturn` goodName
-  cName2 <- cChatValidName =<< newCString " @'Джон'  Доу   👍 "
+  cName2 <- zero_core_runtime_valid_name =<< newCString " @'Джон'  Доу   👍 "
   peekCString cName2 `shouldReturn` goodName
 
 testChatJsonLengthCApi :: TestParams -> IO ()
 testChatJsonLengthCApi _ = do
-  cInt1 <- cChatJsonLength =<< newCString "Hello!"
+  cInt1 <- zero_core_runtime_json_length =<< newCString "Hello!"
   cInt1 `shouldBe` 6
-  cInt2 <- cChatJsonLength =<< newCString "こんにちは！"
+  cInt2 <- zero_core_runtime_json_length =<< newCString "こんにちは！"
   cInt2 `shouldBe` 18
 
 testChatParseServer :: TestParams -> IO ()
@@ -316,10 +316,10 @@ testChatParseUri _ = do
 testBadgeKeygenIssueCApi :: TestParams -> IO ()
 testBadgeKeygenIssueCApi _ = do
   g <- C.newRandom
-  IssuerKeyPair {publicKey, secretKey} <- ffiResult =<< (peekCString =<< cChatBadgeKeygen)
+  IssuerKeyPair {publicKey, secretKey} <- ffiResult =<< (peekCString =<< zero_core_runtime_badge_keygen)
   mk <- generateMasterKey g
   let req = BadgeIssueReq {badgeKeyIdx = 1, secretKey, request = BadgeRequest {masterKey = mk, badgeInfo = BadgeInfo {badgeType = BTSupporter, badgeExpiry = Nothing, badgeExtra = ""}}}
-  cred <- ffiResult =<< (peekCString =<< cChatBadgeIssue =<< newCString (LB.unpack (J.encode req)))
+  cred <- ffiResult =<< (peekCString =<< zero_core_runtime_badge_issue =<< newCString (LB.unpack (J.encode req)))
   verifyCredential publicKey cred `shouldReturn` True
 
 ffiResult :: FromJSON r => String -> IO r

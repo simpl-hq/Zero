@@ -44,13 +44,12 @@ terminalChatConfig =
                     smp =
                       map
                         (presetServer True)
-                        [ "smp://u2dS9sG8nMNURyZwqASV4yROM28Er0luVTx5X1CsMrU=@smp4.zero.im,o5vmywmrnaxalvz6wi3zicyftgio6psuvyniis6gco6bp6ekl4cqj4id.onion",
-                          "smp://hpq7_4gGJiilmz5Rf-CswuU5kZGkm_zOIooSw6yALRg=@smp5.zero.im,jjbyvoemxysm7qxap7m5d5m35jzv5qq6gnlv7s4rsn7tdwwmuqciwpid.onion",
-                          "smp://PQUV2eL0t7OStZOoAsPEV2QYWt4-xilbakvGUGOItUo=@smp6.zero.im,bylepyau3ty4czmn77q4fglvperknl4bi2eb2fdy2bh4jxtf32kf73yd.onion"
+                        [ "smp://pJ5gVPxIPmCXflOJ7W7avwpDka1mEHcNaHEqcAwBx0c=@zerorelay.simpl.global:5223",
+                          "smp://TctoW4I8Pkb7i547zF_zX4OEj0EG1GEFYfh1QAPD3Ok=@zeroeu.simpl.global:5223"
                         ],
-                    useSMP = 3,
+                    useSMP = 2,
                     xftp = map (presetServer True) $ L.toList defaultXFTPServers,
-                    useXFTP = 3,
+                    useXFTP = 1,
                     chatRelays = zeroChatRelays,
                     useChatRelays = 2
                   }

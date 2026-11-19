@@ -84,9 +84,9 @@ defaultChatConfig =
               [ PresetOperator
                   { operator = Just operatorZero,
                     smp = zeroChatSMPServers,
-                    useSMP = 4,
+                    useSMP = 2,
                     xftp = map (presetServer True) $ L.toList defaultXFTPServers,
-                    useXFTP = 3,
+                    useXFTP = 1,
                     chatRelays = zeroChatRelays,
                     useChatRelays = 2
                   },
@@ -104,7 +104,7 @@ defaultChatConfig =
             netCfg = defaultNetworkConfig
           },
       shortLinkPresetServers = allPresetServers,
-      presetDomains = [".zero.im", ".zeroonflux.com"],
+      presetDomains = [".simpl.global", ".eu.simpl.global"],
       tbqSize = 1024,
       fileChunkSize = 15780,
       xftpDescrPartSize = 14000,

@@ -1,8 +1,17 @@
-# Changelog (`zeroq`)
+<div align="center">
 
-Release history for the `zeroq` messaging broker, client agent, `SMP` queue protocol, push notification server, and `XFTP` encrypted file transfer core.
+<h1>Zero Queue — Changelog (<code>zeroq</code>)</h1>
 
-See the root [CHANGELOG.md](../../CHANGELOG.md), [README.md](../../README.md), and [WHITEPAPER.md](../../WHITEPAPER.md).
+<p>Release history for the <code>zeroq</code> messaging broker, <code>SMP</code> queue protocol, push notification server, and <code>XFTP</code> file transfer core.</p>
+
+<p>
+  <a href="https://simpl.global"><img src="../../media-logos/btn-simpl-global.svg" alt="Website — simpl.global" height="38" /></a>
+  <a href="../../README.md"><img src="../../media-logos/btn-readme.svg" alt="README" height="38" /></a>
+  <a href="../../CHANGELOG.md"><img src="../../media-logos/btn-releases.svg" alt="Releases" height="38" /></a>
+  <a href="../../WHITEPAPER.md"><img src="../../media-logos/btn-whitepaper.svg" alt="Whitepaper" height="38" /></a>
+</p>
+
+</div>
 
 ---
 
@@ -45,3 +54,17 @@ See the root [CHANGELOG.md](../../CHANGELOG.md), [README.md](../../README.md), a
 ## [0.1.0] — 2026-03-16
 
 - Initial extraction of `Zero.Messaging` and `Zero.Messaging.Agent` transport, cryptographic primitives (`Ed25519`, `Ed448`, `X448`, `blst`/`libbbs`), and TLS SPKI pinning.
+
+---
+
+<div align="center">
+
+<p>
+  <a href="https://simpl.global"><img src="../../media-logos/btn-simpl-global.svg" alt="Website — simpl.global" height="38" /></a>
+  <a href="../../README.md"><img src="../../media-logos/btn-readme.svg" alt="README" height="38" /></a>
+  <a href="https://simpl.global/donate"><img src="../../media-logos/btn-donate.svg" alt="Support Zero" height="38" /></a>
+</p>
+
+<sub>**&copy; 2021–2026 SimpleX Chat Ltd · &copy; 2026 Simpl LLC.** Licensed under [GNU AGPL-3.0](../../LICENSE). · [simpl.global](https://simpl.global) · [Donate](https://simpl.global/donate) · `support@simpl.global`</sub>
+
+</div>
