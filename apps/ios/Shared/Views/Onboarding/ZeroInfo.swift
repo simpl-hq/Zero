@@ -436,6 +436,14 @@ final class ZeroIdentityBridge {
         set { UserDefaults.standard.set(newValue, forKey: phraseDefaultsKey) }
     }
 
+    var hasActiveProxy: Bool {
+        if let raw = groupDefaults.string(forKey: GROUP_DEFAULT_NETWORK_SOCKS_PROXY)?
+            .trimmingCharacters(in: .whitespacesAndNewlines), !raw.isEmpty {
+            return true
+        }
+        return false
+    }
+
     var currentDeepLink: String? {
         get { UserDefaults.standard.string(forKey: deepLinkDefaultsKey) }
         set { UserDefaults.standard.set(newValue, forKey: deepLinkDefaultsKey) }
@@ -984,6 +992,40 @@ struct ZeroInfo: View {
                         .font(.footnote)
                         .foregroundColor(.red)
                         .padding(.horizontal, 24)
+                }
+
+                if !ZeroIdentityBridge.shared.hasActiveProxy {
+                    HStack(alignment: .top, spacing: 10) {
+                        Image(systemName: "shield.slash")
+                            .foregroundColor(.secondary)
+                            .font(.subheadline)
+                            .padding(.top, 2)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Direct Network Connection")
+                                .font(.caption.weight(.semibold))
+                                .foregroundColor(theme.colors.onBackground)
+                            Text("Your IP address is visible to your ISP during discovery. To hide your IP, enable 2-hop Onion / SOCKS5 routing in Settings.")
+                                .font(.caption2)
+                                .foregroundColor(theme.colors.secondary)
+                        }
+                    }
+                    .padding(12)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .fill(Color(uiColor: .secondarySystemBackground))
+                    )
+                    .padding(.horizontal, 24)
+                } else {
+                    HStack(spacing: 8) {
+                        Image(systemName: "checkmark.shield.fill")
+                            .foregroundColor(.green)
+                            .font(.caption)
+                        Text("Onion / SOCKS5 Proxy Active — IP Masked")
+                            .font(.caption2.weight(.medium))
+                            .foregroundColor(theme.colors.secondary)
+                    }
+                    .padding(.horizontal, 24)
                 }
 
                 Button {

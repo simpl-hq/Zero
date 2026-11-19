@@ -431,6 +431,8 @@ class ZeroIdentityBridge(
     }
   }
 
+  fun hasActiveProxy(): Boolean = resolveActiveSocksProxy() != null
+
   private fun resolveActiveSocksProxy(): Proxy? {
     val useSocks = runCatching { appPrefs.networkUseSocksProxy.get() }.getOrDefault(false)
     if (!useSocks) return null
