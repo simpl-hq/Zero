@@ -27,6 +27,8 @@ fun main() {
     runMigrations()
     setupUpdateChecker()
     initApp()
+    app.zero.core.network.TorDesktop.register(File(System.getProperty("user.home"), ".zero-tor"))
+    CoroutineScope(Dispatchers.IO).launch { app.zero.core.network.TorRuntime.ensureStarted() }
     tmpDir.deleteRecursively()
     tmpDir.mkdir()
     tmpDir.deleteOnExit()

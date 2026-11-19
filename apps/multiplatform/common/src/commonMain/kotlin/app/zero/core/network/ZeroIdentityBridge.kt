@@ -332,6 +332,7 @@ class ZeroIdentityBridge(
 
   suspend fun resolveIdentity(rawTarget: String): String = withContext(Dispatchers.IO) {
     val target = extractResolveTarget(rawTarget)
+    if (runCatching { appPrefs.networkUseSocksProxy.get() }.getOrDefault(false)) TorRuntime.ensureStarted()
     val bases = candidateBaseUrls()
     var lastError: Throwable? = if (bases.isEmpty()) {
       IllegalStateException("Contact discovery broker is disabled; share a direct QR or 1-time link.")
