@@ -6,6 +6,7 @@ _OBJC_CLASS_$_*
 _OBJC_METACLASS_$_*
 
 # C API (Zero.h bridging header)
+_zero_core_runtime_*
 _chat_*
 _haskell_init*
 _hs_init*

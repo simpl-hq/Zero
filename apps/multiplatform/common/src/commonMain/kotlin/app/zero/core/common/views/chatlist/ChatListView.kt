@@ -454,7 +454,7 @@ private fun BoxScope.NewChatSheetFloatingButton(oneHandUI: State<Boolean>, stopp
       focusedElevation = 0.dp,
     ),
     backgroundColor = if (!stopped) MaterialTheme.colors.primary else MaterialTheme.colors.secondary,
-    contentColor = Color.White
+    contentColor = MaterialTheme.colors.onPrimary
   ) {
     Icon(painterResource(MR.images.ic_edit_filled), stringResource(MR.strings.add_contact_or_create_group), Modifier.size(22.dp * fontSizeSqrtMultiplier))
   }
@@ -464,7 +464,7 @@ private fun BoxScope.NewChatSheetFloatingButton(oneHandUI: State<Boolean>, stopp
 private fun ConnectButton(text: String, onClick: () -> Unit) {
   Button(
     onClick,
-    shape = RoundedCornerShape(21.dp),
+    shape = RoundedCornerShape(999.dp),
     colors = ButtonDefaults.textButtonColors(
       backgroundColor = MaterialTheme.colors.primaryVariant
     ),
@@ -472,7 +472,7 @@ private fun ConnectButton(text: String, onClick: () -> Unit) {
     contentPadding = PaddingValues(horizontal = DEFAULT_PADDING, vertical = DEFAULT_PADDING_HALF),
     modifier = Modifier.height(42.dp)
   ) {
-    Text(text, color = Color.White)
+    Text(text, color = MaterialTheme.colors.primaryVariant.onSurfaceInk(), fontWeight = FontWeight.SemiBold)
   }
 }
 
@@ -557,7 +557,7 @@ private fun ChatListToolbar(userPickerState: MutableStateFlow<AnimatedViewState>
               painterResource(MR.images.ic_edit_filled),
               stringResource(MR.strings.add_contact_or_create_group),
               Modifier.size(sp16),
-              tint = Color.White
+              tint = MaterialTheme.colors.onPrimary
             )
           }
         }
@@ -589,10 +589,11 @@ private fun ChatListToolbar(userPickerState: MutableStateFlow<AnimatedViewState>
     title = {
       if (!shouldShowOnboarding()) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(DEFAULT_SPACE_AFTER_ICON)) {
-          Text(
-            stringResource(MR.strings.your_chats),
-            color = MaterialTheme.colors.onBackground,
-            fontWeight = FontWeight.SemiBold,
+          Image(
+            painterResource(if (isInDarkTheme()) MR.images.logo_light else MR.images.logo),
+            contentDescription = stringResource(MR.strings.your_chats),
+            contentScale = ContentScale.Fit,
+            modifier = Modifier.height(22.dp)
           )
           SubscriptionStatusIndicator(
             click = {
@@ -716,7 +717,7 @@ private fun ToggleFilterEnabledButton() {
     Icon(
       painterResource(MR.images.ic_filter_list),
       null,
-      tint = if (showUnread) MaterialTheme.colors.background else MaterialTheme.colors.secondary,
+      tint = if (showUnread) MaterialTheme.colors.onPrimary else MaterialTheme.colors.secondary,
       modifier = Modifier
         .padding(3.dp)
         .background(color = if (showUnread) MaterialTheme.colors.primary else Color.Unspecified, shape = RoundedCornerShape(50))

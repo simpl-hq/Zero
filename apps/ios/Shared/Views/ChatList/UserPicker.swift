@@ -182,7 +182,8 @@ struct UnreadBadge: View {
         let size = dynamicSize(userFont).chatInfoSize
         unreadCountText(count)
             .font(userFont <= .xxxLarge ? .caption : .caption2)
-            .foregroundColor(.white)
+            .fontWeight(.semibold)
+            .foregroundColor(color.onSurfaceInk)
             .padding(.horizontal, dynamicSize(userFont).unreadPadding)
             .frame(minWidth: size, minHeight: size)
             .background(color)

@@ -75,6 +75,8 @@ compose {
           perUserInstall = false
           dirChooser = true
           shortcut = true
+          menu = true
+          menuGroup = "Zero"
           upgradeUuid = "CC9EFBC8-AFFF-40D8-BB69-FCD7CE99EFB9"
         }
         macOS {
@@ -167,13 +169,37 @@ tasks.named("compileKotlinJvm") {
   dependsOn("cmakeBuildAndCopy")
 }
 tasks.withType<AbstractJPackageTask>().configureEach {
+  packageVendor.set("Simpl")
+  packageDescription.set("Zero - Private Post-Quantum Messenger")
+  licenseFile.set(project.file("../../../LICENSE"))
+
+  if (targetFormat == TargetFormat.Msi || targetFormat == TargetFormat.Exe) {
+    freeArgs.addAll(
+      "--resource-dir",
+      project.file("src/jvmMain/resources/distribute/jpackage-windows").absolutePath
+    )
+  } else if (targetFormat == TargetFormat.Dmg) {
+    freeArgs.addAll(
+      "--resource-dir",
+      project.file("src/jvmMain/resources/distribute/jpackage-macos").absolutePath
+    )
+  }
+
   if (targetFormat == TargetFormat.Msi) {
     doLast {
+      val msiFile = destinationDir.asFileTree.matching { include("*.msi") }.singleFile
       exec {
         commandLine(
           "powershell", "-NoProfile", "-ExecutionPolicy", "Bypass",
           "-File", project.file("../../../scripts/desktop/disable-msi-install-dir-wipe-windows.ps1"),
-          destinationDir.asFileTree.matching { include("*.msi") }.singleFile
+          msiFile
+        )
+      }
+      exec {
+        commandLine(
+          "powershell", "-NoProfile", "-ExecutionPolicy", "Bypass",
+          "-File", project.file("../../../scripts/desktop/build-windows-setup.ps1"),
+          "-MsiPath", msiFile.absolutePath
         )
       }
     }

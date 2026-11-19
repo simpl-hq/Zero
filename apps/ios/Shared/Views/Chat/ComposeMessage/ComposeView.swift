@@ -1054,9 +1054,7 @@ struct ComposeView: View {
                 onMediaAdded: { media in if !media.isEmpty { chosenMedia = media }},
                 keyboardVisible: $keyboardVisible,
                 keyboardHiddenDate: $keyboardHiddenDate,
-                sendButtonColor: chat.chatInfo.incognito
-                ? .indigo.opacity(colorScheme == .dark ? 1 : 0.7)
-                : theme.colors.primary
+                sendButtonColor: theme.colors.primary
             )
             .disabled(!chat.chatInfo.sendMsgEnabled)
 
@@ -1856,7 +1854,7 @@ struct ComposeView: View {
     }
 
     private func isZeroLink(_ link: String) -> Bool {
-        link.starts(with: "https://zero.chat") || link.starts(with: "http://zero.chat") || link.starts(with: "zero:/")
+        link.starts(with: "https://simpl.global") || link.starts(with: "https://zero.chat") || link.starts(with: "http://zero.chat") || link.starts(with: "zero:/")
     }
 
     private func cancelLinkPreview() {

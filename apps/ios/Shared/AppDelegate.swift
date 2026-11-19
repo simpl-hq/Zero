@@ -148,27 +148,27 @@ class SceneDelegate: NSObject, ObservableObject, UIWindowSceneDelegate {
             var themeIds = currentThemeIdsDefault.get()
             switch userInterfaceStyle {
             case .light:
-                let light = ThemeOverrides(base: DefaultTheme.LIGHT, colors: colors, wallpaper: ThemeWallpaper(preset: PresetWallpaper.school.filename))
+                let light = ThemeOverrides(base: DefaultTheme.LIGHT, colors: colors, wallpaper: ThemeWallpaper())
                 overrides.append(light)
                 themeOverridesDefault.set(overrides)
                 themeIds[DefaultTheme.LIGHT.themeName] = light.themeId
                 currentThemeIdsDefault.set(themeIds)
                 ThemeManager.applyTheme(DefaultTheme.LIGHT.themeName)
             case .dark:
-                let dark = ThemeOverrides(base: DefaultTheme.DARK, colors: colors, wallpaper: ThemeWallpaper(preset: PresetWallpaper.school.filename))
+                let dark = ThemeOverrides(base: DefaultTheme.BLACK, colors: colors, wallpaper: ThemeWallpaper())
                 overrides.append(dark)
                 themeOverridesDefault.set(overrides)
-                themeIds[DefaultTheme.DARK.themeName] = dark.themeId
+                themeIds[DefaultTheme.BLACK.themeName] = dark.themeId
                 currentThemeIdsDefault.set(themeIds)
-                ThemeManager.applyTheme(DefaultTheme.DARK.themeName)
+                ThemeManager.applyTheme(DefaultTheme.BLACK.themeName)
             case .unspecified:
-                let light = ThemeOverrides(base: DefaultTheme.LIGHT, colors: colors, wallpaper: ThemeWallpaper(preset: PresetWallpaper.school.filename))
-                let dark = ThemeOverrides(base: DefaultTheme.DARK, colors: colors, wallpaper: ThemeWallpaper(preset: PresetWallpaper.school.filename))
+                let light = ThemeOverrides(base: DefaultTheme.LIGHT, colors: colors, wallpaper: ThemeWallpaper())
+                let dark = ThemeOverrides(base: DefaultTheme.BLACK, colors: colors, wallpaper: ThemeWallpaper())
                 overrides.append(light)
                 overrides.append(dark)
                 themeOverridesDefault.set(overrides)
                 themeIds[DefaultTheme.LIGHT.themeName] = light.themeId
-                themeIds[DefaultTheme.DARK.themeName] = dark.themeId
+                themeIds[DefaultTheme.BLACK.themeName] = dark.themeId
                 currentThemeIdsDefault.set(themeIds)
                 ThemeManager.applyTheme(DefaultTheme.SYSTEM_THEME_NAME)
             @unknown default: ()

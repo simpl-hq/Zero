@@ -78,7 +78,7 @@ let DEFAULT_NETWORK_PROXY = "networkProxy"
 
 let ANDROID_DEFAULT_CALL_ON_LOCK_SCREEN = "androidCallOnLockScreen"
 
-let defaultChatItemRoundness: Double = 0.75
+let defaultChatItemRoundness: Double = 0.95
 
 let appDefaults: [String: Any] = [
     DEFAULT_SHOW_LA_NOTICE: false,
@@ -105,8 +105,8 @@ let appDefaults: [String: Any] = [
     DEFAULT_ENCRYPTION_STARTED: false,
     DEFAULT_PROFILE_IMAGE_CORNER_RADIUS: defaultProfileImageCorner,
     DEFAULT_CHAT_ITEM_ROUNDNESS: defaultChatItemRoundness,
-    DEFAULT_CHAT_ITEM_TAIL: true,
-    DEFAULT_ONE_HAND_UI_CARD_SHOWN: false,
+    DEFAULT_CHAT_ITEM_TAIL: false,
+    DEFAULT_ONE_HAND_UI_CARD_SHOWN: true,
     DEFAULT_ADDRESS_CREATION_CARD_SHOWN: false,
     DEFAULT_GET_STAKE_BANNER_TAPPED: false,
     DEFAULT_GET_STAKE_BANNER_DISMISSED: false,
@@ -130,8 +130,8 @@ let appDefaults: [String: Any] = [
     ANDROID_DEFAULT_CALL_ON_LOCK_SCREEN: AppSettingsLockScreenCalls.show.rawValue,
 
     DEFAULT_THEME_OVERRIDES: "{}",
-    DEFAULT_CURRENT_THEME: DefaultTheme.SYSTEM_THEME_NAME,
-    DEFAULT_SYSTEM_DARK_THEME: DefaultTheme.DARK.themeName,
+    DEFAULT_CURRENT_THEME: DefaultTheme.BLACK.themeName,
+    DEFAULT_SYSTEM_DARK_THEME: DefaultTheme.BLACK.themeName,
     DEFAULT_CURRENT_THEME_IDS: "{}"
 ]
 
@@ -203,8 +203,8 @@ let showDeleteContactNoticeDefault = BoolDefault(defaults: UserDefaults.standard
 let showReportsInSupportChatAlertDefault = BoolDefault(defaults: UserDefaults.standard, forKey: DEFAULT_SHOW_REPORTS_IN_SUPPORT_CHAT_ALERT)
 
 let shouldImportAppSettingsDefault = BoolDefault(defaults: UserDefaults.standard, forKey: DEFAULT_SHOULD_IMPORT_APP_SETTINGS)
-let currentThemeDefault = StringDefault(defaults: UserDefaults.standard, forKey: DEFAULT_CURRENT_THEME, withDefault: DefaultTheme.SYSTEM_THEME_NAME)
-let systemDarkThemeDefault = StringDefault(defaults: UserDefaults.standard, forKey: DEFAULT_SYSTEM_DARK_THEME, withDefault: DefaultTheme.DARK.themeName)
+let currentThemeDefault = StringDefault(defaults: UserDefaults.standard, forKey: DEFAULT_CURRENT_THEME, withDefault: DefaultTheme.BLACK.themeName)
+let systemDarkThemeDefault = StringDefault(defaults: UserDefaults.standard, forKey: DEFAULT_SYSTEM_DARK_THEME, withDefault: DefaultTheme.BLACK.themeName)
 let currentThemeIdsDefault = CodableDefault<[String: String]>(defaults: UserDefaults.standard, forKey: DEFAULT_CURRENT_THEME_IDS, withDefault: [:] )
 let themeOverridesDefault: CodableDefault<[ThemeOverrides]> = CodableDefault(defaults: UserDefaults.standard, forKey: DEFAULT_THEME_OVERRIDES, withDefault: [])
 

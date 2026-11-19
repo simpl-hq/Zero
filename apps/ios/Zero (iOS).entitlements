@@ -6,13 +6,14 @@
 	<string>development</string>
 	<key>com.apple.developer.associated-domains</key>
 	<array>
-		<string>applinks:zero.chat</string>
-		<string>applinks:www.zero.chat</string>
-		<string>applinks:zero.chat?mode=developer</string>
-		<string>applinks:*.zero.im</string>
-		<string>applinks:*.zero.im?mode=developer</string>
-		<string>applinks:*.zeroonflux.com</string>
-		<string>applinks:*.zeroonflux.com?mode=developer</string>
+		<string>applinks:simpl.global</string>
+		<string>applinks:www.simpl.global</string>
+		<string>applinks:simpl.global?mode=developer</string>
+		<string>applinks:zeroapi.simpl.global</string>
+		<string>applinks:zerorelay.simpl.global</string>
+		<string>applinks:zeroeu.simpl.global</string>
+		<string>applinks:*.simpl.global</string>
+		<string>applinks:*.simpl.global?mode=developer</string>
 	</array>
 	<key>com.apple.security.application-groups</key>
 	<array>

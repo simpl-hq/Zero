@@ -192,7 +192,7 @@ fun SupportChatRow(member: GroupMember, isChannel: Boolean) {
               Icon(
                 painterResource(MR.images.ic_alternate_email),
                 contentDescription = generalGetString(MR.strings.notifications),
-                tint = Color.White,
+                tint = unreadBadgeColor.onSurfaceInk(),
                 modifier = Modifier.size(9.sp.toDp())
               )
             }

@@ -28,23 +28,23 @@ struct ChatHelp: View {
                 HStack(spacing: 12) {
                     Image(systemName: "questionmark.circle.fill")
                         .font(.title3)
-                        .foregroundColor(.white)
+                        .foregroundColor(theme.colors.onPrimary)
                     VStack(alignment: .leading, spacing: 2) {
                         Text("Open Guided Setup Tutorial")
                             .font(.subheadline.weight(.semibold))
-                            .foregroundColor(.white)
+                            .foregroundColor(theme.colors.onPrimary)
                         Text("4 interactive steps: phrase, pairing codes, onion routing & Face ID")
                             .font(.caption)
-                            .foregroundColor(.white.opacity(0.86))
+                            .foregroundColor(theme.colors.onPrimary.opacity(0.82))
                     }
                     Spacer()
                     Image(systemName: "chevron.right")
                         .font(.caption.weight(.semibold))
-                        .foregroundColor(.white.opacity(0.9))
+                        .foregroundColor(theme.colors.onPrimary.opacity(0.9))
                 }
                 .padding(14)
                 .background(
-                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
                         .fill(theme.colors.primary)
                 )
             }

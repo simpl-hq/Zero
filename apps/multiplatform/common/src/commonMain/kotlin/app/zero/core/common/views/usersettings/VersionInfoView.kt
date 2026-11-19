@@ -5,10 +5,14 @@ import SectionDividerSpaced
 import SectionView
 import itemHPadding
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.sp
 import dev.icerock.moko.resources.compose.stringResource
 import app.zero.core.common.BuildConfigCommon
 import app.zero.core.common.model.ChatModel
@@ -51,6 +55,13 @@ fun VersionInfoView(
     SectionDividerSpaced()
 
     AdvancedSettingsAppSection(showSettingsModal, withAuth)
+    Text(
+      "Zero · Simpl LLC",
+      color = MaterialTheme.colors.secondary,
+      fontSize = 12.sp,
+      textAlign = TextAlign.Center,
+      modifier = Modifier.fillMaxWidth().padding(vertical = DEFAULT_PADDING_HALF)
+    )
     SectionBottomSpacer()
   }
 }

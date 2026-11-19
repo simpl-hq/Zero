@@ -56,6 +56,8 @@ public class Colors: ObservableObject, NSCopying, Equatable {
         self.isLight = isLight
     }
 
+    public var onPrimary: Color { primary.onSurfaceInk }
+
     public static func == (lhs: Colors, rhs: Colors) -> Bool {
         lhs.primary == rhs.primary &&
         lhs.primaryVariant == rhs.primaryVariant &&
@@ -596,96 +598,96 @@ public struct ThemeModeOverride: Codable, Equatable, Hashable {
     }
 
     public static func withFilledAppDefaults(_ mode: DefaultThemeMode, _ base: DefaultTheme) -> ThemeModeOverride {
-        ThemeModeOverride(
+        return ThemeModeOverride(
             mode: mode,
             colors: ThemeOverrides(base: base).withFilledColors(base, nil, nil, nil, nil, nil),
-            wallpaper: ThemeWallpaper(preset: PresetWallpaper.school.filename)
+            wallpaper: ThemeWallpaper()
         )
     }
 }
 
 public let DarkColorPalette = Colors(
-    primary: ZeroBlue,
-    primaryVariant: ZeroBlue,
-    secondary: HighOrLowlight,
-    secondaryVariant: DarkGray,
-    background: Color.black,
-    surface: Color(0xFF222222),
-    error: Color.red,
+    primary: Color.white,
+    primaryVariant: ZeroQuoteDarkOnLight,
+    secondary: ZeroTextSecondaryDark,
+    secondaryVariant: ZeroQuoteLightOnDark,
+    background: ZeroSurfaceDark,
+    surface: Color(0x14, 0x14, 0x16, a: 255),
+    error: WarningRed,
     onBackground: Color.white,
     onSurface: Color.white,
     isLight: false
 )
 public let DarkColorPaletteApp = AppColors(
     title: .white,
-    primaryVariant2: Color(0xFF18262E),
-    sentMessage: Color(0xFF18262E),
-    sentQuote: Color(0xFF1D3847),
-    receivedMessage: Color(0xff262627),
-    receivedQuote: Color(0xff373739)
+    primaryVariant2: Color(0xD4, 0xD4, 0xD8, a: 255),
+    sentMessage: Color.white,
+    sentQuote: ZeroQuoteDarkOnLight,
+    receivedMessage: ZeroQuoteLightOnDark,
+    receivedQuote: Color(0x26, 0x26, 0x29, a: 255)
 )
 
 public let LightColorPalette = Colors (
-    primary: ZeroBlue,
-    primaryVariant: ZeroBlue,
-    secondary: HighOrLowlight,
-    secondaryVariant: LightGray,
-    background: Color.white,
-    surface: Color.white,
-    error: Color.red,
+    primary: Color.black,
+    primaryVariant: Color(0x27, 0x27, 0x2A, a: 255),
+    secondary: ZeroTextSecondaryLight,
+    secondaryVariant: ZeroBorderLight,
+    background: ZeroCanvasLight,
+    surface: ZeroSurfaceLight,
+    error: Color(0xDC, 0x26, 0x26, a: 255),
     onBackground: Color.black,
     onSurface: Color.black,
     isLight: true
 )
 public let LightColorPaletteApp = AppColors(
     title: .black,
-    primaryVariant2: Color(0xFFE9F7FF),
-    sentMessage: Color(0xFFE9F7FF),
-    sentQuote: Color(0xFFD6F0FF),
-    receivedMessage: Color(0xfff5f5f6),
-    receivedQuote: Color(0xffececee)
+    primaryVariant2: Color(0x27, 0x27, 0x2A, a: 255),
+    sentMessage: Color.black,
+    sentQuote: ZeroQuoteLightOnDark,
+    receivedMessage: ZeroElevatedLight,
+    receivedQuote: ZeroBorderLight
 )
 
 public let ZeroColorPalette = Colors(
-    primary: Color(0xFF70F0F9),
-    primaryVariant: Color(0xFF1298A5),
-    secondary: HighOrLowlight,
-    secondaryVariant: Color(0xFF2C464D),
-    background: Color(0xFF111528),
-    surface: Color(0xFF121C37),
-    error: Color.red,
+    primary: Color.white,
+    primaryVariant: ZeroQuoteDarkOnLight,
+    secondary: ZeroTextSecondaryDark,
+    secondaryVariant: ZeroElevatedDark,
+    background: ZeroCanvasBlack,
+    surface: ZeroSurfaceDark,
+    error: WarningRed,
     onBackground: Color.white,
     onSurface: Color.white,
     isLight: false
 )
 public let ZeroColorPaletteApp = AppColors(
     title: .white,
-    primaryVariant2: Color(0xFF172941),
-    sentMessage: Color(0xFF172941),
-    sentQuote: Color(0xFF1C3A57),
-    receivedMessage: Color(0xff25283a),
-    receivedQuote: Color(0xff36394a)
+    primaryVariant2: Color(0xD4, 0xD4, 0xD8, a: 255),
+    sentMessage: Color.white,
+    sentQuote: ZeroQuoteDarkOnLight,
+    receivedMessage: ZeroElevatedDark,
+    receivedQuote: ZeroQuoteDark
 )
 
 public let BlackColorPalette = Colors(
-    primary: Color(0xff0077e0),
-    primaryVariant: Color(0xff0077e0),
-    secondary: HighOrLowlight,
-    secondaryVariant: DarkGray,
-    background: Color(0xff070707),
-    surface: Color(0xff161617),
-    error: Color.red,
+    primary: Color.white,
+    primaryVariant: ZeroQuoteDarkOnLight,
+    secondary: ZeroTextSecondaryDark,
+    secondaryVariant: ZeroElevatedDark,
+    background: ZeroCanvasBlack,
+    surface: ZeroSurfaceDark,
+    error: WarningRed,
     onBackground: Color.white,
     onSurface: Color.white,
     isLight: false
 )
 public let BlackColorPaletteApp = AppColors(
     title: .white,
-    primaryVariant2: Color(0xff243747),
-    sentMessage: Color(0xFF18262E),
-    sentQuote: Color(0xFF1D3847),
-    receivedMessage: Color(0xff1b1b1b),
-    receivedQuote: Color(0xff29292b)
+    primaryVariant2: Color(0xD4, 0xD4, 0xD8, a: 255),
+    sentMessage: Color.white,
+    sentQuote: ZeroQuoteDarkOnLight,
+    receivedMessage: ZeroElevatedDark,
+    receivedQuote: ZeroQuoteDark
 )
 
 extension Colors {

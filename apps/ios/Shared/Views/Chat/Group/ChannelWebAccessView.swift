@@ -123,7 +123,7 @@ struct ChannelWebAccessView: View {
               data-app-download-buttons="on"
               data-color-scheme="light"
             ></div>
-            <script src="https://zero.chat/js/channel-preview.js"></script>
+            <script src="https://simpl.global/js/channel-preview.js"></script>
             """
         } else {
             nil

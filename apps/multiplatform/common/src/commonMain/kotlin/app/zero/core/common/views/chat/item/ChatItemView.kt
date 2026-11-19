@@ -255,7 +255,7 @@ fun ChatItemView(
         Color.Unspecified
       }
       val iconTint = if (fullyVisible) {
-        Color.White
+        mixedBackgroundColor.onSurfaceInk()
       } else {
         if (MaterialTheme.colors.isLight) {
           MaterialTheme.colors.secondary.mixWith(Color.White, mixAlpha)
@@ -1212,7 +1212,13 @@ fun Modifier.chatItemOffset(cItem: ChatItem, tailVisible: Boolean, inverted: Boo
 }
 
 @Composable
-fun Modifier.clipChatItem(chatItem: ChatItem? = null, tailVisible: Boolean = false, revealed: Boolean = false): Modifier {
+fun Modifier.clipChatItem(
+  chatItem: ChatItem? = null,
+  tailVisible: Boolean = false,
+  revealed: Boolean = false,
+  borderColor: Color? = null,
+  borderWidth: Dp = 1.dp,
+): Modifier {
   val chatItemRoundness = remember { appPreferences.chatItemRoundness.state }
   val chatItemTail = remember { appPreferences.chatItemTail.state }
   val style = shapeStyle(chatItem, chatItemTail.value, tailVisible, revealed)
@@ -1227,10 +1233,20 @@ fun Modifier.clipChatItem(chatItem: ChatItem? = null, tailVisible: Boolean = fal
         }
         onDrawWithContent {
           clipPath(path) { this@onDrawWithContent.drawContent() }
+          if (borderColor != null) {
+            drawPath(
+              path,
+              color = borderColor,
+              style = androidx.compose.ui.graphics.drawscope.Stroke(width = borderWidth.toPx())
+            )
+          }
         }
       }
     }
-    is ShapeStyle.RoundRect -> this.clip(RoundedCornerShape(style.radius * cornerRoundness))
+    is ShapeStyle.RoundRect -> {
+      val shape = RoundedCornerShape(style.radius * cornerRoundness)
+      this.clip(shape).then(if (borderColor != null) Modifier.border(borderWidth, borderColor, shape) else Modifier)
+    }
   }
 }
 

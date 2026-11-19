@@ -5,6 +5,8 @@ struct CILinkView: View {
     @EnvironmentObject var theme: AppTheme
     let linkPreview: LinkPreview
     let maxWidth: CGFloat
+    var inkColor: Color? = nil
+    var secondaryInkColor: Color? = nil
     @State private var blurred: Bool = UserDefaults.standard.integer(forKey: DEFAULT_PRIVACY_MEDIA_BLUR_RADIUS) > 0
 
     var body: some View {
@@ -24,11 +26,12 @@ struct CILinkView: View {
             }
             VStack(alignment: .leading, spacing: 6) {
                 Text(linkPreview.title)
+                    .foregroundColor(inkColor ?? theme.colors.onBackground)
                     .lineLimit(3)
                 Text(linkPreview.uri)
                     .font(.caption)
                     .lineLimit(1)
-                    .foregroundColor(theme.colors.secondary)
+                    .foregroundColor(secondaryInkColor ?? theme.colors.secondary)
             }
             .padding(.horizontal, 12)
             .frame(maxWidth: .infinity, alignment: .leading)

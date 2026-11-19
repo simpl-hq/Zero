@@ -228,12 +228,14 @@ struct ChatPreviewView: View {
                         .padding(.bottom, 1)
                 }
                 let singleUnreadIsMention = s.unreadMentions > 0 && s.unreadCount == 1
+                let badgeBg = singleUnreadIsMention ? mentionColor : (chat.chatInfo.ntfsEnabled(false) || chat.chatInfo.chatType == .local ? theme.colors.primary : theme.colors.secondary)
                 (singleUnreadIsMention ? Text("\(MENTION_START)") : unreadCountText(s.unreadCount))
                     .font(userFont <= .xxxLarge ? .caption : .caption2)
-                    .foregroundColor(.white)
+                    .fontWeight(.semibold)
+                    .foregroundColor(badgeBg.onSurfaceInk)
                     .padding(.horizontal, dynamicSize(userFont).unreadPadding)
                     .frame(minWidth: dynamicChatInfoSize, minHeight: dynamicChatInfoSize)
-                    .background(singleUnreadIsMention ? mentionColor : chat.chatInfo.ntfsEnabled(false) || chat.chatInfo.chatType == .local ? theme.colors.primary : theme.colors.secondary)
+                    .background(badgeBg)
                     .cornerRadius(dynamicSize(userFont).unreadCorner)
             }
             .frame(height: dynamicChatInfoSize)

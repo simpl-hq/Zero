@@ -16,6 +16,7 @@ import androidx.compose.ui.draw.*
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.*
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
@@ -373,12 +374,22 @@ fun CenterPartOfScreen() {
         ) {
           Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp)
           ) {
-            Text(stringResource(if (chatModel.desktopNoUserNoRemote) MR.strings.no_connected_mobile else MR.strings.no_selected_chat))
+            Image(
+              painterResource(if (isInDarkTheme()) MR.images.logo_light else MR.images.logo),
+              contentDescription = "Zero",
+              contentScale = ContentScale.Fit,
+              modifier = Modifier.height(34.dp)
+            )
+            Text(
+              stringResource(if (chatModel.desktopNoUserNoRemote) MR.strings.no_connected_mobile else MR.strings.no_selected_chat),
+              color = MaterialTheme.colors.secondary
+            )
             OutlinedButton(
               onClick = { openZeroGuidedTutorial(allowSettingsShortcuts = true) },
-              shape = RoundedCornerShape(12.dp)
+              shape = RoundedCornerShape(999.dp),
+              border = BorderStroke(1.dp, MaterialTheme.colors.secondary.copy(alpha = 0.35f))
             ) {
               Text("Open Setup & Quick Guide")
             }

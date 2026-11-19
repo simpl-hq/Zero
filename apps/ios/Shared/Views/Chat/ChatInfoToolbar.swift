@@ -34,7 +34,7 @@ struct ChatInfoToolbar: View {
                         .scaledToFit()
                         .frame(width: 14, height: 14)
                         .symbolRenderingMode(.palette)
-                        .foregroundStyle(.white, theme.colors.primary)
+                        .foregroundStyle(theme.colors.onPrimary, theme.colors.primary)
                 }
             }
             .padding(.trailing, 4)

@@ -339,13 +339,21 @@ data class ThemeOverrides (
       DefaultTheme.ZERO -> ZeroColorPalette
       DefaultTheme.BLACK -> BlackColorPalette
     }
+    val resolvedPrimary = perChatTheme?.primary?.colorFromReadableHex() ?: perUserTheme?.primary?.colorFromReadableHex() ?: colors.primary?.colorFromReadableHex() ?: presetWallpaperTheme?.primary?.colorFromReadableHex() ?: baseColors.primary
+    val resolvedSecondary = perChatTheme?.secondary?.colorFromReadableHex() ?: perUserTheme?.secondary?.colorFromReadableHex() ?: colors.secondary?.colorFromReadableHex() ?: presetWallpaperTheme?.secondary?.colorFromReadableHex() ?: baseColors.secondary
+    val resolvedBackground = perChatTheme?.background?.colorFromReadableHex() ?: perUserTheme?.background?.colorFromReadableHex() ?: colors.background?.colorFromReadableHex() ?: presetWallpaperTheme?.background?.colorFromReadableHex() ?: baseColors.background
+    val resolvedSurface = perChatTheme?.surface?.colorFromReadableHex() ?: perUserTheme?.surface?.colorFromReadableHex() ?: colors.surface?.colorFromReadableHex() ?: presetWallpaperTheme?.surface?.colorFromReadableHex() ?: baseColors.surface
     return baseColors.copy(
-      primary = perChatTheme?.primary?.colorFromReadableHex() ?: perUserTheme?.primary?.colorFromReadableHex() ?: colors.primary?.colorFromReadableHex() ?: presetWallpaperTheme?.primary?.colorFromReadableHex() ?: baseColors.primary,
+      primary = resolvedPrimary,
+      onPrimary = resolvedPrimary.onSurfaceInk(),
       primaryVariant = perChatTheme?.primaryVariant?.colorFromReadableHex() ?: perUserTheme?.primaryVariant?.colorFromReadableHex() ?: colors.primaryVariant?.colorFromReadableHex() ?: presetWallpaperTheme?.primaryVariant?.colorFromReadableHex() ?: baseColors.primaryVariant,
-      secondary = perChatTheme?.secondary?.colorFromReadableHex() ?: perUserTheme?.secondary?.colorFromReadableHex() ?: colors.secondary?.colorFromReadableHex() ?: presetWallpaperTheme?.secondary?.colorFromReadableHex() ?: baseColors.secondary,
+      secondary = resolvedSecondary,
+      onSecondary = resolvedSecondary.onSurfaceInk(),
       secondaryVariant = perChatTheme?.secondaryVariant?.colorFromReadableHex() ?: perUserTheme?.secondaryVariant?.colorFromReadableHex() ?: colors.secondaryVariant?.colorFromReadableHex() ?: presetWallpaperTheme?.secondaryVariant?.colorFromReadableHex() ?: baseColors.secondaryVariant,
-      background = perChatTheme?.background?.colorFromReadableHex() ?: perUserTheme?.background?.colorFromReadableHex() ?: colors.background?.colorFromReadableHex() ?: presetWallpaperTheme?.background?.colorFromReadableHex() ?: baseColors.background,
-      surface = perChatTheme?.surface?.colorFromReadableHex() ?: perUserTheme?.surface?.colorFromReadableHex() ?: colors.surface?.colorFromReadableHex() ?: presetWallpaperTheme?.surface?.colorFromReadableHex() ?: baseColors.surface,
+      background = resolvedBackground,
+      onBackground = resolvedBackground.onSurfaceInk(),
+      surface = resolvedSurface,
+      onSurface = resolvedSurface.onSurfaceInk(),
     )
   }
 
@@ -446,17 +454,6 @@ fun List<ThemeOverrides>.replace(theme: ThemeOverrides): List<ThemeOverrides> {
 }
 
 fun List<ThemeOverrides>.sameTheme(type: WallpaperType?, themeName: String): ThemeOverrides? = firstOrNull { it.isSame(type, themeName) }
-
-fun List<ThemeOverrides>.skipDuplicates(): List<ThemeOverrides> {
-  val res = ArrayList<ThemeOverrides>()
-  forEach { theme ->
-    val themeType = WallpaperType.from(theme.wallpaper)
-    if (res.none { it.themeId == theme.themeId || it.isSame(themeType, theme.base.themeName) }) {
-      res.add(theme)
-    }
-  }
-  return res
-}
 
 @Serializable
 data class ThemeModeOverrides (
@@ -577,7 +574,7 @@ data class ThemeModeOverride (
       ThemeModeOverride(
         mode = mode,
         colors = ThemeOverrides(base = base).withFilledColors(base, null, null, null, null, null),
-        wallpaper = ThemeWallpaper(preset = PresetWallpaper.SCHOOL.filename)
+        wallpaper = ThemeWallpaper()
       )
   }
 }
@@ -637,77 +634,95 @@ val DEFAULT_END_MODAL_WIDTH = 388.dp
 val DEFAULT_MAX_IMAGE_WIDTH = 500.dp
 
 val DarkColorPalette = darkColors(
-  primary = ZeroBlue,
-  primaryVariant = ZeroBlue,
-  secondary = HighOrLowlight,
-  secondaryVariant = DarkGray,
-  surface = Color(0xFF222222),
-  error = Color.Red,
-  onBackground = Color(0xFFFFFBFA),
-  onSurface = Color(0xFFFFFBFA),
+  primary = Color.White,
+  primaryVariant = ZeroQuoteDarkOnLight,
+  secondary = ZeroTextSecondaryDark,
+  secondaryVariant = ZeroQuoteLightOnDark,
+  background = ZeroSurfaceDark,
+  surface = Color(0xFF141416),
+  error = WarningRed,
+  onPrimary = Color.Black,
+  onSecondary = Color.Black,
+  onBackground = Color.White,
+  onSurface = Color.White,
+  onError = Color.White,
 )
 val DarkColorPaletteApp = AppColors(
-  title = ZeroBlue,
-  primaryVariant2 = Color(0xFF18262E),
-  sentMessage = Color(0xFF18262E),
-  sentQuote = Color(0xFF1D3847),
-  receivedMessage = Color(0xff262627),
-  receivedQuote = Color(0xff373739),
+  title = Color.White,
+  primaryVariant2 = Color(0xFFD4D4D8),
+  sentMessage = Color.White,
+  sentQuote = ZeroQuoteDarkOnLight,
+  receivedMessage = ZeroQuoteLightOnDark,
+  receivedQuote = Color(0xFF262629),
 )
 
 val LightColorPalette = lightColors(
-  primary = ZeroBlue,
-  primaryVariant = ZeroBlue,
-  secondary = HighOrLowlight,
-  secondaryVariant = LightGray,
-  error = Color.Red,
-  surface = Color.White,
+  primary = Color.Black,
+  primaryVariant = Color(0xFF27272A),
+  secondary = ZeroTextSecondaryLight,
+  secondaryVariant = ZeroBorderLight,
+  background = ZeroCanvasLight,
+  surface = ZeroSurfaceLight,
+  error = Color(0xFFDC2626),
+  onPrimary = Color.White,
+  onSecondary = Color.White,
+  onBackground = Color.Black,
+  onSurface = Color.Black,
+  onError = Color.White,
 )
 val LightColorPaletteApp = AppColors(
-  title = ZeroBlue,
-  primaryVariant2 = Color(0xFFE9F7FF),
-  sentMessage = Color(0xFFE9F7FF),
-  sentQuote = Color(0xFFD6F0FF),
-  receivedMessage = Color(0xfff5f5f6),
-  receivedQuote = Color(0xffececee),
+  title = Color.Black,
+  primaryVariant2 = Color(0xFF27272A),
+  sentMessage = Color.Black,
+  sentQuote = ZeroQuoteLightOnDark,
+  receivedMessage = ZeroElevatedLight,
+  receivedQuote = ZeroBorderLight,
 )
 
 val ZeroColorPalette = darkColors(
-  primary = Color(0xFF70F0F9),
-  primaryVariant = Color(0xFF1298A5),
-  secondary = HighOrLowlight,
-  secondaryVariant = Color(0xFF2C464D),
-  background = Color(0xFF111528),
-  surface = Color(0xFF121C37),
-  error = Color.Red,
+  primary = Color.White,
+  primaryVariant = ZeroQuoteDarkOnLight,
+  secondary = ZeroTextSecondaryDark,
+  secondaryVariant = ZeroElevatedDark,
+  background = ZeroCanvasBlack,
+  surface = ZeroSurfaceDark,
+  error = WarningRed,
+  onPrimary = Color.Black,
+  onSecondary = Color.Black,
+  onBackground = Color.White,
+  onSurface = Color.White,
+  onError = Color.White,
 )
 val ZeroColorPaletteApp = AppColors(
-  title = Color(0xFF267BE5),
-  primaryVariant2 = Color(0xFF172941),
-  sentMessage = Color(0xFF172941),
-  sentQuote = Color(0xFF1C3A57),
-  receivedMessage = Color(0xff25283a),
-  receivedQuote = Color(0xff36394a),
+  title = Color.White,
+  primaryVariant2 = Color(0xFFD4D4D8),
+  sentMessage = Color.White,
+  sentQuote = ZeroQuoteDarkOnLight,
+  receivedMessage = ZeroElevatedDark,
+  receivedQuote = ZeroQuoteDark,
 )
 
 val BlackColorPalette = darkColors(
-  primary = Color(0xff0077e0),
-  primaryVariant = Color(0xff0077e0),
-  secondary = HighOrLowlight,
-  secondaryVariant = DarkGray,
-  background = Color(0xff070707),
-  surface = Color(0xff161617),
-  error = Color.Red,
-  onBackground = Color(0xFFFFFBFA),
-  onSurface = Color(0xFFFFFBFA),
+  primary = Color.White,
+  primaryVariant = ZeroQuoteDarkOnLight,
+  secondary = ZeroTextSecondaryDark,
+  secondaryVariant = ZeroElevatedDark,
+  background = ZeroCanvasBlack,
+  surface = ZeroSurfaceDark,
+  error = WarningRed,
+  onPrimary = Color.Black,
+  onSecondary = Color.Black,
+  onBackground = Color.White,
+  onSurface = Color.White,
+  onError = Color.White,
 )
 val BlackColorPaletteApp = AppColors(
-  title = Color(0xff0077e0),
-  primaryVariant2 = Color(0xff243747),
-  sentMessage = Color(0xFF18262E),
-  sentQuote = Color(0xFF1D3847),
-  receivedMessage = Color(0xff1b1b1b),
-  receivedQuote = Color(0xff29292b),
+  title = Color.White,
+  primaryVariant2 = Color(0xFFD4D4D8),
+  sentMessage = Color.White,
+  sentQuote = ZeroQuoteDarkOnLight,
+  receivedMessage = ZeroElevatedDark,
+  receivedQuote = ZeroQuoteDark,
 )
 
 var systemInDarkThemeCurrently: Boolean = isInNightMode()

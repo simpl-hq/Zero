@@ -18,12 +18,13 @@ import app.zero.core.common.ui.theme.*
 @Composable
 fun DeletedItemView(ci: ChatItem, timedMessagesTTL: Int?, showViaProxy: Boolean, showTimestamp: Boolean) {
   val sent = ci.chatDir.sent
-  val sentColor = MaterialTheme.appColors.sentMessage
-  val receivedColor = MaterialTheme.appColors.receivedMessage
+  val bubbleBg = if (sent) MaterialTheme.appColors.sentMessage else MaterialTheme.appColors.receivedMessage
+  val bubbleInk = bubbleBg.onSurfaceInk()
+  val bubbleSecondaryInk = bubbleBg.onSurfaceSecondaryInk()
   Surface(
     shape = RoundedCornerShape(18.dp),
-    color = if (sent) sentColor else receivedColor,
-    contentColor = LocalContentColor.current
+    color = bubbleBg,
+    contentColor = bubbleInk
   ) {
     Row(
       Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
@@ -31,12 +32,12 @@ fun DeletedItemView(ci: ChatItem, timedMessagesTTL: Int?, showViaProxy: Boolean,
     ) {
       Text(
         buildAnnotatedString {
-          withStyle(SpanStyle(fontStyle = FontStyle.Italic, color = MaterialTheme.colors.secondary)) { append(ci.content.text) }
+          withStyle(SpanStyle(fontStyle = FontStyle.Italic, color = bubbleSecondaryInk)) { append(ci.content.text) }
         },
         style = MaterialTheme.typography.body1.copy(lineHeight = 22.sp),
         modifier = Modifier.padding(end = 8.dp)
       )
-      CIMetaView(ci, timedMessagesTTL, showViaProxy = showViaProxy, showTimestamp = showTimestamp)
+      CIMetaView(ci, timedMessagesTTL, metaColor = bubbleSecondaryInk, statusPrimaryColor = bubbleInk, showViaProxy = showViaProxy, showTimestamp = showTimestamp)
     }
   }
 }

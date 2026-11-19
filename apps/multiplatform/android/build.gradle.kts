@@ -146,17 +146,17 @@ android {
         "zh-rCN"
     )
     ndkVersion = "23.1.7779620"
+    val requestedAbi = (project.findProperty("android.abi") as String?)?.trim()?.takeIf { it.isNotEmpty() }
+    val abis = if (requestedAbi != null) arrayOf(requestedAbi) else arrayOf("arm64-v8a", "armeabi-v7a")
     if (isBundle) {
-        defaultConfig.ndk.abiFilters("arm64-v8a", "armeabi-v7a")
+        defaultConfig.ndk.abiFilters(*abis)
     } else {
         splits {
             abi {
                 isEnable = true
                 reset()
-                if (isRelease) {
-                    include("arm64-v8a", "armeabi-v7a")
-                } else {
-                    include("arm64-v8a", "armeabi-v7a")
+                include(*abis)
+                if (!isRelease) {
                     isUniversalApk = false
                 }
             }
@@ -234,10 +234,18 @@ tasks {
                 } else {
                     try {
                         val gradleConfig = android.signingConfigs.getByName(buildType)
-                        keyAlias = gradleConfig.keyAlias!!
-                        keyPassword = gradleConfig.keyPassword!!
-                        storeFile = gradleConfig.storeFile!!.absolutePath
-                        storePassword = gradleConfig.storePassword!!
+                        val sf = gradleConfig.storeFile
+                        val ka = gradleConfig.keyAlias
+                        val kp = gradleConfig.keyPassword
+                        val sp = gradleConfig.storePassword
+                        if (sf == null || ka.isNullOrBlank() || kp == null || sp == null) {
+                            println("No complete signing config for this build type: $buildType")
+                            return@forEach
+                        }
+                        keyAlias = ka
+                        keyPassword = kp
+                        storeFile = sf.absolutePath
+                        storePassword = sp
                     } catch (e: UnknownDomainObjectException) {
                         // There is no signing config for current build type, can"t sign the apk
                         println("No signing configs for this build type: $buildType")

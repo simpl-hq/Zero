@@ -52,8 +52,6 @@ private enum class ZeroPinMode {
   ENTER_EXISTING_PIN
 }
 
-private fun generateFallback4WordPhrase(): String = ZeroIdentityBridge.generateLocal4WordPhrase()
-
 private suspend fun ensureSeamlessProfileAndNetwork(chatModel: ChatModel): User? {
   var user = chatModel.currentUser.value ?: chatModel.controller.apiGetActiveUser(null)
   if (user == null) {
@@ -119,18 +117,11 @@ private fun AboutZeroView() {
   ) {
     Spacer(Modifier.statusBarsPadding().padding(top = AppBarHeight * fontSizeSqrtMultiplier))
     Box(
-      modifier = Modifier.widthIn(max = 120.dp).padding(top = 8.dp),
+      modifier = Modifier.widthIn(max = 156.dp).padding(top = 8.dp),
       contentAlignment = Alignment.Center
     ) {
       ZeroLogo()
     }
-    Text(
-      text = "Zero",
-      style = MaterialTheme.typography.h1,
-      fontWeight = FontWeight.Bold,
-      fontSize = 36.sp,
-      color = MaterialTheme.colors.onBackground
-    )
     Text(
       text = "Privacy Should Be Effortless.",
       style = MaterialTheme.typography.h2,
@@ -184,12 +175,12 @@ private fun AboutZeroView() {
 
     Button(
       onClick = { openZeroGuidedTutorial(allowSettingsShortcuts = true) },
-      shape = RoundedCornerShape(14.dp),
+      shape = RoundedCornerShape(999.dp),
       elevation = ButtonDefaults.elevation(0.dp, 0.dp, 0.dp, 0.dp),
       colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary),
-      modifier = Modifier.widthIn(max = 320.dp).fillMaxWidth().height(48.dp)
+      modifier = Modifier.widthIn(max = 320.dp).fillMaxWidth().height(50.dp)
     ) {
-      Text("Start Quick Setup Guide", color = Color.White, fontWeight = FontWeight.SemiBold)
+      Text("Start Quick Setup Guide", color = MaterialTheme.colors.onPrimary, fontWeight = FontWeight.SemiBold)
     }
   }
 }
@@ -230,23 +221,13 @@ private fun MinimalistZeroOnboarding(chatModel: ChatModel) {
       verticalArrangement = Arrangement.Center
     ) {
       Box(
-        modifier = Modifier.widthIn(max = 160.dp).padding(bottom = 12.dp),
+        modifier = Modifier.widthIn(max = 188.dp).padding(bottom = 4.dp),
         contentAlignment = Alignment.Center
       ) {
         ZeroLogo()
       }
 
-      Text(
-        text = "Zero",
-        style = MaterialTheme.typography.h1,
-        fontWeight = FontWeight.SemiBold,
-        fontSize = 36.sp,
-        letterSpacing = (-0.5).sp,
-        textAlign = TextAlign.Center,
-        color = MaterialTheme.colors.onBackground
-      )
-
-      Spacer(Modifier.height(48.dp))
+      Spacer(Modifier.height(40.dp))
 
       when (mode) {
         ZeroPinMode.INITIAL -> {
@@ -260,8 +241,11 @@ private fun MinimalistZeroOnboarding(chatModel: ChatModel) {
                 val inviteUrl = connLink?.connShortLink ?: connLink?.connFullLink ?: "zero:/contact"
                 val phrase = runCatching {
                   identityBridge.provisionPhraseAndDeepLink(inviteUrl).phrase
-                }.getOrElse {
-                  generateFallback4WordPhrase()
+                }.getOrNull()
+                if (phrase == null) {
+                  statusError = "Unable to reach Zero identity broker. Check your connection and try again."
+                  mode = ZeroPinMode.INITIAL
+                  return@withBGApi
                 }
                 appPrefs.zeroAccountPin.set(phrase)
                 assignedPin = phrase
@@ -269,13 +253,13 @@ private fun MinimalistZeroOnboarding(chatModel: ChatModel) {
               }
             },
             modifier = Modifier.fillMaxWidth().height(54.dp),
-            shape = RoundedCornerShape(14.dp),
+            shape = RoundedCornerShape(999.dp),
             elevation = ButtonDefaults.elevation(0.dp, 0.dp, 0.dp, 0.dp),
             colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary)
           ) {
             Text(
               "Create Zero Identity",
-              color = Color.White,
+              color = MaterialTheme.colors.onPrimary,
               fontSize = 17.sp,
               fontWeight = FontWeight.Medium
             )
@@ -289,7 +273,7 @@ private fun MinimalistZeroOnboarding(chatModel: ChatModel) {
               mode = ZeroPinMode.ENTER_EXISTING_PIN
             },
             modifier = Modifier.fillMaxWidth().height(54.dp),
-            shape = RoundedCornerShape(14.dp),
+            shape = RoundedCornerShape(999.dp),
             border = BorderStroke(1.dp, MaterialTheme.colors.secondary.copy(alpha = 0.35f)),
             colors = ButtonDefaults.outlinedButtonColors(
               backgroundColor = Color.Transparent,
@@ -300,6 +284,16 @@ private fun MinimalistZeroOnboarding(chatModel: ChatModel) {
               "I Already Have a Phrase",
               fontSize = 17.sp,
               fontWeight = FontWeight.Medium
+            )
+          }
+
+          AnimatedVisibility(visible = statusError != null) {
+            Text(
+              text = statusError ?: "",
+              color = MaterialTheme.colors.error,
+              fontSize = 13.sp,
+              textAlign = TextAlign.Center,
+              modifier = Modifier.padding(top = 12.dp)
             )
           }
         }
@@ -368,13 +362,13 @@ private fun MinimalistZeroOnboarding(chatModel: ChatModel) {
               mode = ZeroPinMode.GUIDED_TUTORIAL
             },
             modifier = Modifier.fillMaxWidth().height(54.dp),
-            shape = RoundedCornerShape(14.dp),
+            shape = RoundedCornerShape(999.dp),
             elevation = ButtonDefaults.elevation(0.dp, 0.dp, 0.dp, 0.dp),
             colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary)
           ) {
             Text(
               "Start Quick Setup Guide",
-              color = Color.White,
+              color = MaterialTheme.colors.onPrimary,
               fontSize = 17.sp,
               fontWeight = FontWeight.Medium
             )
@@ -452,13 +446,13 @@ private fun MinimalistZeroOnboarding(chatModel: ChatModel) {
               }
             },
             modifier = Modifier.fillMaxWidth().height(54.dp),
-            shape = RoundedCornerShape(14.dp),
+            shape = RoundedCornerShape(999.dp),
             elevation = ButtonDefaults.elevation(0.dp, 0.dp, 0.dp, 0.dp),
             colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary)
           ) {
             Text(
               "Continue with Phrase",
-              color = Color.White,
+              color = MaterialTheme.colors.onPrimary,
               fontSize = 17.sp,
               fontWeight = FontWeight.Medium
             )
@@ -508,7 +502,7 @@ fun OnboardingActionButton(
   onboarding: OnboardingStage?,
   enabled: Boolean = true,
   icon: Painter? = null,
-  iconColor: Color = Color.White,
+  iconColor: Color = MaterialTheme.colors.onPrimary,
   onclick: (() -> Unit)?
 ) {
   Button(
@@ -527,7 +521,7 @@ fun OnboardingActionButton(
     if (icon != null) {
       Icon(icon, stringResource(labelId), Modifier.padding(end = DEFAULT_PADDING_HALF), tint = iconColor)
     }
-    Text(stringResource(labelId), style = MaterialTheme.typography.h2, color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Medium)
+    Text(stringResource(labelId), style = MaterialTheme.typography.h2, color = MaterialTheme.colors.onPrimary, fontSize = 18.sp, fontWeight = FontWeight.Medium)
   }
 }
 

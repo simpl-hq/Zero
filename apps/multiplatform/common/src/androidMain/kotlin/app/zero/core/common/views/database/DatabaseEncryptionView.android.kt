@@ -12,7 +12,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import app.zero.core.common.ui.theme.ZeroGreen
 import app.zero.core.common.views.helpers.*
 import app.zero.core.res.MR
 import dev.icerock.moko.resources.compose.painterResource
@@ -33,7 +32,7 @@ actual fun SavePassphraseSetting(
       Icon(
         if (storedKey) painterResource(MR.images.ic_vpn_key_filled) else painterResource(MR.images.ic_vpn_key_off_filled),
         stringResource(MR.strings.save_passphrase_in_keychain),
-        tint = if (storedKey) ZeroGreen else MaterialTheme.colors.secondary
+        tint = if (storedKey) MaterialTheme.colors.primary else MaterialTheme.colors.secondary
       )
       if (smallPadding) {
         Spacer(Modifier.padding(horizontal = 4.dp))

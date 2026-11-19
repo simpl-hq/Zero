@@ -4781,13 +4781,13 @@ sealed class Format {
     is StrikeThrough -> SpanStyle(textDecoration = TextDecoration.LineThrough)
     is Snippet -> SpanStyle(fontFamily = FontFamily.Monospace)
     is Secret -> SpanStyle(color = Color.Transparent, background = SecretColor)
-    is Small -> SpanStyle(fontSize = MaterialTheme.typography.body2.fontSize, color = MaterialTheme.colors.secondary)
+    is Small -> SpanStyle(fontSize = MaterialTheme.typography.body2.fontSize, color = LocalContentColor.current.copy(alpha = 0.68f))
     is Colored -> SpanStyle(color = this.color.uiColor)
     is Uri -> linkStyle
     is HyperLink -> linkStyle
     is ZeroLink -> linkStyle
     is ZeroName -> linkStyle
-    is Command -> SpanStyle(color = MaterialTheme.colors.primary, fontFamily = FontFamily.Monospace)
+    is Command -> SpanStyle(color = LocalContentColor.current, fontFamily = FontFamily.Monospace)
     is Mention -> SpanStyle(fontWeight = FontWeight.Medium)
     is Email -> linkStyle
     is Phone -> linkStyle
@@ -4798,7 +4798,7 @@ sealed class Format {
   val isZeroLink = this is ZeroLink
 
   companion object {
-    val linkStyle @Composable get() = SpanStyle(color = MaterialTheme.colors.primary, textDecoration = TextDecoration.Underline)
+    val linkStyle @Composable get() = SpanStyle(color = LocalContentColor.current, fontWeight = FontWeight.Medium, textDecoration = TextDecoration.Underline)
   }
 }
 

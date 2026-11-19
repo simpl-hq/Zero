@@ -1,11 +1,12 @@
 package app.zero.core.network
 
-// Unit tests for Kotlin Argon2id PoW vectors and 4-word phrase lookup helpers.
+// Regression tests for Argon2id invite-bound PoW vectors and 4-word phrase parsing.
 
 import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class ZeroIdentityBridgeTest {
@@ -42,13 +43,27 @@ class ZeroIdentityBridgeTest {
   @Test
   fun testSolveArgon2idPuzzleProducesLeadingZero() = runBlocking {
     val bridge = ZeroIdentityBridge(leadingHexZeros = 1)
-    val ip = "127.0.0.1"
+    val inviteUrl = "zero:/contact#/?v=2-7&smp=smp%3A%2F%2Fzerorelay.simpl.global:5223"
     val timestamp = 1700000000L
-    val nonce = bridge.solveArgon2idPuzzle(ip, timestamp)
+    val nonce = bridge.solveArgon2idPuzzle(inviteUrl, timestamp)
     val digest = Argon2idPow.hash(
-      secret = "$ip:$timestamp:$nonce".toByteArray(Charsets.UTF_8),
+      secret = "$inviteUrl:$timestamp:$nonce".toByteArray(Charsets.UTF_8),
       salt = "zero-argon2id-pow".toByteArray(Charsets.UTF_8)
     )
     assertTrue((digest[0].toInt() and 0xF0) == 0, "Expected leading 0 hex nibble")
+  }
+
+  @Test
+  fun testLeadingZeroBitsBoundaryAndResolvedInviteValidation() {
+    assertTrue(ZeroIdentityBridge.matchesLeadingZeroBits(byteArrayOf(0x00, 0x3F), 10))
+    assertFalse(ZeroIdentityBridge.matchesLeadingZeroBits(byteArrayOf(0x00, 0x40), 10))
+    assertTrue(ZeroIdentityBridge.matchesLeadingZeroBits(byteArrayOf(0x00, 0x0F), 12))
+    assertFalse(ZeroIdentityBridge.matchesLeadingZeroBits(byteArrayOf(0x00, 0x10), 12))
+
+    val valid = "zero:/contact#/?v=2-7&smp=smp%3A%2F%2Fzerorelay.simpl.global:5223"
+    assertEquals(valid, ZeroIdentityBridge.validateResolvedInviteUrl(valid))
+    assertFailsWith<IllegalArgumentException> {
+      ZeroIdentityBridge.validateResolvedInviteUrl("https://evil.example/phish")
+    }
   }
 }

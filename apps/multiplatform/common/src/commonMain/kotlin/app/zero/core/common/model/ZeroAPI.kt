@@ -184,7 +184,7 @@ class AppPreferences {
   val liveMessageAlertShown = mkBoolPreference(SHARED_PREFS_LIVE_MESSAGE_ALERT_SHOWN, false)
   val signMessageAlertShown = mkBoolPreference(SHARED_PREFS_SIGN_MESSAGE_ALERT_SHOWN, false)
   val showHiddenProfilesNotice = mkBoolPreference(SHARED_PREFS_SHOW_HIDDEN_PROFILES_NOTICE, true)
-  val oneHandUICardShown = mkBoolPreference(SHARED_PREFS_ONE_HAND_UI_CARD_SHOWN, false)
+  val oneHandUICardShown = mkBoolPreference(SHARED_PREFS_ONE_HAND_UI_CARD_SHOWN, true)
   val addressCreationCardShown = mkBoolPreference(SHARED_PREFS_ADDRESS_CREATION_CARD_SHOWN, false)
   val getStakeBannerTapped = mkBoolPreference(SHARED_PREFS_GET_STAKE_BANNER_TAPPED, false)
   val getStakeBannerDismissed = mkBoolPreference(SHARED_PREFS_GET_STAKE_BANNER_DISMISSED, false)
@@ -215,8 +215,8 @@ class AppPreferences {
 
   val shouldImportAppSettings = mkBoolPreference(SHARED_PREFS_SHOULD_IMPORT_APP_SETTINGS, false)
 
-  val currentTheme = mkStrPreference(SHARED_PREFS_CURRENT_THEME, DefaultTheme.SYSTEM_THEME_NAME)
-  val systemDarkTheme = mkStrPreference(SHARED_PREFS_SYSTEM_DARK_THEME, DefaultTheme.DARK.themeName)
+  val currentTheme = mkStrPreference(SHARED_PREFS_CURRENT_THEME, DefaultTheme.BLACK.themeName)
+  val systemDarkTheme = mkStrPreference(SHARED_PREFS_SYSTEM_DARK_THEME, DefaultTheme.BLACK.themeName)
   val currentThemeIds = mkMapPreference(SHARED_PREFS_CURRENT_THEME_IDs, mapOf(), encode = {
     json.encodeToString(MapSerializer(String.serializer(), String.serializer()), it)
   }, decode = {
@@ -228,9 +228,9 @@ class AppPreferences {
     jsonCoerceInputValues.decodeFromString(MapSerializer(String.serializer(), ThemeOverrides.serializer()), it)
   }, settingsThemes)
   val themeOverrides = mkThemeOverridesPreference()
-  val profileImageCornerRadius = mkFloatPreference(SHARED_PREFS_PROFILE_IMAGE_CORNER_RADIUS, 22.5f)
-  val chatItemRoundness = mkFloatPreference(SHARED_PREFS_CHAT_ITEM_ROUNDNESS, 0.75f)
-  val chatItemTail = mkBoolPreference(SHARED_PREFS_CHAT_ITEM_TAIL, true)
+  val profileImageCornerRadius = mkFloatPreference(SHARED_PREFS_PROFILE_IMAGE_CORNER_RADIUS, 50f)
+  val chatItemRoundness = mkFloatPreference(SHARED_PREFS_CHAT_ITEM_ROUNDNESS, 0.95f)
+  val chatItemTail = mkBoolPreference(SHARED_PREFS_CHAT_ITEM_TAIL, false)
   val fontScale = mkFloatPreference(SHARED_PREFS_FONT_SCALE, 1f)
   val densityScale = mkFloatPreference(SHARED_PREFS_DENSITY_SCALE, 1f)
   val inAppBarsDefaultAlpha = if (deviceSupportsBlur) 0.875f else 0.975f
@@ -255,7 +255,7 @@ class AppPreferences {
   val iosCallKitEnabled = mkBoolPreference(SHARED_PREFS_IOS_CALL_KIT_ENABLED, true)
   val iosCallKitCallsInRecents = mkBoolPreference(SHARED_PREFS_IOS_CALL_KIT_CALLS_IN_RECENTS, false)
 
-  val oneHandUI = mkBoolPreference(SHARED_PREFS_ONE_HAND_UI, true)
+  val oneHandUI = mkBoolPreference(SHARED_PREFS_ONE_HAND_UI, false)
   val chatBottomBar = mkBoolPreference(SHARED_PREFS_CHAT_BOTTOM_BAR, true)
 
   val zeroAccountPin = mkStrPreference(SHARED_PREFS_ZERO_ACCOUNT_PIN, null)
@@ -273,7 +273,7 @@ class AppPreferences {
 
   val hintPreferences: List<HintPref> = listOf(
     hintPref(laNoticeShown, false),
-    hintPref(oneHandUICardShown, false),
+    hintPref(oneHandUICardShown, true),
     hintPref(addressCreationCardShown, false),
     hintPref(getStakeBannerTapped, false),
     hintPref(getStakeBannerDismissed, false),
@@ -4574,7 +4574,7 @@ data class ServerOperator(
       operatorTag = OperatorTag.Zero,
       tradeName = "Zero",
       legalName = "Zero",
-      serverDomains = listOf("zero.im"),
+      serverDomains = listOf("simpl.global"),
       conditionsAcceptance = ConditionsAcceptance.Accepted(acceptedAt = null, autoAccepted = false),
       enabled = true,
       smpRoles = ServerRoles(storage = true, proxy = true, names = true),
@@ -4834,7 +4834,7 @@ data class UserServer(
       preset = UserServer(
         remoteHostId = null,
         serverId = 1,
-        server = "smp://abcd@smp8.zero.im",
+        server = "smp://pJ5gVPxIPmCXflOJ7W7avwpDka1mEHcNaHEqcAwBx0c=@zerorelay.simpl.global:5223",
         preset = true,
         tested = true,
         enabled = true,
@@ -4843,7 +4843,7 @@ data class UserServer(
       custom = UserServer(
         remoteHostId = null,
         serverId = 2,
-        server = "smp://abcd@smp9.zero.im",
+        server = "smp://TctoW4I8Pkb7i547zF_zX4OEj0EG1GEFYfh1QAPD3Ok=@zeroeu.simpl.global:5223",
         preset = false,
         tested = false,
         enabled = false,
@@ -4852,7 +4852,7 @@ data class UserServer(
       untested = UserServer(
         remoteHostId = null,
         serverId = 3,
-        server = "smp://abcd@smp10.zero.im",
+        server = "smp://abcd@zerona.simpl.global:5223",
         preset = false,
         tested = null,
         enabled = true,
@@ -4861,7 +4861,7 @@ data class UserServer(
       xftpPreset = UserServer(
         remoteHostId = null,
         serverId = 4,
-        server = "xftp://abcd@xftp8.zero.im",
+        server = "xftp://RP75-w9zE9n-JoaGv2Fwik49YLCDcIJJFoFfh0-m6lU=@zerocdn.simpl.global:5223",
         preset = true,
         tested = true,
         enabled = true,
@@ -4990,7 +4990,7 @@ data class ServerAddress(
     )
     val sampleData = ServerAddress(
       serverProtocol = ServerProtocol.SMP,
-      hostnames = listOf("smp.zero.im", "1234.onion"),
+      hostnames = listOf("zerorelay.simpl.global", "1234.onion"),
       port = "",
       keyHash = "LcJUMfVhwD8yxjAiSaDzzGF3-kLG4Uh0Fl_ZIjrRwjI=",
       basicAuth = "server_password"
@@ -8408,14 +8408,14 @@ data class AppSettings(
         androidCallOnLockScreen = AppSettingsLockScreenCalls.SHOW,
         iosCallKitEnabled = true,
         iosCallKitCallsInRecents = false,
-        uiProfileImageCornerRadius = 22.5f,
-        uiChatItemRoundness = 0.75f,
-        uiChatItemTail = true,
-        uiColorScheme = DefaultTheme.SYSTEM_THEME_NAME,
-        uiDarkColorScheme = DefaultTheme.ZERO.themeName,
+        uiProfileImageCornerRadius = 50f,
+        uiChatItemRoundness = 0.95f,
+        uiChatItemTail = false,
+        uiColorScheme = DefaultTheme.BLACK.themeName,
+        uiDarkColorScheme = DefaultTheme.BLACK.themeName,
         uiCurrentThemeIds = null,
         uiThemes = null,
-        oneHandUI = true,
+        oneHandUI = false,
         chatBottomBar = true,
       )
 
@@ -8450,8 +8450,8 @@ data class AppSettings(
           uiProfileImageCornerRadius = def.profileImageCornerRadius.get(),
           uiChatItemRoundness = def.chatItemRoundness.get(),
           uiChatItemTail = def.chatItemTail.get(),
-          uiColorScheme = def.currentTheme.get() ?: DefaultTheme.SYSTEM_THEME_NAME,
-          uiDarkColorScheme = def.systemDarkTheme.get() ?: DefaultTheme.ZERO.themeName,
+          uiColorScheme = def.currentTheme.get() ?: DefaultTheme.BLACK.themeName,
+          uiDarkColorScheme = def.systemDarkTheme.get() ?: DefaultTheme.BLACK.themeName,
           uiCurrentThemeIds = def.currentThemeIds.get(),
           uiThemes = def.themeOverrides.get(),
           oneHandUI = def.oneHandUI.get(),

@@ -95,19 +95,17 @@ internal fun gradientPoints(aspectRatio: Float, scale: Float): GradientEndpoints
 }
 
 internal val lightStops = arrayOf(
-  0.0f to oklch(0.9219f, 0.0431f, 249.4f),
-  0.5f to oklch(0.9198f, 0.0471f, 240.7f),
-  0.9f to oklch(0.9772f, 0.0358f, 196.6f),
-  0.95f to oklch(0.9829f, 0.0104f, 70.0f),
-  1.0f to oklch(0.9886f, 0.0272f, 99.1f)
+  0.0f to Color(0xFFFFFFFF),
+  0.45f to Color(0xFFF5F5F7),
+  0.85f to Color(0xFFEBEBED),
+  1.0f to Color(0xFFE2E2E6)
 )
 
 internal val darkStops = arrayOf(
-  0.4f to oklch(0.1578f, 0.0609f, 267.3f),
-  0.72f to oklch(0.4729f, 0.1574f, 267.3f),
-  0.9f to oklch(0.9024f, 0.0760f, 202.8f),
-  0.95f to oklch(0.9384f, 0.0354f, 65.0f),
-  1.0f to oklch(0.9744f, 0.0370f, 88.4f)
+  0.0f to Color(0xFF0A0A0A),
+  0.45f to Color(0xFF121214),
+  0.85f to Color(0xFF1A1A1D),
+  1.0f to Color(0xFF222226)
 )
 
 private fun Modifier.maxHeightByWidthRatio(ratio: Float) = layout { measurable, constraints ->

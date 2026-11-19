@@ -22,7 +22,7 @@ object ThemeManager {
     DefaultTheme.DARK.themeName -> DarkColorPalette to DefaultTheme.DARK
     DefaultTheme.ZERO.themeName -> ZeroColorPalette to DefaultTheme.ZERO
     DefaultTheme.BLACK.themeName -> BlackColorPalette to DefaultTheme.BLACK
-    else -> ZeroColorPalette to DefaultTheme.ZERO
+    else -> BlackColorPalette to DefaultTheme.BLACK
   }
 
   private fun nonSystemThemeName(): String {
@@ -46,8 +46,7 @@ object ThemeManager {
       return perUserTheme
     }
     val defaultTheme = defaultActiveTheme(appSettingsTheme)
-    return ThemeModeOverride(colors = defaultTheme?.colors ?: ThemeColors(), wallpaper = defaultTheme?.wallpaper
-      ?: ThemeWallpaper.from(PresetWallpaper.SCHOOL.toType(CurrentColors.value.base), null, null))
+    return ThemeModeOverride(colors = defaultTheme?.colors ?: ThemeColors(), wallpaper = defaultTheme?.wallpaper ?: ThemeWallpaper())
   }
 
   fun currentColors(themeOverridesForType: WallpaperType?, perChatTheme: ThemeModeOverride?, perUserTheme: ThemeModeOverrides?, appSettingsTheme: List<ThemeOverrides>): ActiveTheme {
@@ -56,11 +55,11 @@ object ThemeManager {
     val defaultTheme = defaultActiveTheme(appSettingsTheme)
 
     val baseTheme = when (nonSystemThemeName) {
-      DefaultTheme.LIGHT.themeName -> ActiveTheme(DefaultTheme.LIGHT.themeName, DefaultTheme.LIGHT, LightColorPalette, LightColorPaletteApp, AppWallpaper(type = PresetWallpaper.SCHOOL.toType(DefaultTheme.LIGHT)))
-      DefaultTheme.DARK.themeName -> ActiveTheme(DefaultTheme.DARK.themeName, DefaultTheme.DARK, DarkColorPalette, DarkColorPaletteApp, AppWallpaper(type = PresetWallpaper.SCHOOL.toType(DefaultTheme.DARK)))
-      DefaultTheme.ZERO.themeName -> ActiveTheme(DefaultTheme.ZERO.themeName, DefaultTheme.ZERO, ZeroColorPalette, ZeroColorPaletteApp, AppWallpaper(type = PresetWallpaper.SCHOOL.toType(DefaultTheme.ZERO)))
-      DefaultTheme.BLACK.themeName -> ActiveTheme(DefaultTheme.BLACK.themeName, DefaultTheme.BLACK, BlackColorPalette, BlackColorPaletteApp, AppWallpaper(type = PresetWallpaper.SCHOOL.toType(DefaultTheme.BLACK)))
-      else -> ActiveTheme(DefaultTheme.LIGHT.themeName, DefaultTheme.LIGHT, LightColorPalette, LightColorPaletteApp, AppWallpaper(type = PresetWallpaper.SCHOOL.toType(DefaultTheme.LIGHT)))
+      DefaultTheme.LIGHT.themeName -> ActiveTheme(DefaultTheme.LIGHT.themeName, DefaultTheme.LIGHT, LightColorPalette, LightColorPaletteApp, AppWallpaper(type = WallpaperType.Empty))
+      DefaultTheme.DARK.themeName -> ActiveTheme(DefaultTheme.DARK.themeName, DefaultTheme.DARK, DarkColorPalette, DarkColorPaletteApp, AppWallpaper(type = WallpaperType.Empty))
+      DefaultTheme.ZERO.themeName -> ActiveTheme(DefaultTheme.ZERO.themeName, DefaultTheme.ZERO, ZeroColorPalette, ZeroColorPaletteApp, AppWallpaper(type = WallpaperType.Empty))
+      DefaultTheme.BLACK.themeName -> ActiveTheme(DefaultTheme.BLACK.themeName, DefaultTheme.BLACK, BlackColorPalette, BlackColorPaletteApp, AppWallpaper(type = WallpaperType.Empty))
+      else -> ActiveTheme(DefaultTheme.BLACK.themeName, DefaultTheme.BLACK, BlackColorPalette, BlackColorPaletteApp, AppWallpaper(type = WallpaperType.Empty))
     }
 
     val perUserTheme = if (baseTheme.colors.isLight) perUserTheme?.light else perUserTheme?.dark

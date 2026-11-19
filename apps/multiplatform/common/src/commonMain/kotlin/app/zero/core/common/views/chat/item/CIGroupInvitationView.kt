@@ -45,12 +45,18 @@ fun CIGroupInvitationView(
     }
   }
 
+  val sentColor = MaterialTheme.appColors.sentMessage
+  val receivedColor = MaterialTheme.appColors.receivedMessage
+  val bubbleBg = if (sent) sentColor else receivedColor
+  val bubbleInk = bubbleBg.onSurfaceInk()
+  val bubbleSecondaryInk = bubbleBg.onSurfaceSecondaryInk()
+
   @Composable
   fun groupInfoView() {
     val p = groupInvitation.groupProfile
     val iconColor =
-      if (action && !inProgress.value) if (chatIncognito) Indigo else MaterialTheme.colors.primary
-      else if (isInDarkTheme()) FileDark else FileLight
+      if (action && !inProgress.value) bubbleInk
+      else bubbleSecondaryInk
 
     Row(
       Modifier.defaultMinSize(minWidth = 220.dp)
@@ -82,16 +88,14 @@ fun CIGroupInvitationView(
     }
   }
 
-  val sentColor = MaterialTheme.appColors.sentMessage
-  val receivedColor = MaterialTheme.appColors.receivedMessage
   Surface(
     modifier = if (action && !inProgress.value) Modifier.clickable(onClick = {
       inProgress.value = true
       joinGroup(groupInvitation.groupId) { inProgress.value = false }
     }) else Modifier,
     shape = RoundedCornerShape(18.dp),
-    color = if (sent) sentColor else receivedColor,
-    contentColor = LocalContentColor.current
+    color = bubbleBg,
+    contentColor = bubbleInk
   ) {
     Box(
       Modifier
@@ -108,7 +112,7 @@ fun CIGroupInvitationView(
             .padding(bottom = 4.dp),
         ) {
           groupInfoView()
-          val secondaryColor = MaterialTheme.colors.secondary
+          val secondaryColor = bubbleSecondaryInk
           Divider(Modifier.fillMaxWidth().padding(top = 8.dp))
           Column(Modifier.padding(top = 8.dp, bottom = 4.dp, start = 4.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
             if (action) {
@@ -118,10 +122,8 @@ fun CIGroupInvitationView(
                   append(generalGetString(if (chatIncognito) MR.strings.group_invitation_tap_to_join_incognito else MR.strings.group_invitation_tap_to_join))
                   withStyle(reserveTimestampStyle) { append(reserveSpaceForMeta(ci.meta, timedMessagesTTL, encrypted = null, showStatus = false, showEdited = false, secondaryColor = secondaryColor, showTimestamp = showTimestamp)) }
                 },
-                color = if (inProgress.value)
-                  MaterialTheme.colors.secondary
-                else
-                  if (chatIncognito) Indigo else MaterialTheme.colors.primary
+                fontWeight = FontWeight.Medium,
+                color = if (inProgress.value) bubbleSecondaryInk else bubbleInk
               )
             } else {
               Text(
@@ -139,13 +141,13 @@ fun CIGroupInvitationView(
         if (progressByTimeout) {
           CircularProgressIndicator(
             Modifier.size(32.dp),
-            color = if (isInDarkTheme()) FileDark else FileLight,
+            color = bubbleSecondaryInk,
             strokeWidth = 3.dp
           )
         }
       }
 
-      CIMetaView(ci, timedMessagesTTL, showStatus = false, showEdited = false, showViaProxy = false, showTimestamp = showTimestamp)
+      CIMetaView(ci, timedMessagesTTL, metaColor = bubbleSecondaryInk, statusPrimaryColor = bubbleInk, showStatus = false, showEdited = false, showViaProxy = false, showTimestamp = showTimestamp)
     }
   }
 }

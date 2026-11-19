@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.sp
 import app.zero.core.common.model.*
 import app.zero.core.common.platform.appPreferences
 import app.zero.core.common.ui.theme.isInDarkTheme
+import app.zero.core.common.ui.theme.isLightSurface
 import app.zero.core.res.MR
 import kotlinx.datetime.Clock
 
@@ -22,18 +23,13 @@ import kotlinx.datetime.Clock
 fun CIMetaView(
   chatItem: ChatItem,
   timedMessagesTTL: Int?,
-  metaColor: Color = MaterialTheme.colors.secondary,
-  paleMetaColor: Color = if (isInDarkTheme()) {
-    metaColor.copy(
-      red = metaColor.red * 0.67F,
-      green = metaColor.green * 0.67F,
-      blue = metaColor.red * 0.67F)
+  metaColor: Color = LocalContentColor.current.copy(alpha = 0.65f),
+  paleMetaColor: Color = if (metaColor.isLightSurface()) {
+    metaColor.copy(alpha = 0.45f)
   } else {
-    metaColor.copy(
-      red = minOf(metaColor.red * 1.33F, 1F),
-      green = minOf(metaColor.green * 1.33F, 1F),
-      blue = minOf(metaColor.red * 1.33F, 1F))
+    metaColor.copy(alpha = 0.55f)
   },
+  statusPrimaryColor: Color = LocalContentColor.current,
   showStatus: Boolean = true,
   showEdited: Boolean = true,
   showTimestamp: Boolean,
@@ -54,6 +50,7 @@ fun CIMetaView(
         encrypted = chatItem.encryptedFile,
         metaColor,
         paleMetaColor,
+        statusPrimaryColor,
         showStatus = showStatus,
         showEdited = showEdited,
         showViaProxy = showViaProxy,
@@ -71,6 +68,7 @@ private fun CIMetaText(
   encrypted: Boolean?,
   color: Color,
   paleColor: Color,
+  statusPrimaryColor: Color,
   showStatus: Boolean = true,
   showEdited: Boolean = true,
   showTimestamp: Boolean,
@@ -91,11 +89,11 @@ private fun CIMetaText(
   }
   if (showViaProxy && meta.sentViaProxy == true) {
     Spacer(Modifier.width(4.dp))
-    Icon(painterResource(MR.images.ic_arrow_forward), null, Modifier.height(17.dp), tint = MaterialTheme.colors.secondary)
+    Icon(painterResource(MR.images.ic_arrow_forward), null, Modifier.height(17.dp), tint = color)
   }
   if (showStatus) {
     Spacer(Modifier.width(4.dp))
-    val statusIcon = meta.statusIcon(MaterialTheme.colors.primary, color, paleColor)
+    val statusIcon = meta.statusIcon(statusPrimaryColor, color, paleColor)
     if (statusIcon != null) {
       val (icon, statusColor) = statusIcon
       if (meta.itemStatus is CIStatus.SndSent || meta.itemStatus is CIStatus.SndRcvd) {

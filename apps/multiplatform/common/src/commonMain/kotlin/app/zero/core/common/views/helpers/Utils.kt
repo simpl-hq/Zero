@@ -564,7 +564,7 @@ fun UriHandler.openUriCatching(uri: String) {
 
 fun UriHandler.openExternalLink(uri: String) {
   val uriHandler = this
-  if (uri.startsWith("https://zero.chat/contact#") || (uri.startsWith("https://smp") && ".zero.im/a#" in uri)) {
+  if (uri.startsWith("https://simpl.global/") || uri.startsWith("https://zero.chat/contact#") || (uri.startsWith("https://") && ".simpl.global/a#" in uri)) {
     uriHandler.openVerifiedZeroUri(uri)
   } else {
     AlertManager.shared.showAlertDialog(

@@ -44,10 +44,12 @@ fun CIFileView(
   val saveFileLauncher = rememberSaveFileLauncher(ciFile = file)
   val sizeMultiplier = 1f
   val progressSizeMultiplier = if (smallView) 0.7f else 1f
+  val defaultFileColor = LocalContentColor.current.copy(alpha = 0.72f)
+  val activeFileColor = LocalContentColor.current
   @Composable
   fun fileIcon(
     innerIcon: Painter? = null,
-    color: Color = if (isInDarkTheme()) FileDark else FileLight,
+    color: Color = defaultFileColor,
     topPadding: Dp = 12.sp.toDp()
   ) {
     Box(
@@ -67,7 +69,7 @@ fun CIFileView(
             .padding(top = topPadding * sizeMultiplier)
             .height(20.sp.toDp() * sizeMultiplier)
             .width(32.sp.toDp() * sizeMultiplier),
-          tint = Color.White
+          tint = color.onSurfaceInk()
         )
       }
     }
@@ -158,7 +160,7 @@ fun CIFileView(
           is CIFileStatus.SndWarning -> fileIcon(innerIcon = painterResource(MR.images.ic_warning_filled))
           is CIFileStatus.RcvInvitation ->
             if (fileSizeValid(file, senderProfile))
-              fileIcon(innerIcon = painterResource(MR.images.ic_arrow_downward), color = MaterialTheme.colors.primary, topPadding = 10.sp.toDp())
+              fileIcon(innerIcon = painterResource(MR.images.ic_arrow_downward), color = activeFileColor, topPadding = 10.sp.toDp())
             else
               fileIcon(innerIcon = painterResource(MR.images.ic_priority_high), color = WarningOrange)
           is CIFileStatus.RcvAccepted -> fileIcon(innerIcon = painterResource(MR.images.ic_more_horiz))
@@ -169,7 +171,7 @@ fun CIFileView(
               CIFileViewScope.progressIndicator(progressSizeMultiplier)
             }
           is CIFileStatus.RcvAborted ->
-            fileIcon(innerIcon = painterResource(MR.images.ic_sync_problem), color = MaterialTheme.colors.primary)
+            fileIcon(innerIcon = painterResource(MR.images.ic_sync_problem), color = activeFileColor)
           is CIFileStatus.RcvComplete -> fileIcon()
           is CIFileStatus.RcvCancelled -> fileIcon(innerIcon = painterResource(MR.images.ic_close))
           is CIFileStatus.RcvError -> fileIcon(innerIcon = painterResource(MR.images.ic_close))
@@ -207,7 +209,7 @@ fun CIFileView(
   ) {
     fileIndicator()
     if (!smallView) {
-      val secondaryColor = MaterialTheme.colors.secondary
+      val secondaryColor = LocalContentColor.current.copy(alpha = 0.68f)
       val encrypted = if (file?.fileSource == null) null else file.fileSource.cryptoArgs != null
       val metaReserve = buildAnnotatedString {
         withStyle(reserveTimestampStyle) {

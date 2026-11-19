@@ -1,15 +1,15 @@
 import SwiftUI
 import Zero
 
-let uiLinkColor = UIColor(red: 0, green: 0.533, blue: 1, alpha: 1)
+let uiLinkColor = UIColor.label
 
-private func typing(_ theme: AppTheme, _ descr: UIFontDescriptor, _ ws: [UIFont.Weight]) -> NSMutableAttributedString {
+private func typing(_ color: UIColor, _ descr: UIFontDescriptor, _ ws: [UIFont.Weight]) -> NSMutableAttributedString {
     let res = NSMutableAttributedString()
     for w in ws {
         res.append(NSAttributedString(string: ".", attributes: [
             .font: UIFont.monospacedSystemFont(ofSize: descr.pointSize, weight: w),
             .kern: -2 as NSNumber,
-            .foregroundColor: UIColor(theme.colors.secondary)
+            .foregroundColor: color
         ]))
     }
     return res
@@ -30,6 +30,7 @@ struct MsgContentView: View {
     var rightToLeft = false
     var prefix: NSAttributedString? = nil
     var stripLink: String? = nil
+    var textColor: UIColor? = nil
     @State private var showSecrets: Set<Int> = []
     @State private var typingIdx = 0
     @State private var timer: Timer?
@@ -40,15 +41,20 @@ struct MsgContentView: View {
     @AppStorage(DEFAULT_SHOW_SENT_VIA_RPOXY) private var showSentViaProxy = false
     @AppStorage(DEFAULT_PRIVACY_SHOW_SIGNATURE) private var showSignature = true
 
+    private var resolvedTextColor: UIColor {
+        textColor ?? UIColor(theme.colors.onSurface)
+    }
+
     var body: some View {
         let v = msgContentView()
         if meta?.isLive == true {
+            let typingTint = resolvedTextColor.withAlphaComponent(0.6)
             v.onAppear {
                 let descr = UIFontDescriptor.preferredFontDescriptor(withTextStyle: .body)
                 noTyping = NSAttributedString(string: "   ", attributes: [
                     .font: UIFont.monospacedSystemFont(ofSize: descr.pointSize, weight: .regular),
                     .kern: -2 as NSNumber,
-                    .foregroundColor: UIColor(theme.colors.secondary)
+                    .foregroundColor: typingTint
                 ])
                 switchTyping()
             }
@@ -64,11 +70,12 @@ struct MsgContentView: View {
         if let meta = meta, meta.isLive && meta.recent {
             if typingIndicators.isEmpty {
                 let descr = UIFontDescriptor.preferredFontDescriptor(withTextStyle: .body)
+                let typingTint = resolvedTextColor.withAlphaComponent(0.6)
                 typingIndicators = [
-                    typing(theme, descr, [.black, .light, .light]),
-                    typing(theme, descr, [.bold, .black, .light]),
-                    typing(theme, descr, [.light, .bold, .black]),
-                    typing(theme, descr, [.light, .light, .bold])
+                    typing(typingTint, descr, [.black, .light, .light]),
+                    typing(typingTint, descr, [.bold, .black, .light]),
+                    typing(typingTint, descr, [.light, .bold, .black]),
+                    typing(typingTint, descr, [.light, .light, .bold])
                 ]
             }
             timer = timer ?? Timer.scheduledTimer(withTimeInterval: 0.25, repeats: true) { _ in
@@ -98,7 +105,8 @@ struct MsgContentView: View {
             commands: chat.chatInfo.useCommands && chat.chatInfo.sndReady,
             backgroundColor: containerBackground,
             prefix: prefix,
-            stripLink: stripLink
+            stripLink: stripLink,
+            textColor: resolvedTextColor
         )
         let s = r.string
         let t: Text
@@ -386,7 +394,8 @@ func messageText(
     commands: Bool = false,
     backgroundColor: UIColor,
     prefix: NSAttributedString? = nil,
-    stripLink: String? = nil
+    stripLink: String? = nil,
+    textColor: UIColor = .label
 ) -> MsgTextResult {
     let text = if let stripLink { stripTextLink(text, stripLink) } else { text }
     let formattedText = if let stripLink { stripFormattedTextLink(formattedText, stripLink) } else { formattedText }
@@ -395,8 +404,9 @@ func messageText(
     let font = UIFont.preferredFont(forTextStyle: textStyle)
     let plain: [NSAttributedString.Key: Any] = [
         .font: font,
-        .foregroundColor: UIColor.label
+        .foregroundColor: textColor
     ]
+    let secondaryTextColor = textColor.withAlphaComponent(0.68)
     let secretColor = backgroundColor.withAlphaComponent(1)
     var link: [NSAttributedString.Key: Any]?
     var hasSecrets = false
@@ -456,7 +466,7 @@ func messageText(
             case .small:
                 small = small ?? UIFont.preferredFont(forTextStyle: .footnote)
                 attrs[.font] = small
-                attrs[.foregroundColor] = UIColor.secondaryLabel
+                attrs[.foregroundColor] = secondaryTextColor
             case let .colored(color):
                 if let c = color.uiColor {
                     attrs[.foregroundColor] = UIColor(c)
@@ -497,7 +507,8 @@ func messageText(
                 attrs[.font] = snippet
                 t = "/" + cmdStr
                 if !preview && commands {
-                    attrs[.foregroundColor] = uiLinkColor
+                    attrs[.foregroundColor] = textColor
+                    attrs[.underlineStyle] = NSUnderlineStyle.single.rawValue
                     attrs[commandAttrKey] = t
                     handleTaps = true
                 }
@@ -512,7 +523,7 @@ func messageText(
                             ref.displayName
                         }
                         if m.memberId == userMemberId {
-                            attrs[.foregroundColor] = UIColor.tintColor
+                            attrs[.foregroundColor] = textColor
                         }
                         t = mentionText(name)
                     } else {
@@ -557,7 +568,7 @@ func messageText(
     func linkAttrs() -> [NSAttributedString.Key: Any] {
         link = link ?? [
             .font: font,
-            .foregroundColor: uiLinkColor,
+            .foregroundColor: textColor,
             .underlineStyle: NSUnderlineStyle.single.rawValue
         ]
         return link!

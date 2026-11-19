@@ -230,7 +230,8 @@ struct MemberSupportView: View {
                         let singleUnreadIsMention = supportChat.mentions > 0 && supportChat.unread == 1
                         (singleUnreadIsMention ? Text("\(MENTION_START)") : unreadCountText(supportChat.unread))
                             .font(userFont <= .xxxLarge ? .caption : .caption2)
-                            .foregroundColor(.white)
+                            .fontWeight(.semibold)
+                            .foregroundColor(indicatorTint.onSurfaceInk)
                             .padding(.horizontal, dynamicSize(userFont).unreadPadding)
                             .frame(minWidth: dynamicChatInfoSize, minHeight: dynamicChatInfoSize)
                             .background(indicatorTint)

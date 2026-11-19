@@ -11,6 +11,9 @@ struct CIChatLinkHeader: View {
 
     @AppStorage(DEFAULT_SHOW_SENT_VIA_RPOXY) private var showSentViaProxy = false
 
+    private var bubbleInk: Color { chatItemFrameColor(chatItem, theme).onSurfaceInk }
+    private var bubbleSecondaryInk: Color { chatItemFrameColor(chatItem, theme).onSurfaceSecondaryInk }
+
     var body: some View {
         VStack(alignment: .leading) {
             linkProfileView()
@@ -23,15 +26,15 @@ struct CIChatLinkHeader: View {
                 if let descr = chatLink.shortDescription {
                     Text(descr)
                         .font(.footnote)
-                        .foregroundColor(theme.colors.secondary)
+                        .foregroundColor(bubbleSecondaryInk)
                         .lineLimit(2)
                         .padding(.bottom, 2)
                 }
                 Text(chatLink.infoLine(signed: ownerSig != nil))
                     .font(.footnote)
-                    .foregroundColor(theme.colors.secondary)
+                    .foregroundColor(bubbleSecondaryInk)
                     .padding(.bottom, 2)
-                let t = Text("Tap to open").foregroundColor(theme.colors.primary).font(.callout)
+                let t = Text("Tap to open").foregroundColor(bubbleInk).font(.callout).fontWeight(.medium)
                 if hasText {
                     t
                 } else {

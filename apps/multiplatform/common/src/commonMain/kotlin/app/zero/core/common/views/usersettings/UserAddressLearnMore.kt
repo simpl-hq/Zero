@@ -68,7 +68,7 @@ fun UserAddressLearnMore(showCreateAddressButton: Boolean = false) {
           contentPadding = PaddingValues(horizontal =  DEFAULT_PADDING * 2, vertical = DEFAULT_PADDING),
           colors = ButtonDefaults.buttonColors(MaterialTheme.colors.primary, disabledBackgroundColor = MaterialTheme.colors.secondary)
         ) {
-          Text(stringResource(MR.strings.create_zero_address), style = MaterialTheme.typography.h2, color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Medium)
+          Text(stringResource(MR.strings.create_zero_address), style = MaterialTheme.typography.h2, color = MaterialTheme.colors.onPrimary, fontSize = 18.sp, fontWeight = FontWeight.Medium)
         }
 
         val closeAll = { ModalManager.start.closeModals() }

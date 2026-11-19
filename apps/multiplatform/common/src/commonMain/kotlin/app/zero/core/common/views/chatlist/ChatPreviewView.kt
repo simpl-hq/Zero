@@ -484,7 +484,7 @@ fun ChatPreviewView(
                     Icon(
                       painterResource(MR.images.ic_alternate_email),
                       contentDescription = generalGetString(MR.strings.notifications),
-                      tint = Color.White,
+                      tint = mentionColor.onSurfaceInk(),
                       modifier = Modifier.size(9.sp.toDp())
                     )
                   }
@@ -592,8 +592,9 @@ fun UnreadBadge(
 ) {
   Text(
     text,
-    color = Color.White,
+    color = backgroundColor.onSurfaceInk(),
     fontSize = 10.sp,
+    fontWeight = FontWeight.SemiBold,
     style = TextStyle(textAlign = TextAlign.Center),
     modifier = Modifier
       .offset(y = yOffset ?: 0.dp)

@@ -2086,6 +2086,11 @@ struct ChatView: View {
                         if ci.chatDir.sent {
                             goToItemButton(true)
                         }
+                        let incomingBorder: Color? = if !ci.chatDir.sent && !onlyImageOrVideo(ci) && (ci.content.msgContent != nil || ci.isDeletedContent) {
+                            theme.colors.background.isLightSurface ? Color.black.opacity(0.06) : Color.white.opacity(0.10)
+                        } else {
+                            nil
+                        }
                         ChatItemView(
                             chat: chat,
                             im: im,
@@ -2097,7 +2102,7 @@ struct ChatView: View {
                         )
                         .environment(\.revealed, revealed)
                         .environment(\.showTimestamp, itemSeparation.timestamp)
-                        .modifier(ChatItemClipped(ci, tailVisible: itemSeparation.largeGap && (ci.meta.itemDeleted == nil || revealed)))
+                        .modifier(ChatItemClipped(ci, tailVisible: itemSeparation.largeGap && (ci.meta.itemDeleted == nil || revealed), borderColor: incomingBorder))
                         .contextMenu { menu(ci, range, live: live) }
                         .accessibilityLabel("")
                         if !ci.chatDir.sent {

@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -32,7 +33,6 @@ import app.zero.core.common.model.ChatModel
 import app.zero.core.common.platform.chatModel
 import app.zero.core.common.views.helpers.ModalManager
 import app.zero.core.common.views.helpers.withBGApi
-import app.zero.core.common.views.newchat.connectIfOpenedViaUri
 import app.zero.core.common.views.onboarding.openZeroGuidedTutorial
 import app.zero.core.common.views.usersettings.networkAndServers.NetworkAndServersView
 import app.zero.core.network.ZeroIdentityBridge
@@ -60,20 +60,31 @@ fun ZeroDashboardView(
         backgroundColor = MaterialTheme.colors.background,
         elevation = 0.dp,
         title = {
-          Text(
-            "Zero",
-            style = MaterialTheme.typography.h1,
-            fontSize = 24.sp,
-            fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colors.onBackground
-          )
+          Column(verticalArrangement = Arrangement.spacedBy(1.dp)) {
+            Text(
+              "ZERO",
+              style = MaterialTheme.typography.h1,
+              fontSize = 18.sp,
+              fontWeight = FontWeight.Bold,
+              letterSpacing = 2.4.sp,
+              color = MaterialTheme.colors.onBackground
+            )
+            Text(
+              "BY SIMPL",
+              fontSize = 9.sp,
+              fontFamily = FontFamily.Monospace,
+              fontWeight = FontWeight.Medium,
+              letterSpacing = 1.4.sp,
+              color = MaterialTheme.colors.secondary
+            )
+          }
         },
         actions = {
           if (onOpenTutorialClick != null) {
             IconButton(onClick = onOpenTutorialClick) {
               Icon(
                 painter = painterResource(MR.images.ic_help),
-                contentDescription = "Setup & Quick Guide",
+                contentDescription = "Quick guide",
                 tint = MaterialTheme.colors.primary
               )
             }
@@ -81,7 +92,7 @@ fun ZeroDashboardView(
           IconButton(onClick = onNavigateToAdvancedSettings) {
             Icon(
               painter = painterResource(MR.images.ic_settings),
-              contentDescription = "Engineering & Advanced Settings",
+              contentDescription = "Network settings",
               tint = MaterialTheme.colors.secondary
             )
           }
@@ -93,46 +104,65 @@ fun ZeroDashboardView(
       modifier = Modifier
         .fillMaxSize()
         .padding(padding)
-        .padding(24.dp)
+        .padding(horizontal = 24.dp, vertical = 20.dp)
     ) {
+      Text(
+        "Private messaging. No phone number. No tracking.",
+        style = MaterialTheme.typography.body1,
+        color = MaterialTheme.colors.secondary,
+        modifier = Modifier.padding(bottom = 20.dp)
+      )
       Card(
         modifier = Modifier
           .fillMaxWidth()
           .padding(bottom = 24.dp)
-          .clickable {
+          .clickable(
+            onClickLabel = "Copy your private phrase",
+            role = Role.Button
+          ) {
             clipboardManager.setText(AnnotatedString(userAccountPin))
-            copiedLabel = "4-WORD PHRASE COPIED"
+            copiedLabel = "PHRASE COPIED"
           },
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(20.dp),
         elevation = 0.dp,
-        border = BorderStroke(1.dp, MaterialTheme.colors.secondary.copy(alpha = 0.2f)),
+        border = BorderStroke(1.dp, MaterialTheme.colors.onSurface.copy(alpha = 0.12f)),
         backgroundColor = MaterialTheme.colors.surface
       ) {
         Column(
-          modifier = Modifier.padding(vertical = 20.dp, horizontal = 16.dp),
+          modifier = Modifier.padding(vertical = 24.dp, horizontal = 20.dp),
           horizontalAlignment = Alignment.CenterHorizontally
         ) {
           Text(
-            copiedLabel ?: "YOUR 4-WORD PHRASE",
+            copiedLabel ?: "YOUR PRIVATE PHRASE · TAP TO COPY",
             style = MaterialTheme.typography.caption,
             fontWeight = FontWeight.SemiBold,
-            letterSpacing = 1.2.sp,
-            color = if (copiedLabel != null) MaterialTheme.colors.primary else MaterialTheme.colors.secondary
+            letterSpacing = 1.4.sp,
+            color = if (copiedLabel != null) MaterialTheme.colors.primary else MaterialTheme.colors.secondary,
+            textAlign = TextAlign.Center
           )
-          Spacer(Modifier.height(8.dp))
+          Spacer(Modifier.height(12.dp))
           Text(
             userAccountPin,
             style = MaterialTheme.typography.h1,
-            fontSize = 20.sp,
+            fontSize = 22.sp,
             fontWeight = FontWeight.Bold,
             fontFamily = FontFamily.Monospace,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colors.onSurface
           )
           if (!ephemeralCode.isNullOrBlank()) {
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(12.dp))
             Text(
-              "In-Person (5m): $ephemeralCode",
+              "IN-PERSON CODE · EXPIRES IN 5 MIN",
+              fontSize = 10.sp,
+              fontFamily = FontFamily.Monospace,
+              fontWeight = FontWeight.Medium,
+              letterSpacing = 0.8.sp,
+              color = MaterialTheme.colors.secondary
+            )
+            Spacer(Modifier.height(4.dp))
+            Text(
+              ephemeralCode,
               fontSize = 13.sp,
               fontFamily = FontFamily.Monospace,
               fontWeight = FontWeight.SemiBold,
@@ -174,13 +204,33 @@ fun ZeroDashboardView(
           modifier = Modifier.weight(1f).fillMaxWidth(),
           contentAlignment = Alignment.Center
         ) {
-          Text(
-            "Your conversations are secure.",
-            style = MaterialTheme.typography.body1,
-            color = MaterialTheme.colors.secondary
-          )
+          Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+              "Your private space",
+              style = MaterialTheme.typography.h2,
+              fontWeight = FontWeight.SemiBold,
+              color = MaterialTheme.colors.onBackground,
+              textAlign = TextAlign.Center
+            )
+            Spacer(Modifier.height(8.dp))
+            Text(
+              "Connect with someone to start a conversation.",
+              style = MaterialTheme.typography.body2,
+              color = MaterialTheme.colors.secondary,
+              textAlign = TextAlign.Center
+            )
+          }
         }
       } else {
+        Text(
+          "CONVERSATIONS",
+          style = MaterialTheme.typography.caption,
+          fontFamily = FontFamily.Monospace,
+          fontWeight = FontWeight.SemiBold,
+          letterSpacing = 1.2.sp,
+          color = MaterialTheme.colors.secondary,
+          modifier = Modifier.padding(bottom = 12.dp)
+        )
         LazyColumn(
           modifier = Modifier.weight(1f).fillMaxWidth(),
           verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -192,7 +242,7 @@ fun ZeroDashboardView(
                 .clickable { onSelectChat(chat) },
               shape = RoundedCornerShape(12.dp),
               color = MaterialTheme.colors.surface,
-              border = BorderStroke(1.dp, MaterialTheme.colors.secondary.copy(alpha = 0.12f))
+              border = BorderStroke(1.dp, MaterialTheme.colors.onSurface.copy(alpha = 0.1f))
             ) {
               Row(
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
@@ -228,14 +278,14 @@ fun ZeroDashboardView(
 
       Button(
         onClick = onAddContactClick,
-        modifier = Modifier.fillMaxWidth().height(56.dp),
-        shape = RoundedCornerShape(14.dp),
+        modifier = Modifier.fillMaxWidth().height(54.dp),
+        shape = RoundedCornerShape(999.dp),
         elevation = ButtonDefaults.elevation(0.dp, 0.dp, 0.dp, 0.dp),
         colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary)
       ) {
         Text(
-          "Connect (Phrase, Link, or 6-Digit Code)",
-          color = Color.White,
+          "Connect privately",
+          color = MaterialTheme.colors.onPrimary,
           fontSize = 15.sp,
           fontWeight = FontWeight.Medium
         )
@@ -332,9 +382,10 @@ fun ZeroAccountPinBannerCard(model: ChatModel = chatModel) {
         val res = runCatching {
           identityBridge.provisionPhraseAndDeepLink(inviteUrl)
         }.getOrNull()
-        val phrase = res?.phrase ?: ZeroIdentityBridge.generateLocal4WordPhrase()
-        deepLink = res?.deepLink ?: "${ZeroIdentityBridge.DEEP_LINK_PREFIX}${phrase.lowercase().replace("-", "")}"
-        appPrefs.zeroAccountPin.set(phrase)
+        if (res != null) {
+          deepLink = res.deepLink
+          appPrefs.zeroAccountPin.set(res.phrase)
+        }
       }
     }
   }
@@ -414,9 +465,15 @@ fun ZeroAccountPinBannerCard(model: ChatModel = chatModel) {
       ) {
         OutlinedButton(
           onClick = {
-            val link = deepLink ?: "${ZeroIdentityBridge.DEEP_LINK_PREFIX}${displayPhrase.lowercase().replace("-", "")}"
-            clipboardManager.setText(AnnotatedString(link))
-            copiedLabel = "DEEP LINK COPIED"
+            val link = deepLink ?: savedPhrase?.let {
+              "${ZeroIdentityBridge.DEEP_LINK_PREFIX}${it.lowercase().replace("-", "")}"
+            }
+            if (link != null) {
+              clipboardManager.setText(AnnotatedString(link))
+              copiedLabel = "DEEP LINK COPIED"
+            } else {
+              copiedLabel = "BROKER OFFLINE — USE QR"
+            }
           },
           modifier = Modifier.weight(1f).height(40.dp),
           shape = RoundedCornerShape(10.dp)
@@ -430,10 +487,12 @@ fun ZeroAccountPinBannerCard(model: ChatModel = chatModel) {
               val inviteUrl = connLink?.connShortLink ?: connLink?.connFullLink ?: "zero:/contact"
               val code = runCatching {
                 identityBridge.provisionEphemeral6DigitCode(inviteUrl).code
-              }.getOrElse {
-                ZeroIdentityBridge.generateLocal6DigitCode()
+              }.getOrNull()
+              if (code != null) {
+                ephemeralCode = code
+              } else {
+                copiedLabel = "BROKER OFFLINE — USE QR"
               }
-              ephemeralCode = code
             }
           },
           modifier = Modifier.weight(1f).height(40.dp),
@@ -446,13 +505,13 @@ fun ZeroAccountPinBannerCard(model: ChatModel = chatModel) {
       Button(
         onClick = { showConnectDialog = true },
         modifier = Modifier.fillMaxWidth().height(48.dp),
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(999.dp),
         elevation = ButtonDefaults.elevation(0.dp, 0.dp, 0.dp, 0.dp),
         colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary)
       ) {
         Text(
           "Connect (Phrase, Link, or 6-Digit Code)",
-          color = Color.White,
+          color = MaterialTheme.colors.onPrimary,
           fontSize = 14.sp,
           fontWeight = FontWeight.Medium
         )
@@ -497,9 +556,10 @@ fun ZeroIntegratedDashboard(
         val res = runCatching {
           identityBridge.provisionPhraseAndDeepLink(inviteUrl)
         }.getOrNull()
-        val phrase = res?.phrase ?: ZeroIdentityBridge.generateLocal4WordPhrase()
-        deepLink = res?.deepLink ?: "${ZeroIdentityBridge.DEEP_LINK_PREFIX}${phrase.lowercase().replace("-", "")}"
-        appPrefs.zeroAccountPin.set(phrase)
+        if (res != null) {
+          deepLink = res.deepLink
+          appPrefs.zeroAccountPin.set(res.phrase)
+        }
       }
     }
   }
@@ -516,10 +576,11 @@ fun ZeroIntegratedDashboard(
       withBGApi {
         val connLink = model.controller.apiCreateOrGetSilentUserAddress(model.remoteHostId())
         val inviteUrl = connLink?.connShortLink ?: connLink?.connFullLink ?: "zero:/contact"
-        ephemeralCode = runCatching {
+        val code = runCatching {
           identityBridge.provisionEphemeral6DigitCode(inviteUrl).code
-        }.getOrElse {
-          ZeroIdentityBridge.generateLocal6DigitCode()
+        }.getOrNull()
+        if (code != null) {
+          ephemeralCode = code
         }
       }
     },

@@ -27,7 +27,7 @@ struct AppearanceSettings: View {
     @AppStorage(DEFAULT_PROFILE_IMAGE_CORNER_RADIUS) private var profileImageCornerRadius = defaultProfileImageCorner
     @AppStorage(DEFAULT_CHAT_ITEM_ROUNDNESS) private var chatItemRoundness = defaultChatItemRoundness
     @AppStorage(DEFAULT_CHAT_ITEM_TAIL) private var chatItemTail = true
-    @AppStorage(GROUP_DEFAULT_ONE_HAND_UI, store: groupDefaults) private var oneHandUI = true
+    @AppStorage(GROUP_DEFAULT_ONE_HAND_UI, store: groupDefaults) private var oneHandUI = false
     @AppStorage(DEFAULT_TOOLBAR_MATERIAL) private var toolbarMaterial = ToolbarMaterial.defaultMaterial
 
     @State var themeUserDestination: (Int64, ThemeModeOverrides?)? = {
@@ -200,9 +200,9 @@ struct AppearanceSettings: View {
 
                 Section(header: Text("App icon").foregroundColor(theme.colors.secondary)) {
                     HStack {
-                        updateAppIcon(image: "icon-light", icon: nil, tapped: $iconLightTapped)
+                        updateAppIcon(image: "icon-dark", icon: nil, tapped: $iconDarkTapped)
                         Spacer().frame(width: 16)
-                        updateAppIcon(image: "icon-dark", icon: "DarkAppIcon", tapped: $iconDarkTapped)
+                        updateAppIcon(image: "icon-light", icon: "DarkAppIcon", tapped: $iconLightTapped)
                     }
                 }
             }

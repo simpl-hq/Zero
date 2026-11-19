@@ -8,6 +8,7 @@ struct CIMetaView: View {
     var chatItem: ChatItem
     var metaColor: Color
     var paleMetaColor = Color(uiColor: .tertiaryLabel)
+    var primaryColor: Color? = nil
     var showStatus = true
     var showEdited = true
     var invertedMaterial = false
@@ -27,6 +28,7 @@ struct CIMetaView: View {
                     encrypted: chatItem.encryptedFile,
                     color: metaColor,
                     paleColor: paleMetaColor,
+                    primaryColor: primaryColor ?? theme.colors.primary,
                     colorMode: invertedMaterial
                         ? .invertedMaterial
                         : .normal,
@@ -43,6 +45,7 @@ struct CIMetaView: View {
                         chatItem.meta,
                         chatTTL: chat.chatInfo.timedMessagesTTL,
                         encrypted: chatItem.encryptedFile,
+                        primaryColor: primaryColor ?? theme.colors.primary,
                         colorMode: .normal,
                         onlyOverrides: true,
                         showStatus: showStatus,
@@ -179,12 +182,12 @@ struct CIMetaView_Previews: PreviewProvider {
     static let metaColor = Color.secondary
     static var previews: some View {
         Group {
-            CIMetaView(chat: Chat.sampleData, chatItem: ChatItem.getSample(2, .directSnd, .now, "https://zero.chat", .sndSent(sndProgress: .complete)), metaColor: metaColor)
-            CIMetaView(chat: Chat.sampleData, chatItem: ChatItem.getSample(2, .directSnd, .now, "https://zero.chat", .sndSent(sndProgress: .partial)), metaColor: metaColor)
-            CIMetaView(chat: Chat.sampleData, chatItem: ChatItem.getSample(2, .directSnd, .now, "https://zero.chat", .sndRcvd(msgRcptStatus: .ok, sndProgress: .complete)), metaColor: metaColor)
-            CIMetaView(chat: Chat.sampleData, chatItem: ChatItem.getSample(2, .directSnd, .now, "https://zero.chat", .sndRcvd(msgRcptStatus: .ok, sndProgress: .partial)), metaColor: metaColor)
-            CIMetaView(chat: Chat.sampleData, chatItem: ChatItem.getSample(2, .directSnd, .now, "https://zero.chat", .sndRcvd(msgRcptStatus: .badMsgHash, sndProgress: .complete)), metaColor: metaColor)
-            CIMetaView(chat: Chat.sampleData, chatItem: ChatItem.getSample(2, .directSnd, .now, "https://zero.chat", .sndSent(sndProgress: .complete), itemEdited: true), metaColor: metaColor)
+            CIMetaView(chat: Chat.sampleData, chatItem: ChatItem.getSample(2, .directSnd, .now, "https://simpl.global", .sndSent(sndProgress: .complete)), metaColor: metaColor)
+            CIMetaView(chat: Chat.sampleData, chatItem: ChatItem.getSample(2, .directSnd, .now, "https://simpl.global", .sndSent(sndProgress: .partial)), metaColor: metaColor)
+            CIMetaView(chat: Chat.sampleData, chatItem: ChatItem.getSample(2, .directSnd, .now, "https://simpl.global", .sndRcvd(msgRcptStatus: .ok, sndProgress: .complete)), metaColor: metaColor)
+            CIMetaView(chat: Chat.sampleData, chatItem: ChatItem.getSample(2, .directSnd, .now, "https://simpl.global", .sndRcvd(msgRcptStatus: .ok, sndProgress: .partial)), metaColor: metaColor)
+            CIMetaView(chat: Chat.sampleData, chatItem: ChatItem.getSample(2, .directSnd, .now, "https://simpl.global", .sndRcvd(msgRcptStatus: .badMsgHash, sndProgress: .complete)), metaColor: metaColor)
+            CIMetaView(chat: Chat.sampleData, chatItem: ChatItem.getSample(2, .directSnd, .now, "https://simpl.global", .sndSent(sndProgress: .complete), itemEdited: true), metaColor: metaColor)
             CIMetaView(chat: Chat.sampleData, chatItem: ChatItem.getDeletedContentSample(), metaColor: metaColor)
         }
         .previewLayout(.fixed(width: 360, height: 100))

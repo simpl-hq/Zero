@@ -3,18 +3,21 @@ import Zero
 
 struct ChatItemClipped: ViewModifier {
     @AppStorage(DEFAULT_CHAT_ITEM_ROUNDNESS) private var roundness = defaultChatItemRoundness
-    @AppStorage(DEFAULT_CHAT_ITEM_TAIL) private var tailEnabled = true
+    @AppStorage(DEFAULT_CHAT_ITEM_TAIL) private var tailEnabled = false
     private let chatItem: (content: CIContent, chatDir: CIDirection)?
     private let tailVisible: Bool
+    private let borderColor: Color?
 
     init() {
         self.chatItem = nil
         self.tailVisible = false
+        self.borderColor = nil
     }
 
-    init(_ ci: ChatItem, tailVisible: Bool) {
+    init(_ ci: ChatItem, tailVisible: Bool, borderColor: Color? = nil) {
         self.chatItem = (ci.content, ci.chatDir)
         self.tailVisible = tailVisible
+        self.borderColor = borderColor
     }
 
     private func shapeStyle() -> ChatItemShape.Style {
@@ -56,6 +59,11 @@ struct ChatItemClipped: ViewModifier {
             .contentShape(.dragPreview, clipShape)
             .contentShape(.contextMenuPreview, clipShape)
             .clipShape(clipShape)
+            .overlay {
+                if let borderColor {
+                    clipShape.stroke(borderColor, lineWidth: 0.75)
+                }
+            }
     }
 }
 

@@ -1,10 +1,26 @@
 import Foundation
 import SwiftUI
 
-let ZeroBlue = Color(0, 136, 255, a: 255)
-let LightGray = Color(241, 242, 246, a: 255)
-let DarkGray = Color(43, 44, 46, a: 255)
-let HighOrLowlight = Color(139, 135, 134, a: 255)
+let ZeroBlue = Color(0xE4, 0xE4, 0xE7, a: 255)
+let ZeroCanvasBlack = Color(0x00, 0x00, 0x00, a: 255)
+let ZeroSurfaceDark = Color(0x0A, 0x0A, 0x0A, a: 255)
+let ZeroElevatedDark = Color(0x16, 0x16, 0x17, a: 255)
+let ZeroBorderDark = Color(0x1F, 0x1F, 0x1F, a: 255)
+let ZeroBubbleBorderDark = Color(0x26, 0x26, 0x26, a: 255)
+let ZeroTextSecondaryDark = Color(0x8E, 0x8E, 0x93, a: 255)
+let ZeroTextMuted = Color(0x52, 0x52, 0x5B, a: 255)
+let ZeroQuoteDarkOnLight = Color(0xE4, 0xE4, 0xE7, a: 255)
+let ZeroQuoteDark = Color(0x22, 0x22, 0x24, a: 255)
+let ZeroCanvasLight = Color(0xFF, 0xFF, 0xFF, a: 255)
+let ZeroSurfaceLight = Color(0xF5, 0xF5, 0xF7, a: 255)
+let ZeroElevatedLight = Color(0xF2, 0xF2, 0xF7, a: 255)
+let ZeroBorderLight = Color(0xE5, 0xE5, 0xEA, a: 255)
+let ZeroTextSecondaryLight = Color(0x6E, 0x6E, 0x73, a: 255)
+let ZeroQuoteLightOnDark = Color(0x1C, 0x1C, 0x1E, a: 255)
+let WarningRed = Color(0xEF, 0x44, 0x44, a: 255)
+let LightGray = ZeroBorderLight
+let DarkGray = ZeroElevatedDark
+let HighOrLowlight = ZeroTextSecondaryDark
 
 public func oklch(_ L: Double, _ C: Double, _ H: Double, alpha: Double = 1.0) -> Color {
     let hRad = H * .pi / 180.0
@@ -106,6 +122,21 @@ extension Color {
         var (r, g, b, a): (CGFloat, CGFloat, CGFloat, CGFloat) = (0, 0, 0, 0)
         UIColor(self).getRed(&r, green: &g, blue: &b, alpha: &a)
         return Color(.sRGB, red: min(r * (1 + factor), 1), green: min(g * (1 + factor), 1), blue: min(b * (1 + factor), 1), opacity: a)
+    }
+
+    public var isLightSurface: Bool {
+        var (r, g, b, a): (CGFloat, CGFloat, CGFloat, CGFloat) = (0, 0, 0, 0)
+        UIColor(self).getRed(&r, green: &g, blue: &b, alpha: &a)
+        let luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b
+        return luminance > 0.45
+    }
+
+    public var onSurfaceInk: Color {
+        isLightSurface ? .black : .white
+    }
+
+    public var onSurfaceSecondaryInk: Color {
+        isLightSurface ? Color(0x52, 0x52, 0x5B, a: 255) : Color(0xA1, 0xA1, 0xA6, a: 255)
     }
 
     public func asGroupedBackground(_ mode: DefaultThemeMode) -> Color {

@@ -572,7 +572,7 @@ private fun ToggleFilterButton() {
     Icon(
       painterResource(MR.images.ic_filter_list),
       null,
-      tint = if (pref.state.value) MaterialTheme.colors.background else MaterialTheme.colors.secondary,
+      tint = if (pref.state.value) MaterialTheme.colors.onPrimary else MaterialTheme.colors.secondary,
       modifier = Modifier
         .padding(3.dp)
         .background(color = if (pref.state.value) MaterialTheme.colors.primary else Color.Unspecified, shape = RoundedCornerShape(50))

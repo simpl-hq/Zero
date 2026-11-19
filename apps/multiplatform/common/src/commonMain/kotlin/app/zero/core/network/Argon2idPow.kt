@@ -1,6 +1,6 @@
 package app.zero.core.network
 
-// Pure Kotlin RFC 9106 Argon2id and BLAKE2b PoW solver matching broker parameters.
+// RFC 9106 Argon2id and BLAKE2b PoW solver aligned with apps/zero-pin-broker parameters (m=8 MiB, t=1, p=1).
 
 internal object Argon2idPow {
   private val BLAKE2B_IV = ulongArrayOf(

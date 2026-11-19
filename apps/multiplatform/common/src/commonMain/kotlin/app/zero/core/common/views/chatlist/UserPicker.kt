@@ -424,15 +424,17 @@ fun UserProfilePickerItem(
     } else {
       Row(verticalAlignment = Alignment.CenterVertically) {
         if (unreadCount > 0) {
+          val badgeBg = if (u.showNtfs) MaterialTheme.colors.primaryVariant else MaterialTheme.colors.secondary
           Box(
             contentAlignment = Alignment.Center,
           ) {
             Text(
               unreadCountStr(unreadCount),
-              color = Color.White,
+              color = badgeBg.onSurfaceInk(),
               fontSize = 10.sp,
+              fontWeight = FontWeight.SemiBold,
               modifier = Modifier
-                .background(if (u.showNtfs) MaterialTheme.colors.primaryVariant else MaterialTheme.colors.secondary, shape = CircleShape)
+                .background(badgeBg, shape = CircleShape)
                 .padding(2.dp)
                 .badgeLayout()
             )
@@ -634,14 +636,16 @@ fun HostDisconnectButton(onClick: (() -> Unit)?) {
 
 @Composable
 fun BoxScope.userUnreadBadge(unreadCount: Int, userMuted: Boolean, hasPadding: Boolean) {
+  val badgeBg = if (userMuted) MaterialTheme.colors.primaryVariant else MaterialTheme.colors.secondary
   Text(
     if (unreadCount > 0) unreadCountStr(unreadCount) else "",
-    color = Color.White,
+    color = badgeBg.onSurfaceInk(),
     fontSize = 10.sp,
+    fontWeight = FontWeight.SemiBold,
     style = TextStyle(textAlign = TextAlign.Center),
     modifier = Modifier
       .offset(y = if (hasPadding) 3.sp.toDp() else -4.sp.toDp(), x = if (hasPadding) 0.dp else 4.sp.toDp())
-      .background(if (userMuted) MaterialTheme.colors.primaryVariant else MaterialTheme.colors.secondary, shape = CircleShape)
+      .background(badgeBg, shape = CircleShape)
       .badgeLayout()
       .padding(horizontal = 2.sp.toDp())
       .padding(vertical = 2.sp.toDp())

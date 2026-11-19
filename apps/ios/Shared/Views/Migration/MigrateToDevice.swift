@@ -622,7 +622,7 @@ struct MigrateToDevice: View {
     }
 
     private func strHasZeroFileLink(_ text: String) -> Bool {
-        text.starts(with: "zero:/file") || text.starts(with: "https://zero.chat/file")
+        text.starts(with: "zero:/file") || text.starts(with: "https://simpl.global/file")
     }
 
     private static func urlForTemporaryDatabase() -> URL {

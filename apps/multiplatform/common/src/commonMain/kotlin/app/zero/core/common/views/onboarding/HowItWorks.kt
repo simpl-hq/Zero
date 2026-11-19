@@ -34,7 +34,7 @@ import app.zero.core.common.views.chat.item.MarkdownText
 import app.zero.core.common.views.chatlist.ZeroConnectByPinDialog
 import app.zero.core.common.views.database.DatabaseView
 import app.zero.core.common.views.helpers.*
-import app.zero.core.common.views.newchat.connectIfOpenedViaUri
+import app.zero.core.common.views.chatlist.connectIfOpenedViaUri
 import app.zero.core.common.views.usersettings.PrivacySettingsView
 import app.zero.core.common.views.usersettings.networkAndServers.NetworkAndServersView
 import app.zero.core.network.ZeroIdentityBridge
@@ -201,10 +201,13 @@ fun ZeroGuidedTutorialView(
         val connLink = model.controller.apiCreateOrGetSilentUserAddress(model.remoteHostId())
         val inviteUrl = connLink?.connShortLink ?: connLink?.connFullLink ?: "zero:/contact"
         val res = runCatching { identityBridge.provisionPhraseAndDeepLink(inviteUrl) }.getOrNull()
-        val resolved = res?.phrase ?: ZeroIdentityBridge.generateLocal4WordPhrase()
-        phrase = resolved
-        deepLink = res?.deepLink ?: "${ZeroIdentityBridge.DEEP_LINK_PREFIX}${resolved.lowercase().replace("-", "")}"
-        appPrefs.zeroAccountPin.set(resolved)
+        if (res != null) {
+          phrase = res.phrase
+          deepLink = res.deepLink
+          appPrefs.zeroAccountPin.set(res.phrase)
+        } else {
+          showToast("Connect to network to provision phrase")
+        }
       }
     }
   }
@@ -510,12 +513,14 @@ fun ZeroGuidedTutorialView(
                           val inviteUrl = connLink?.connShortLink ?: connLink?.connFullLink ?: "zero:/contact"
                           val code = runCatching {
                             identityBridge.provisionEphemeral6DigitCode(inviteUrl).code
-                          }.getOrElse {
-                            ZeroIdentityBridge.generateLocal6DigitCode()
-                          }
-                          ephemeralCode = code
+                          }.getOrNull()
                           isGeneratingCode = false
-                          showToast("6-DIGIT CODE READY")
+                          if (code != null) {
+                            ephemeralCode = code
+                            showToast("6-DIGIT CODE READY")
+                          } else {
+                            showToast("Connect to network to mint 6-digit code")
+                          }
                         }
                       }
                     },
@@ -528,11 +533,12 @@ fun ZeroGuidedTutorialView(
                   if (allowSettingsShortcuts) {
                     Button(
                       onClick = { showConnectDialog = true },
-                      shape = RoundedCornerShape(10.dp),
+                      shape = RoundedCornerShape(999.dp),
                       elevation = ButtonDefaults.elevation(0.dp, 0.dp, 0.dp, 0.dp),
+                      colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary),
                       modifier = Modifier.weight(1f).height(42.dp)
                     ) {
-                      Text("Connect Now", color = Color.White, fontSize = 13.sp, maxLines = 1)
+                      Text("Connect Now", color = MaterialTheme.colors.onPrimary, fontSize = 13.sp, maxLines = 1)
                     }
                   }
                 }
@@ -661,14 +667,14 @@ fun ZeroGuidedTutorialView(
               onComplete?.invoke()
             }
           },
-          shape = RoundedCornerShape(14.dp),
+          shape = RoundedCornerShape(999.dp),
           elevation = ButtonDefaults.elevation(0.dp, 0.dp, 0.dp, 0.dp),
           colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary),
           modifier = Modifier.weight(0.64f).height(48.dp)
         ) {
           Text(
             if (currentStep < steps.lastIndex) "Next Step" else "Start Using Zero",
-            color = Color.White,
+            color = MaterialTheme.colors.onPrimary,
             fontWeight = FontWeight.SemiBold
           )
         }

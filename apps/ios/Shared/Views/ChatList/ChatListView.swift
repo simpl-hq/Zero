@@ -159,8 +159,8 @@ struct ChatListView: View {
 
     @State private var viewOnScreen = true
 
-    @AppStorage(GROUP_DEFAULT_ONE_HAND_UI, store: groupDefaults) private var oneHandUI = true
-    @AppStorage(DEFAULT_ONE_HAND_UI_CARD_SHOWN) private var oneHandUICardShown = false
+    @AppStorage(GROUP_DEFAULT_ONE_HAND_UI, store: groupDefaults) private var oneHandUI = false
+    @AppStorage(DEFAULT_ONE_HAND_UI_CARD_SHOWN) private var oneHandUICardShown = true
     @AppStorage(DEFAULT_ADDRESS_CREATION_CARD_SHOWN) private var addressCreationCardShown = false
     @AppStorage(DEFAULT_GET_STAKE_BANNER_TAPPED) private var getStakeBannerTapped = false
     @AppStorage(DEFAULT_GET_STAKE_BANNER_DISMISSED) private var getStakeBannerDismissed = false
@@ -580,6 +580,7 @@ struct ChatListView: View {
 }
 
 struct SubsStatusIndicator: View {
+    @EnvironmentObject var theme: AppTheme
     @State private var subs: SMPServerSubs = SMPServerSubs.newSMPServerSubs
     @State private var hasSess: Bool = false
     @State private var task: Task<Void, Never>?
@@ -592,7 +593,11 @@ struct SubsStatusIndicator: View {
             showServersSummary = true
         } label: {
             HStack(spacing: 4) {
-                Text("Chats").foregroundStyle(Color.primary).fixedSize().font(.headline)
+                Image(theme.colors.background.isLightSurface ? "logo" : "logo-light")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 22)
+                    .accessibilityLabel("Zero")
                 SubscriptionStatusIndicatorView(subs: subs, hasSess: hasSess)
                 if showSubscriptionPercentage {
                     SubscriptionStatusPercentageView(subs: subs, hasSess: hasSess)
@@ -648,7 +653,7 @@ struct ChatListSearchBar: View {
     @Binding var searchShowingZeroLink: Bool
     @Binding var searchChatFilteredByZeroLink: Set<String>
     @Binding var parentSheet: SomeSheet<AnyView>?
-    @AppStorage(GROUP_DEFAULT_ONE_HAND_UI, store: groupDefaults) private var oneHandUI = true
+    @AppStorage(GROUP_DEFAULT_ONE_HAND_UI, store: groupDefaults) private var oneHandUI = false
     @State private var ignoreSearchTextChange = false
     @State private var connectNameCandidate: String? = nil
     @State private var nameSearchTask: Task<Void, Never>? = nil

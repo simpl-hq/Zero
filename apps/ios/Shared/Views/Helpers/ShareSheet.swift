@@ -83,7 +83,7 @@ func showSheet(
 
 func openExternalLink(_ url: URL) {
     let s = url.absoluteString
-    if s.starts(with: "https://zero.chat/contact#") || (s.starts(with: "https://smp") && s.contains(".zero.im/a#")) {
+    if s.starts(with: "https://simpl.global/") || s.starts(with: "https://zero.chat/contact#") || (s.starts(with: "https://") && s.contains(".simpl.global/a#")) {
         ChatModel.shared.appOpenUrl = url
     } else {
         showAlert(

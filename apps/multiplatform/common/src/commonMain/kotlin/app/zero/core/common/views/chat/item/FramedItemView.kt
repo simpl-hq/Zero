@@ -2,6 +2,7 @@ package app.zero.core.common.views.chat.item
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -55,6 +56,17 @@ fun FramedItemView(
     return if (chatInfo is ChatInfo.Group) chatInfo.groupInfo.membership else null
   }
 
+  val sentColor = MaterialTheme.appColors.sentMessage
+  val receivedColor = MaterialTheme.appColors.receivedMessage
+  val bubbleBg = if (sent) sentColor else receivedColor
+  val bubbleInk = bubbleBg.onSurfaceInk()
+  val bubbleSecondaryInk = bubbleBg.onSurfaceSecondaryInk()
+  val sentQuoteColor = MaterialTheme.appColors.sentQuote
+  val receivedQuoteColor = MaterialTheme.appColors.receivedQuote
+  val quoteBg = if (sent) sentQuoteColor else receivedQuoteColor
+  val quoteInk = quoteBg.onSurfaceInk()
+  val quoteSecondaryInk = quoteBg.onSurfaceSecondaryInk()
+
   @Composable
   fun ciQuotedMsgTextView(qi: CIQuote, lines: Int, showTimestamp: Boolean, stripLink: String? = null, prefix: AnnotatedString? = null) {
     MarkdownText(
@@ -63,7 +75,7 @@ fun FramedItemView(
       toggleSecrets = true,
       maxLines = lines,
       overflow = TextOverflow.Ellipsis,
-      style = TextStyle(fontSize = 15.sp, color = MaterialTheme.colors.onSurface),
+      style = TextStyle(fontSize = 15.sp, color = quoteInk),
       linkMode = linkMode,
       uriHandler = if (appPlatform.isDesktop) uriHandler else null,
       showTimestamp = showTimestamp,
@@ -87,7 +99,7 @@ fun FramedItemView(
         ) {
           Text(
             sender,
-            style = TextStyle(fontSize = 13.5.sp, color = if (qi.chatDir is CIDirection.GroupSnd) CurrentColors.value.colors.primary else CurrentColors.value.colors.secondary),
+            style = TextStyle(fontSize = 13.5.sp, color = if (qi.chatDir is CIDirection.GroupSnd) quoteInk else quoteSecondaryInk),
             maxLines = 1
           )
           ciQuotedMsgTextView(qi, lines = 2, showTimestamp = showTimestamp, stripLink = stripLink, prefix = prefix)
@@ -100,11 +112,9 @@ fun FramedItemView(
 
   @Composable
   fun FramedItemHeader(caption: String, italic: Boolean, icon: Painter? = null, pad: Boolean = false, iconColor: Color? = null) {
-    val sentColor = MaterialTheme.appColors.sentQuote
-    val receivedColor = MaterialTheme.appColors.receivedQuote
     Row(
       Modifier
-        .background(if (sent) sentColor else receivedColor)
+        .background(quoteBg)
         .fillMaxWidth()
         .padding(start = 8.dp, top = 6.dp, end = 12.dp, bottom = if (pad || (ci.quotedItem == null && ci.meta.itemForwarded == null)) 6.dp else 0.dp),
       horizontalArrangement = Arrangement.spacedBy(4.dp),
@@ -115,12 +125,12 @@ fun FramedItemView(
           icon,
           caption,
           Modifier.size(18.dp),
-          tint = iconColor ?: if (isInDarkTheme()) FileDark else FileLight
+          tint = iconColor ?: quoteSecondaryInk
         )
       }
       Text(
         buildAnnotatedString {
-          withStyle(SpanStyle(fontSize = 12.sp, fontStyle = if (italic) FontStyle.Italic else FontStyle.Normal, color = MaterialTheme.colors.secondary)) {
+          withStyle(SpanStyle(fontSize = 12.sp, fontStyle = if (italic) FontStyle.Italic else FontStyle.Normal, color = quoteSecondaryInk)) {
             append(caption)
           }
         },
@@ -134,11 +144,10 @@ fun FramedItemView(
   @Composable
   fun ciQuoteView(qi: CIQuote) {
     val blurred = remember { mutableStateOf(appPreferences.privacyMediaBlurRadius.get() > 0) }
-    val sentColor = MaterialTheme.appColors.sentQuote
-    val receivedColor = MaterialTheme.appColors.receivedQuote
+    CompositionLocalProvider(LocalContentColor provides quoteInk) {
     Row(
       Modifier
-        .background(if (sent) sentColor else receivedColor)
+        .background(quoteBg)
         .fillMaxWidth()
     ) {
       when (qi.content) {
@@ -176,7 +185,7 @@ fun FramedItemView(
             Modifier
               .padding(top = 6.dp, end = 4.dp)
               .size(22.dp),
-            tint = if (isInDarkTheme()) FileDark else FileLight
+            tint = quoteSecondaryInk
           )
         }
         is MsgContent.MCChat -> {
@@ -190,11 +199,12 @@ fun FramedItemView(
             painterResource(qi.content.chatLink.smallIconRes),
             null,
             Modifier.padding(top = 6.dp, end = 4.dp).size(22.dp),
-            tint = if (isInDarkTheme()) FileDark else FileLight
+            tint = quoteSecondaryInk
           )
         }
         else -> ciQuotedMsgView(qi)
       }
+    }
     }
   }
 
@@ -208,19 +218,20 @@ fun FramedItemView(
 
   val transparentBackground = (ci.content.msgContent is MsgContent.MCImage || ci.content.msgContent is MsgContent.MCVideo) &&
       !ci.meta.isLive && ci.content.text.isEmpty() && ci.quotedItem == null && ci.meta.itemForwarded == null
+  val incomingBorder = if (!transparentBackground && !sent) {
+    if (isInDarkTheme()) ZeroBubbleBorderDark else ZeroBorderLight
+  } else null
 
-  val sentColor = MaterialTheme.appColors.sentMessage
-  val receivedColor = MaterialTheme.appColors.receivedMessage
+  CompositionLocalProvider(LocalContentColor provides bubbleInk) {
   Box(Modifier
-    .clipChatItem(ci, tailVisible, revealed = true)
+    .clipChatItem(ci, tailVisible, revealed = true, borderColor = incomingBorder)
     .background(
       when {
         transparentBackground -> Color.Transparent
-        sent -> sentColor
-        else -> receivedColor
+        else -> bubbleBg
       }
     )) {
-    var metaColor = MaterialTheme.colors.secondary
+    var metaColor = bubbleSecondaryInk
     Box(contentAlignment = Alignment.BottomEnd) {
       val chatItemTail = remember { appPreferences.chatItemTail.state }
       val style = shapeStyle(ci, chatItemTail.value, tailVisible, true)
@@ -378,16 +389,30 @@ fun FramedItemView(
           }
         }
       }
+      val metaModifier = Modifier.padding(
+        bottom = 6.dp,
+        end = 12.dp + if (tailRendered && sent) msgTailWidthDp else 0.dp,
+      )
       Box(
-        Modifier
-          .padding(
-            bottom = 6.dp,
-            end = 12.dp + if (tailRendered && sent) msgTailWidthDp else 0.dp,
-          )
+        if (transparentBackground) {
+          metaModifier
+            .background(Color.Black.copy(alpha = 0.55f), RoundedCornerShape(999.dp))
+            .padding(horizontal = 6.dp, vertical = 2.dp)
+        } else {
+          metaModifier
+        }
       ) {
-        CIMetaView(ci, chatTTL, metaColor, showViaProxy = showViaProxy, showTimestamp = showTimestamp)
+        CIMetaView(
+          ci,
+          chatTTL,
+          metaColor,
+          statusPrimaryColor = if (transparentBackground) Color.White else bubbleInk,
+          showViaProxy = showViaProxy,
+          showTimestamp = showTimestamp
+        )
       }
     }
+  }
   }
 }
 

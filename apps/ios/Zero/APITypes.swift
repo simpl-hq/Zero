@@ -235,7 +235,7 @@ public struct ServerAddress: Decodable {
 
     static public var sampleData = ServerAddress(
         serverProtocol: .smp,
-        hostnames: ["smp.zero.im", "1234.onion"],
+        hostnames: ["zerorelay.simpl.global", "1234.onion"],
         port: "",
         keyHash: "LcJUMfVhwD8yxjAiSaDzzGF3-kLG4Uh0Fl_ZIjrRwjI=",
         basicAuth: "server_password"

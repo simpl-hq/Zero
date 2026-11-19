@@ -40,7 +40,7 @@ class CallManager(val chatModel: ChatModel) {
     }
   }
 
-  private fun justAcceptIncomingCall(invitation: RcvCallInvitation, userProfile: Profile) {
+  private suspend fun justAcceptIncomingCall(invitation: RcvCallInvitation, userProfile: Profile) {
     with (chatModel) {
       activeCall.value?.androidCallState?.close()
       activeCall.value = Call(

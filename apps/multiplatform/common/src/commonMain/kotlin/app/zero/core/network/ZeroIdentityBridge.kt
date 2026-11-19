@@ -1,6 +1,6 @@
 package app.zero.core.network
 
-// Client bridge for the pin broker API, PoW solving, and ephemeral TURN credentials.
+// Broker client for 4-word phrase provisioning, ephemeral 6-digit pairing codes, invite-bound Argon2id PoW, and TURN tokens.
 
 import app.zero.core.common.model.ChatController.appPrefs
 import app.zero.core.common.views.call.RTCIceServer
@@ -19,7 +19,11 @@ import java.net.HttpURLConnection
 import java.net.InetSocketAddress
 import java.net.Proxy
 import java.net.URL
-import java.security.SecureRandom
+import java.security.MessageDigest
+import java.security.cert.X509Certificate
+import java.util.Base64
+import javax.net.ssl.HttpsURLConnection
+import javax.net.ssl.SSLPeerUnverifiedException
 import kotlin.coroutines.coroutineContext
 
 data class ZeroPhraseIdentity(
@@ -35,44 +39,39 @@ data class ZeroEphemeralCode(
 
 class ZeroIdentityBridge(
   private val directoryUrl: String = DEFAULT_DIRECTORY_URL,
-  private val leadingHexZeros: Int = DEFAULT_POW_HEX_ZEROS
+  private val leadingHexZeros: Int? = null,
+  private val leadingZeroBits: Int = leadingHexZeros?.let { it * 4 } ?: DEFAULT_POW_ZERO_BITS
 ) {
   companion object {
     const val DEFAULT_DIRECTORY_URL = "https://zeroapi.simpl.global"
+    private val SIMPL_BROKER_HOSTS = setOf(
+      "zeroapi.simpl.global",
+      "zeroeu.simpl.global",
+      "zerona.simpl.global"
+    )
+    private val FALLBACK_DIRECTORY_URLS = listOf(
+      "https://zeroapi.simpl.global",
+      "https://zeroeu.simpl.global",
+      "https://zerona.simpl.global"
+    )
+    // Verified CA SPKI SHA-256 pins (ISRG Root X2, Root YE, Let's Encrypt YE1/YE2) — survives 90-day leaf cert renewal while blocking rogue CAs.
+    private val SIMPL_BROKER_SPKI_PINS = setOf(
+      "diGVwiVYbubAI3RW4hB9xU8e/CH2GnkuvVFZE8zmgzI=",
+      "sCkq5UWXjg+7mKu9lMhhYF5bGLsy7VI/UNW3tccdR7w=",
+      "brzvtCELCIZUo4sD/qPX0ccRtPsd3DY6RfmxpOU9oB4=",
+      "s/tdAOmUzd8syaTuqfgGvFcn6DzA5Cmb+Vby1ST+U3Y="
+    )
     const val DEEP_LINK_PREFIX = "https://simpl.global/add/"
-    const val DEFAULT_POW_HEX_ZEROS = 1
+    const val DEFAULT_POW_HEX_ZEROS = 2
+    const val DEFAULT_POW_ZERO_BITS = 10
     private val ARGON2_SALT = "zero-argon2id-pow".toByteArray(Charsets.UTF_8)
-    private const val MAX_SOLVER_ITERATIONS = 50_000L
+    private const val MAX_SOLVER_ITERATIONS = 100_000L
     private const val CONNECT_TIMEOUT_MS = 8_000
     private const val READ_TIMEOUT_MS = 8_000
     private const val MASKED_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
 
     private val EPHEMERAL_DIGITS_REGEX = Regex("^\\d{6}$")
     private val PHRASE_REGEX = Regex("^[a-zA-Z]+-[a-zA-Z]+-[a-zA-Z]+-[a-zA-Z]+$")
-
-    private val FALLBACK_WORDS = arrayOf(
-      "Acorn", "Amber", "Anchor", "Anvil", "Apex", "Arbor", "Arctic", "Arrow",
-      "Aspen", "Atlas", "Aurora", "Autumn", "Azure", "Beacon", "Birch", "Blaze",
-      "Boulder", "Breeze", "Bridge", "Brook", "Canyon", "Carbon", "Cedar", "Cipher",
-      "Cloud", "Cobalt", "Comet", "Copper", "Coral", "Cosmos", "Crest", "Crimson",
-      "Crystal", "Cypress", "Dawn", "Delta", "Diamond", "Drift", "Dune", "Echo",
-      "Eclipse", "Ember", "Emerald", "Falcon", "Feather", "Fjord", "Flame", "Flint",
-      "Forest", "Forge", "Frost", "Galaxy", "Garnet", "Glacier", "Glade", "Granite",
-      "Harbor", "Hawk", "Heather", "Helix", "Horizon", "Indigo", "Iron", "Island",
-      "Ivory", "Jade", "Jasper", "Juniper", "Kestrel", "Lagoon", "Lantern", "Laurel",
-      "Lotus", "Lunar", "Lynx", "Magnet", "Maple", "Marble", "Meadow", "Mercury",
-      "Meteor", "Mirror", "Mist", "Monarch", "Moon", "Nebula", "Nimbus", "Noble",
-      "North", "Nova", "Oak", "Oasis", "Obsidian", "Ocean", "Onyx", "Opal",
-      "Orbit", "Orchid", "Osprey", "Otter", "Ozone", "Panther", "Pebble", "Phantom",
-      "Phoenix", "Pine", "Planet", "Polar", "Prism", "Quartz", "Quill", "Rain",
-      "Raven", "Redwood", "Reef", "Ridge", "Ripple", "River", "Rocket", "Ruby",
-      "Sable", "Saffron", "Sage", "Sapphire", "Scarlet", "Sequoia", "Shadow", "Shield",
-      "Sierra", "Silver", "Slate", "Snow", "Solar", "Solstice", "Spark", "Specter",
-      "Sphere", "Spruce", "Star", "Steel", "Stone", "Storm", "Summit", "Swift",
-      "Tempest", "Thistle", "Thunder", "Timber", "Topaz", "Torch", "Trail", "Tundra",
-      "Valiant", "Valley", "Vapor", "Vector", "Velvet", "Vertex", "Vesper", "Vortex",
-      "Voyager", "Wave", "Whisper", "Willow", "Winter", "Wolf", "Zenith", "Zephyr"
-    )
 
     fun normalizePhrase(input: String): String {
       val tokens = input.trim().split(Regex("[\\s\\-]+")).filter { it.isNotBlank() }
@@ -108,40 +107,41 @@ class ZeroIdentityBridge(
       return trimmed
     }
 
-    fun generateLocal4WordPhrase(): String {
-      val rng = SecureRandom()
-      return (0 until 4).joinToString("-") {
-        FALLBACK_WORDS[rng.nextInt(FALLBACK_WORDS.size)]
-      }
-    }
-
-    fun generateLocal6DigitCode(): String {
-      val rng = SecureRandom()
-      val p1 = 100 + rng.nextInt(900)
-      val p2 = 100 + rng.nextInt(900)
-      return "%03d-%03d".format(p1, p2)
-    }
-
-    internal fun matchesLeadingHexZeros(digestBytes: ByteArray, hexZeros: Int): Boolean {
-      val fullZeroBytes = hexZeros / 2
+    internal fun matchesLeadingZeroBits(digestBytes: ByteArray, zeroBits: Int): Boolean {
+      if (zeroBits <= 0) return true
+      val fullZeroBytes = zeroBits / 8
+      if (fullZeroBytes >= digestBytes.size) return false
       for (i in 0 until fullZeroBytes) {
         if (digestBytes[i].toInt() != 0) return false
       }
-      if (hexZeros % 2 == 1) {
-        if ((digestBytes[fullZeroBytes].toInt() and 0xF0) != 0) return false
+      val remBits = zeroBits % 8
+      if (remBits > 0) {
+        val mask = (0xFF shl (8 - remBits)) and 0xFF
+        if ((digestBytes[fullZeroBytes].toInt() and mask) != 0) return false
       }
       return true
     }
+
+    internal fun matchesLeadingHexZeros(digestBytes: ByteArray, hexZeros: Int): Boolean =
+      matchesLeadingZeroBits(digestBytes, hexZeros * 4)
+
+    internal fun validateResolvedInviteUrl(inviteUrl: String): String {
+      val cleanInvite = inviteUrl.trim()
+      require(cleanInvite.startsWith("zero:/") && cleanInvite.none { it.isISOControl() }) {
+        "Resolved invite URI must use zero:/ scheme"
+      }
+      return cleanInvite
+    }
   }
 
-  internal suspend fun solveArgon2idPuzzle(ip: String, time: Long): String = withContext(Dispatchers.Default) {
-    require(!ip.contains(':') || ip.count { it == ':' } <= 7) { "Invalid IP format" }
+  internal suspend fun solveArgon2idPuzzle(inviteUrl: String, time: Long): String = withContext(Dispatchers.Default) {
+    require(inviteUrl.isNotBlank() && inviteUrl.length <= 4096) { "Invalid invite context for PoW" }
     var nonce = 0L
     while (nonce < MAX_SOLVER_ITERATIONS) {
       coroutineContext.ensureActive()
-      val secret = "$ip:$time:$nonce".toByteArray(Charsets.UTF_8)
+      val secret = "$inviteUrl:$time:$nonce".toByteArray(Charsets.UTF_8)
       val hash = Argon2idPow.hash(secret, ARGON2_SALT)
-      if (matchesLeadingHexZeros(hash, leadingHexZeros)) {
+      if (matchesLeadingZeroBits(hash, leadingZeroBits)) {
         return@withContext nonce.toString()
       }
       nonce++
@@ -150,11 +150,21 @@ class ZeroIdentityBridge(
   }
 
   private fun candidateBaseUrls(): List<String> {
-    val configured = runCatching { appPrefs.zeroDirectoryUrl.get() }.getOrNull()
-    return listOfNotNull(
-      configured?.takeIf { it.isNotBlank() && it.startsWith("https://", ignoreCase = true) },
-      directoryUrl
-    ).map { it.trimEnd('/') }.distinct()
+    val configured = runCatching { appPrefs.zeroDirectoryUrl.get() }.getOrNull()?.trim()
+    if (configured != null && configured.lowercase() in setOf("", "off", "disabled", "none")) {
+      return emptyList()
+    }
+    if (configured != null && configured.startsWith("https://", ignoreCase = true)) {
+      val host = runCatching { URL(configured).host.lowercase() }.getOrNull()
+      if (host != null && host !in SIMPL_BROKER_HOSTS) {
+        // Custom/self-hosted broker configured: never silently fall back to simpl.global
+        return listOf(configured.trimEnd('/'))
+      }
+    }
+    return (listOfNotNull(
+      configured?.takeIf { it.startsWith("https://", ignoreCase = true) },
+      directoryUrl.takeIf { it.startsWith("https://", ignoreCase = true) }
+    ) + FALLBACK_DIRECTORY_URLS).map { it.trimEnd('/') }.distinct()
   }
 
   private fun cacheIdentityLocally(key: String, inviteUrl: String) {
@@ -180,12 +190,11 @@ class ZeroIdentityBridge(
   }
 
   suspend fun provisionPhraseAndDeepLink(
-    localCryptoInviteUrl: String,
-    dummyIp: String = "127.0.0.1"
+    localCryptoInviteUrl: String
   ): ZeroPhraseIdentity = withContext(Dispatchers.IO) {
     val cleanInvite = validateInviteUrl(localCryptoInviteUrl)
     val timestamp = System.currentTimeMillis() / 1000
-    val verifiedNonce = solveArgon2idPuzzle(dummyIp, timestamp)
+    val verifiedNonce = solveArgon2idPuzzle(cleanInvite, timestamp)
 
     val payload = buildJsonObject {
       put("invite_url", cleanInvite)
@@ -193,7 +202,13 @@ class ZeroIdentityBridge(
       put("timestamp", timestamp)
     }.toString()
 
-    for (base in candidateBaseUrls()) {
+    val bases = candidateBaseUrls()
+    if (bases.isEmpty()) {
+      throw IllegalStateException("Contact discovery broker is disabled; share a direct QR or 1-time link.")
+    }
+
+    var lastError: Throwable? = null
+    for (base in bases) {
       try {
         val responseText = executeHttpRequest(
           url = "$base/api/v1/identity/phrase",
@@ -210,27 +225,20 @@ class ZeroIdentityBridge(
           cacheIdentityLocally(slug, cleanInvite)
           return@withContext ZeroPhraseIdentity(normalized, deepLink, slug)
         }
-      } catch (_: Throwable) {
+      } catch (e: Throwable) {
+        lastError = e
       }
     }
 
-    val fallbackPhrase = generateLocal4WordPhrase()
-    val fallbackSlug = fallbackPhrase.lowercase().replace("-", "")
-    cacheIdentityLocally(fallbackPhrase, cleanInvite)
-    ZeroPhraseIdentity(
-      phrase = fallbackPhrase,
-      deepLink = "$DEEP_LINK_PREFIX$fallbackSlug",
-      slug = fallbackSlug
-    )
+    throw IllegalStateException("Directory relay unreachable for phrase provisioning", lastError)
   }
 
   suspend fun provisionEphemeral6DigitCode(
-    localCryptoInviteUrl: String,
-    dummyIp: String = "127.0.0.1"
+    localCryptoInviteUrl: String
   ): ZeroEphemeralCode = withContext(Dispatchers.IO) {
     val cleanInvite = validateInviteUrl(localCryptoInviteUrl)
     val timestamp = System.currentTimeMillis() / 1000
-    val verifiedNonce = solveArgon2idPuzzle(dummyIp, timestamp)
+    val verifiedNonce = solveArgon2idPuzzle(cleanInvite, timestamp)
 
     val payload = buildJsonObject {
       put("invite_url", cleanInvite)
@@ -238,7 +246,13 @@ class ZeroIdentityBridge(
       put("timestamp", timestamp)
     }.toString()
 
-    for (base in candidateBaseUrls()) {
+    val bases = candidateBaseUrls()
+    if (bases.isEmpty()) {
+      throw IllegalStateException("Contact discovery broker is disabled; share a direct QR or 1-time link.")
+    }
+
+    var lastError: Throwable? = null
+    for (base in bases) {
       try {
         val responseText = executeHttpRequest(
           url = "$base/api/v1/identity/ephemeral",
@@ -253,19 +267,21 @@ class ZeroIdentityBridge(
           cacheIdentityLocally(normalized, cleanInvite)
           return@withContext ZeroEphemeralCode(normalized, ttl)
         }
-      } catch (_: Throwable) {
+      } catch (e: Throwable) {
+        lastError = e
       }
     }
 
-    val fallbackCode = generateLocal6DigitCode()
-    cacheIdentityLocally(fallbackCode, cleanInvite)
-    ZeroEphemeralCode(fallbackCode, 300)
+    throw IllegalStateException("Directory relay unreachable for ephemeral code provisioning", lastError)
   }
 
   suspend fun resolveIdentity(rawTarget: String): String = withContext(Dispatchers.IO) {
     val target = extractResolveTarget(rawTarget)
-    var lastError: Throwable? = null
-    for (base in candidateBaseUrls()) {
+    val bases = candidateBaseUrls()
+    var lastError: Throwable? = if (bases.isEmpty()) {
+      IllegalStateException("Contact discovery broker is disabled; share a direct QR or 1-time link.")
+    } else null
+    for (base in bases) {
       try {
         val responseText = executeHttpRequest(
           url = "$base/api/v1/identity/resolve/$target",
@@ -275,8 +291,7 @@ class ZeroIdentityBridge(
         val json = Json.parseToJsonElement(responseText).jsonObject
         val inviteUrl = json["invite_url"]?.jsonPrimitive?.content
         if (!inviteUrl.isNullOrBlank()) {
-          validateInviteUrl(inviteUrl)
-          return@withContext inviteUrl
+          return@withContext validateResolvedInviteUrl(inviteUrl)
         }
       } catch (e: Throwable) {
         lastError = e
@@ -288,8 +303,7 @@ class ZeroIdentityBridge(
       map[target] ?: map[normalizePhrase(rawTarget)]
     }.getOrNull()
     if (!cached.isNullOrBlank()) {
-      validateInviteUrl(cached)
-      return@withContext cached
+      return@withContext validateResolvedInviteUrl(cached)
     }
 
     throw lastError ?: IllegalStateException("Identity could not be resolved")
@@ -323,44 +337,75 @@ class ZeroIdentityBridge(
     null
   }
 
+  private fun verifyBrokerTlsPins(conn: HttpURLConnection, url: URL) {
+    if (!url.protocol.equals("https", ignoreCase = true)) {
+      throw SSLPeerUnverifiedException("Plaintext HTTP rejected for broker host ${url.host}")
+    }
+    val host = url.host.lowercase()
+    if (host !in SIMPL_BROKER_HOSTS) return
+    val httpsConn = conn as? HttpsURLConnection
+      ?: throw SSLPeerUnverifiedException("Expected HTTPS connection for $host")
+    val sha256 = MessageDigest.getInstance("SHA-256")
+    val matched = httpsConn.serverCertificates.any { cert ->
+      val x509 = cert as? X509Certificate ?: return@any false
+      val spkiPin = Base64.getEncoder().encodeToString(sha256.digest(x509.publicKey.encoded))
+      spkiPin in SIMPL_BROKER_SPKI_PINS
+    }
+    if (!matched) {
+      throw SSLPeerUnverifiedException("Broker TLS SPKI pin verification failed for $host")
+    }
+  }
+
   private fun executeHttpRequest(url: String, method: String, body: String?): String {
+    val parsedUrl = URL(url)
     val proxy = resolveActiveSocksProxy()
-    val conn = (if (proxy != null) URL(url).openConnection(proxy) else URL(url).openConnection()) as HttpURLConnection
+    val conn = (if (proxy != null) parsedUrl.openConnection(proxy) else parsedUrl.openConnection()) as HttpURLConnection
+    conn.instanceFollowRedirects = false
     conn.connectTimeout = CONNECT_TIMEOUT_MS
     conn.readTimeout = READ_TIMEOUT_MS
     conn.requestMethod = method
     conn.setRequestProperty("User-Agent", MASKED_USER_AGENT)
     conn.setRequestProperty("Accept", "application/json")
     conn.setRequestProperty("Cache-Control", "no-store")
-    if (body != null) {
-      conn.doOutput = true
-      conn.setRequestProperty("Content-Type", "application/json; charset=utf-8")
-      OutputStreamWriter(conn.outputStream, Charsets.UTF_8).use { writer ->
-        writer.write(body)
-        writer.flush()
+    try {
+      if (body != null) {
+        conn.doOutput = true
+        conn.setRequestProperty("Content-Type", "application/json; charset=utf-8")
+        conn.connect()
+        verifyBrokerTlsPins(conn, parsedUrl)
+        OutputStreamWriter(conn.outputStream, Charsets.UTF_8).use { writer ->
+          writer.write(body)
+          writer.flush()
+        }
+      } else {
+        conn.connect()
+        verifyBrokerTlsPins(conn, parsedUrl)
       }
+      val code = conn.responseCode
+      val stream = if (code in 200..299) conn.inputStream else conn.errorStream
+      val text = stream?.bufferedReader(Charsets.UTF_8)?.use { it.readText() } ?: ""
+      if (code !in 200..299) {
+        throw IllegalStateException("Directory HTTP $code: $text")
+      }
+      return text
+    } finally {
+      conn.disconnect()
     }
-    val code = conn.responseCode
-    val stream = if (code in 200..299) conn.inputStream else conn.errorStream
-    val text = stream?.bufferedReader(Charsets.UTF_8)?.use { it.readText() } ?: ""
-    conn.disconnect()
-    if (code !in 200..299) {
-      throw IllegalStateException("Directory HTTP $code: $text")
-    }
-    return text
   }
 
   private fun resolveActiveSocksProxy(): Proxy? {
-    return runCatching {
-      val socksHostPort = appPrefs.networkSocksProxy.get()
-      if (!socksHostPort.isNullOrBlank() && appPrefs.networkUseSocksProxy.get()) {
-        val parts = socksHostPort.split(":")
-        val host = parts[0].trim()
-        val port = parts.getOrNull(1)?.trim()?.toIntOrNull() ?: 9050
-        Proxy(Proxy.Type.SOCKS, InetSocketAddress(host, port))
-      } else {
-        null
-      }
-    }.getOrNull()
+    val useSocks = runCatching { appPrefs.networkUseSocksProxy.get() }.getOrDefault(false)
+    if (!useSocks) return null
+    val netProxy = try {
+      appPrefs.networkProxy.get()
+    } catch (t: Throwable) {
+      throw IllegalStateException("SOCKS5 proxy enabled but configuration could not be read", t)
+    }
+    val host = netProxy.host.trim().ifBlank { "localhost" }
+    val port = netProxy.port
+    if (port !in 1..65535) {
+      throw IllegalStateException("SOCKS5 proxy enabled with invalid port: $port")
+    }
+    return Proxy(Proxy.Type.SOCKS, InetSocketAddress(host, port))
   }
 }

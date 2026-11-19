@@ -13,19 +13,17 @@ struct OnboardingCardView: View {
     let action: () -> Void
 
     static let lightStops: [Gradient.Stop] = [
-        .init(color: oklch(0.9219, 0.0431, 249.4), location: 0.0),
-        .init(color: oklch(0.9198, 0.0471, 240.7), location: 0.5),
-        .init(color: oklch(0.9772, 0.0358, 196.6), location: 0.9),
-        .init(color: oklch(0.9829, 0.0104, 70.0), location: 0.95),
-        .init(color: oklch(0.9886, 0.0272, 99.1), location: 1.0)
+        .init(color: Color(red: 1.0, green: 1.0, blue: 1.0), location: 0.0),
+        .init(color: Color(red: 0.961, green: 0.961, blue: 0.969), location: 0.45),
+        .init(color: Color(red: 0.922, green: 0.922, blue: 0.929), location: 0.85),
+        .init(color: Color(red: 0.886, green: 0.886, blue: 0.902), location: 1.0)
     ]
 
     static let darkStops: [Gradient.Stop] = [
-        .init(color: oklch(0.1578, 0.0609, 267.3), location: 0.4),
-        .init(color: oklch(0.4729, 0.1574, 267.3), location: 0.72),
-        .init(color: oklch(0.9024, 0.0760, 202.8), location: 0.9),
-        .init(color: oklch(0.9384, 0.0354, 65.0), location: 0.95),
-        .init(color: oklch(0.9744, 0.0370, 88.4), location: 1.0)
+        .init(color: Color(red: 0.039, green: 0.039, blue: 0.039), location: 0.0),
+        .init(color: Color(red: 0.071, green: 0.071, blue: 0.078), location: 0.45),
+        .init(color: Color(red: 0.102, green: 0.102, blue: 0.114), location: 0.85),
+        .init(color: Color(red: 0.133, green: 0.133, blue: 0.149), location: 1.0)
     ]
 
     static let gradientAngle: Double = 80.0 * .pi / 180.0
@@ -138,9 +136,11 @@ struct ConnectOnboardingView: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack {
-                Text("Zero")
-                    .font(.system(size: 28, weight: .bold, design: .rounded))
-                    .foregroundColor(theme.colors.onBackground)
+                Image(theme.colors.background.isLightSurface ? "logo" : "logo-light")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 24)
+                    .accessibilityLabel("Zero")
                 Spacer()
                 Button {
                     showGuidedTutorial = true
@@ -155,8 +155,9 @@ struct ConnectOnboardingView: View {
                 Button {
                     showAdvancedSettings = true
                 } label: {
-                    Text("⚙️")
+                    Image(systemName: "gearshape")
                         .font(.title3)
+                        .foregroundColor(theme.colors.secondary)
                 }
                 .buttonStyle(.plain)
             }
@@ -185,7 +186,11 @@ struct ConnectOnboardingView: View {
             .padding(20)
             .background(
                 RoundedRectangle(cornerRadius: 18, style: .continuous)
-                    .fill(Color(uiColor: .secondarySystemBackground))
+                    .fill(theme.colors.surface)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 18, style: .continuous)
+                            .strokeBorder(theme.colors.secondary.opacity(0.22), lineWidth: 1)
+                    )
             )
             .padding(.horizontal, 24)
             .padding(.top, 20)
@@ -209,11 +214,11 @@ struct ConnectOnboardingView: View {
                 } label: {
                     Text("Connect (Phrase, Link, or 6-Digit Code)")
                         .font(.headline)
-                        .foregroundColor(.white)
+                        .foregroundColor(theme.colors.onPrimary)
                         .frame(maxWidth: .infinity)
-                        .frame(height: 56)
+                        .frame(height: 54)
                         .background(
-                            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                            Capsule()
                                 .fill(theme.colors.primary)
                         )
                 }

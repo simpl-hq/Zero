@@ -11,13 +11,15 @@ rm -rf $vlc_dir
 mkdir -p $vlc_dir/vlc || exit 0
 
 vlc_tag='v3.0.23-2'
-vlc_url="${VLC_MIRROR_URL:-https://github.com/simpl-hq/vlc/releases/download}/${vlc_tag}/vlc-win-x86_64.zip"
+vlc_url="${VLC_MIRROR_URL:-https://github.com/simplex-chat/vlc/releases/download}/${vlc_tag}/vlc-win-x86_64.zip"
 
 cd /tmp
 mkdir tmp 2>/dev/null || true
 cd tmp
 curl --tlsv1.2 "${vlc_url}" -L -o vlc
-$WINDIR\\System32\\tar.exe -xf vlc
+tar_bin="$(cygpath -u "${WINDIR:-C:/Windows}")/System32/tar.exe"
+[ -x "$tar_bin" ] || tar_bin=tar
+"$tar_bin" -xf vlc
 cd vlc-*
 find plugins | grep ".dll" | xargs touch -m -d "1970-01-01T00:00:00Z"
 ./vlc-cache-gen plugins

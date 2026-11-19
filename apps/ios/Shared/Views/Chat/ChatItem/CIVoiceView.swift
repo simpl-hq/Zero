@@ -78,29 +78,31 @@ struct CIVoiceView: View {
     }
 
     private func playerTime() -> some View {
-        VoiceMessagePlayerTime(
+        let secondaryInk = smallViewSize != nil ? theme.colors.secondary : chatItemFrameColor(chatItem, theme).onSurfaceSecondaryInk
+        return VoiceMessagePlayerTime(
             recordingTime: TimeInterval(duration),
             playbackState: $playbackState,
             playbackTime: $playbackTime
         )
-        .foregroundColor(theme.colors.secondary)
+        .foregroundColor(secondaryInk)
     }
 
     private func playbackSlider() -> some View {
-            ComposeVoiceView.SliderBar(
-                length: TimeInterval(duration),
-                progress: $playbackTime,
-                seek: {
-                    let time = max(0.0001, $0)
-                    seek(time)
-                    playbackTime = time
-                })
-            .onChange(of: .playing == playbackState || (playbackTime ?? 0) > 0) { show in
-                if !show {
-                    allowMenu = true
-                }
+        let tintInk = smallViewSize != nil ? theme.colors.primary : chatItemFrameColor(chatItem, theme).onSurfaceInk
+        return ComposeVoiceView.SliderBar(
+            length: TimeInterval(duration),
+            progress: $playbackTime,
+            seek: {
+                let time = max(0.0001, $0)
+                seek(time)
+                playbackTime = time
+            })
+        .onChange(of: .playing == playbackState || (playbackTime ?? 0) > 0) { show in
+            if !show {
+                allowMenu = true
             }
-            .tint(theme.colors.primary)
+        }
+        .tint(tintInk)
     }
 
     private func metaView() -> some View {
@@ -250,7 +252,8 @@ struct VoiceMessagePlayer: View {
         case .playing: "pause.fill"
         case .paused: "play.fill"
         }
-        return playPauseIcon(icon, theme.colors.primary)
+        let playerInk = chatItemFrameColor(chatItem, theme).onSurfaceInk
+        return playPauseIcon(icon, playerInk)
             .simultaneousGesture(TapGesture().onEnded { _ in
                 switch playbackState {
                 case .noPlayback:
@@ -270,7 +273,8 @@ struct VoiceMessagePlayer: View {
     }
 
     private func playPauseIcon(_ image: String, _ color: Color) -> some View {
-        ZStack {
+        let playerInk = chatItemFrameColor(chatItem, theme).onSurfaceInk
+        return ZStack {
             Image(systemName: image)
                 .resizable()
                 .aspectRatio(contentMode: .fit)
@@ -281,14 +285,15 @@ struct VoiceMessagePlayer: View {
                 .background(showBackground ? chatItemFrameColor(chatItem, theme) : .clear)
                 .clipShape(Circle())
             if recordingTime > 0 {
-                ProgressCircle(length: recordingTime, progress: $playbackTime)
+                ProgressCircle(length: recordingTime, progress: $playbackTime, ringColor: playerInk)
                     .frame(width: 53 * sizeMultiplier, height: 53 * sizeMultiplier)
             }
         }
     }
 
     private func downloadButton(_ recordingFile: CIFile, _ icon: String) -> some View {
-        playPauseIcon(icon, theme.colors.primary)
+        let playerInk = chatItemFrameColor(chatItem, theme).onSurfaceInk
+        return playPauseIcon(icon, playerInk)
             .simultaneousGesture(TapGesture().onEnded {
                 Task {
                     if let user = chatModel.currentUser {
@@ -310,12 +315,13 @@ struct VoiceMessagePlayer: View {
         @EnvironmentObject var theme: AppTheme
         var length: TimeInterval
         @Binding var progress: TimeInterval?
+        var ringColor: Color
 
         var body: some View {
             Circle()
                 .trim(from: 0, to: ((progress ?? TimeInterval(0)) / length))
                 .stroke(
-                    theme.colors.primary,
+                    ringColor,
                     style: StrokeStyle(lineWidth: 3)
                 )
                 .rotationEffect(.degrees(-90))

@@ -132,13 +132,11 @@ private fun VoiceLayout(
     var movedManuallyTo by rememberSaveable(file.fileId) { mutableStateOf(-1) }
     if (audioPlaying.value || progress.value > 0 || movedManuallyTo == progress.value) {
       val dp4 = with(LocalDensity.current) { 4.dp.toPx() }
-      val primary = MaterialTheme.colors.primary
-      val inactiveTrackColor =
-        MaterialTheme.colors.primary.mixWith(
-          backgroundColor.copy(1f).mixWith(MaterialTheme.colors.background, backgroundColor.alpha),
-          0.24f)
+      val trackColor = LocalContentColor.current
+      val inactiveTrackColor = trackColor.copy(alpha = 0.24f)
       val width = LocalWindowWidth()
       val colors = SliderDefaults.colors(
+        thumbColor = trackColor,
         inactiveTrackColor = Color.Transparent,
         activeTrackColor = Color.Transparent
       )
@@ -154,7 +152,7 @@ private fun VoiceLayout(
           .padding(padding)
           .drawBehind {
             drawRect(inactiveTrackColor, Offset(0f, (size.height - dp4) / 2), size = Size(size.width, dp4))
-            drawRect(primary, Offset(0f, (size.height - dp4) / 2), size = Size(progress.value.toFloat() / max(0.00001f, duration.value.toFloat()) * size.width, dp4))
+            drawRect(trackColor, Offset(0f, (size.height - dp4) / 2), size = Size(progress.value.toFloat() / max(0.00001f, duration.value.toFloat()) * size.width, dp4))
           },
         valueRange = 0f..duration.value.toFloat(),
         colors = colors
@@ -229,7 +227,7 @@ private fun DurationText(text: State<String>, padding: PaddingValues, smallView:
     Modifier
       .padding(padding)
       .widthIn(min = minWidth),
-    color = MaterialTheme.colors.secondary,
+    color = LocalContentColor.current.copy(alpha = 0.68f),
     fontSize = if (smallView) 15.sp else 16.sp,
     maxLines = 1
   )
@@ -252,11 +250,13 @@ private fun PlayPauseButton(
 ) {
   val sentColor = MaterialTheme.appColors.sentMessage
   val receivedColor = MaterialTheme.appColors.receivedMessage
+  val bubbleBg = if (sent) sentColor else receivedColor
+  val bubbleInk = bubbleBg.onSurfaceInk()
   Surface(
     Modifier.drawRingModifier(angle, strokeColor, strokeWidth),
-    color = if (sent) sentColor else receivedColor,
+    color = bubbleBg,
     shape = MaterialTheme.shapes.small.copy(CornerSize(percent = 50)),
-    contentColor = LocalContentColor.current
+    contentColor = bubbleInk
   ) {
     Box(
       Modifier
@@ -272,7 +272,7 @@ private fun PlayPauseButton(
         if (audioPlaying) painterResource(MR.images.ic_pause_filled) else painterResource(icon),
         contentDescription = null,
         Modifier.size(36.sp.toDp() * sizeMultiplier),
-        tint = if (error) WarningOrange else if (!enabled) MaterialTheme.colors.secondary else MaterialTheme.colors.primary
+        tint = if (error) WarningOrange else if (!enabled) bubbleInk.copy(alpha = 0.45f) else bubbleInk
       )
     }
   }
@@ -307,7 +307,7 @@ private fun PlayablePlayPauseButton(
         if (audioPlaying) painterResource(MR.images.ic_pause_filled) else painterResource(MR.images.ic_play_arrow_filled),
         contentDescription = null,
         Modifier.size(36.sp.toDp() * sizeMultiplier),
-        tint = MaterialTheme.colors.primary
+        tint = LocalContentColor.current
       )
     }
   } else {
@@ -356,7 +356,7 @@ private fun FileStatusIcon(
         painterResource(icon),
         contentDescription = null,
         Modifier.size(36.sp.toDp() * sizeMultiplier),
-        tint = MaterialTheme.colors.secondary
+        tint = LocalContentColor.current.copy(alpha = 0.68f)
       )
     }
   }
@@ -378,7 +378,7 @@ private fun VoiceMsgIndicator(
   receiveFile: (Long) -> Unit,
 ) {
   val strokeWidth = with(LocalDensity.current) { 3.sp.toPx() } * sizeMultiplier
-  val strokeColor = MaterialTheme.colors.primary
+  val strokeColor = LocalContentColor.current
   when {
     file?.fileStatus is CIFileStatus.SndStored ->
       if (file.fileProtocol == FileProtocol.LOCAL && progress != null && duration != null) {

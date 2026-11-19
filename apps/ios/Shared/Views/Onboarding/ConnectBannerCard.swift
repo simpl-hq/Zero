@@ -48,17 +48,18 @@ struct ZeroHybridConnectSheet: View {
                     ProgressView("Resolving via Zero Broker...")
                         .padding(.top, 8)
                 } else {
+                    let canConnect = !targetInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
                     Button {
                         resolveAndConnect()
                     } label: {
                         Text("Connect")
                             .font(.headline)
-                            .foregroundColor(.white)
+                            .foregroundColor(canConnect ? theme.colors.onPrimary : .white)
                             .frame(maxWidth: .infinity)
                             .frame(height: 52)
                             .background(
-                                RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                    .fill(!targetInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? theme.colors.primary : Color.gray.opacity(0.4))
+                                Capsule()
+                                    .fill(canConnect ? theme.colors.primary : Color.gray.opacity(0.4))
                             )
                     }
                     .disabled(targetInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
@@ -217,11 +218,11 @@ struct ConnectBannerCard: View {
                 } label: {
                     Text("Connect (Phrase, Link, or 6-Digit Code)")
                         .font(.subheadline.weight(.semibold))
-                        .foregroundColor(.white)
+                        .foregroundColor(theme.colors.onPrimary)
                         .frame(maxWidth: .infinity)
                         .frame(height: 44)
                         .background(
-                            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            Capsule()
                                 .fill(theme.colors.primary)
                         )
                 }

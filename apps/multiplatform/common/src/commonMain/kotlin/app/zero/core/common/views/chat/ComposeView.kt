@@ -3,9 +3,11 @@ package app.zero.core.common.views.chat
 
 import SectionItemView
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.Saver
@@ -392,7 +394,7 @@ fun ComposeView(
   val chatScope = remember(chatsCtx) { chatsCtx.groupScopeInfo?.toChatScope() }
   val scopeChatId = remember { chat.id }
   fun isZeroLink(link: String): Boolean =
-    link.startsWith("https://zero.chat", true) || link.startsWith("http://zero.chat", true)
+    link.startsWith("https://simpl.global", true) || link.startsWith("https://zero.chat", true) || link.startsWith("http://zero.chat", true)
 
   fun getMessageLinks(parsedMsg: List<FormattedText>?): Pair<String?, Boolean> {
     if (parsedMsg == null) return null to false
@@ -1392,10 +1394,7 @@ fun ComposeView(
     sendToConnect: (() -> Unit)? = null
   ) {
     val timedMessageAllowed = remember(chat.chatInfo) { chat.chatInfo.featureEnabled(ChatFeature.TimedMessages) }
-    val sendButtonColor =
-      if (chat.chatInfo.incognito)
-        if (isInDarkTheme()) Indigo else Indigo.copy(alpha = 0.7F)
-      else MaterialTheme.colors.primary
+    val sendButtonColor = MaterialTheme.colors.primary
     SendMsgView(
       composeState,
       showVoiceRecordIcon = true,
@@ -1696,15 +1695,29 @@ fun ComposeView(
           )
         }
       } else if (nextSendGrpInv.value) {
+        val pillBg = if (isInDarkTheme()) ZeroElevatedDark else ZeroElevatedLight
+        val pillBorder = if (isInDarkTheme()) ZeroBubbleBorderDark else ZeroBorderLight
         Column {
           ContextSendMessageToConnect(generalGetString(MR.strings.compose_send_direct_message_to_connect))
           Divider()
-          Row(Modifier.padding(end = 8.dp), verticalAlignment = Alignment.Bottom) {
+          Row(
+            Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
+            verticalAlignment = Alignment.Bottom
+          ) {
             AttachmentAndCommandsButtons()
-            SendMsgView_(
-              disableSendButton = disableSendButton,
-              sendToConnect = { withApi { sendMemberContactInvitation() } }
-            )
+            Box(
+              Modifier
+                .weight(1f)
+                .clip(RoundedCornerShape(24.dp))
+                .background(pillBg)
+                .border(1.dp, pillBorder, RoundedCornerShape(24.dp))
+                .padding(horizontal = 12.dp)
+            ) {
+              SendMsgView_(
+                disableSendButton = disableSendButton,
+                sendToConnect = { withApi { sendMemberContactInvitation() } }
+              )
+            }
           }
         }
       } else if (
@@ -1754,13 +1767,27 @@ fun ComposeView(
           groupDirectInv = chat.chatInfo.contact.groupDirectInv
         )
       } else {
-        Row(Modifier.padding(end = 8.dp), verticalAlignment = Alignment.Bottom) {
+        val pillBg = if (isInDarkTheme()) ZeroElevatedDark else ZeroElevatedLight
+        val pillBorder = if (isInDarkTheme()) ZeroBubbleBorderDark else ZeroBorderLight
+        Row(
+          Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
+          verticalAlignment = Alignment.Bottom
+        ) {
           AttachmentAndCommandsButtons()
           val broadcastPlaceholder = (chat.chatInfo as? ChatInfo.Group)?.groupInfo?.let { gi ->
             if (gi.useRelays && gi.membership.memberRole >= GroupMemberRole.Owner && chat.chatInfo.groupChatScope() == null) generalGetString(MR.strings.compose_view_broadcast)
             else null
           }
-          SendMsgView_(disableSendButton = disableSendButton, placeholder = broadcastPlaceholder)
+          Box(
+            Modifier
+              .weight(1f)
+              .clip(RoundedCornerShape(24.dp))
+              .background(pillBg)
+              .border(1.dp, pillBorder, RoundedCornerShape(24.dp))
+              .padding(horizontal = 12.dp)
+          ) {
+            SendMsgView_(disableSendButton = disableSendButton, placeholder = broadcastPlaceholder)
+          }
         }
       }
     }

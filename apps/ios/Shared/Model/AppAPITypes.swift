@@ -1761,8 +1761,8 @@ struct ServerOperator: Identifiable, Equatable, Codable {
         operatorId: 1,
         operatorTag: .zero,
         tradeName: "Zero",
-        legalName: "Zero",
-        serverDomains: ["zero.im"],
+        legalName: "Simpl",
+        serverDomains: ["simpl.global"],
         conditionsAcceptance: .accepted(acceptedAt: nil, autoAccepted: false),
         enabled: true,
         smpRoles: ServerRoles(storage: true, proxy: true, names: true),
@@ -1957,7 +1957,7 @@ struct UserServer: Identifiable, Equatable, Codable, Hashable {
     static var sampleData = SampleData(
         preset: UserServer(
             serverId: 1,
-            server: "smp://abcd@smp8.zero.im",
+            server: "smp://pJ5gVPxIPmCXflOJ7W7avwpDka1mEHcNaHEqcAwBx0c=@zerorelay.simpl.global:5223",
             preset: true,
             tested: true,
             enabled: true,
@@ -1965,7 +1965,7 @@ struct UserServer: Identifiable, Equatable, Codable, Hashable {
         ),
         custom: UserServer(
             serverId: 2,
-            server: "smp://abcd@smp9.zero.im",
+            server: "smp://TctoW4I8Pkb7i547zF_zX4OEj0EG1GEFYfh1QAPD3Ok=@zeroeu.simpl.global:5223",
             preset: false,
             tested: false,
             enabled: false,
@@ -1973,7 +1973,7 @@ struct UserServer: Identifiable, Equatable, Codable, Hashable {
         ),
         untested: UserServer(
             serverId: 3,
-            server: "smp://abcd@smp10.zero.im",
+            server: "smp://abcd@zerona.simpl.global:5223",
             preset: false,
             tested: nil,
             enabled: true,
@@ -1981,7 +1981,7 @@ struct UserServer: Identifiable, Equatable, Codable, Hashable {
         ),
         xftpPreset: UserServer(
             serverId: 4,
-            server: "xftp://abcd@xftp8.zero.im",
+            server: "xftp://RP75-w9zE9n-JoaGv2Fwik49YLCDcIJJFoFfh0-m6lU=@zerocdn.simpl.global:5223",
             preset: true,
             tested: true,
             enabled: true,

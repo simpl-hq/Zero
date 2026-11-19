@@ -30,6 +30,17 @@ struct VersionView: View {
                     Text("Developer")
                 }
             }
+
+            Section {
+                HStack {
+                    Spacer()
+                    Text("Zero · Simpl LLC")
+                        .font(.footnote)
+                        .foregroundColor(theme.colors.secondary)
+                    Spacer()
+                }
+                .listRowBackground(Color.clear)
+            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .onAppear {

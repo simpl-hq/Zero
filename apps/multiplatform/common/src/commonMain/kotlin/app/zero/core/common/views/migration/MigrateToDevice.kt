@@ -719,7 +719,7 @@ private suspend fun MutableState<MigrationToState?>.cleanUpOnBack(chatReceiver: 
 }
 
 private fun strHasZeroFileLink(text: String): Boolean =
-  text.startsWith("zero:/file") || text.startsWith("https://zero.chat/file")
+  text.startsWith("zero:/file") || text.startsWith("https://simpl.global/file")
 
 private fun fileForTemporaryDatabase(): File =
   File(getMigrationTempFilesDirectory(), generateNewFileName("migration", "db", getMigrationTempFilesDirectory()))

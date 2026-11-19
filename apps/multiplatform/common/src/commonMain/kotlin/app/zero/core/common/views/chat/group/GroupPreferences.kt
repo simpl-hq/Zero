@@ -274,7 +274,7 @@ private fun FeatureSection(
   SectionView {
     val on = enableFeature.value == GroupFeatureEnabled.ON
     val icon = if (on) feature.iconFilled() else feature.icon
-    val iconTint = if (on) ZeroGreen else MaterialTheme.colors.secondary
+    val iconTint = if (on) MaterialTheme.colors.primary else MaterialTheme.colors.secondary
     val timedOn = feature == GroupFeature.TimedMessages && enableFeature.value == GroupFeatureEnabled.ON
     if (groupInfo.isOwner) {
       PreferenceToggleWithIcon(

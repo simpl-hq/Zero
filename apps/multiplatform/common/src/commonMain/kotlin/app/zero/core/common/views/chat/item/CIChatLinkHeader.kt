@@ -57,7 +57,7 @@ fun CIChatLinkHeader(
       chatLink.shortDescription?.let { descr ->
         Text(
           descr,
-          color = MaterialTheme.colors.secondary,
+          color = LocalContentColor.current.copy(alpha = 0.68f),
           fontSize = 13.sp,
           lineHeight = 18.sp,
           maxLines = 2,
@@ -66,13 +66,14 @@ fun CIChatLinkHeader(
       }
       Text(
         chatLink.infoLine(signed = ownerSig != null),
-        color = MaterialTheme.colors.secondary,
+        color = LocalContentColor.current.copy(alpha = 0.68f),
         fontSize = 13.sp,
         lineHeight = 18.sp,
       )
       Text(
         stringResource(MR.strings.tap_to_open),
-        color = MaterialTheme.colors.primary,
+        color = LocalContentColor.current,
+        fontWeight = FontWeight.Medium,
       )
     }
   }

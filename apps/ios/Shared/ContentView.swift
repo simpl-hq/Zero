@@ -214,10 +214,14 @@ struct ContentView: View {
     }
 
     private func initializationView() -> some View {
-        VStack {
-            ProgressView().scaleEffect(2)
-            Text("Opening app…")
-                .padding()
+        VStack(spacing: 18) {
+            Image(theme.colors.background.isLightSurface ? "logo" : "logo-light")
+                .resizable()
+                .scaledToFit()
+                .frame(height: 36)
+                .accessibilityLabel("Zero")
+            ProgressView()
+                .controlSize(.regular)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity )
         .background(

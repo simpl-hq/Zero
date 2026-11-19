@@ -18,6 +18,9 @@ struct FramedCIVoiceView: View {
 
     @State private var seek: (TimeInterval) -> Void = { _ in }
 
+    private var bubbleInk: Color { chatItemFrameColor(chatItem, theme).onSurfaceInk }
+    private var bubbleSecondaryInk: Color { chatItemFrameColor(chatItem, theme).onSurfaceSecondaryInk }
+
     var body: some View {
         HStack {
             VoiceMessagePlayer(
@@ -38,10 +41,11 @@ struct FramedCIVoiceView: View {
                 playbackState: $playbackState,
                 playbackTime: $playbackTime
             )
-            .foregroundColor(theme.colors.secondary)
+            .foregroundColor(bubbleSecondaryInk)
             .frame(width: 50, alignment: .leading)
             if .playing == playbackState || (playbackTime ?? 0) > 0 || !allowMenu {
                 playbackSlider()
+                    .tint(bubbleInk)
             }
         }
         .padding(.top, 6)

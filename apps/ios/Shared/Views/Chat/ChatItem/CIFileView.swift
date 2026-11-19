@@ -13,6 +13,11 @@ struct CIFileView: View {
     let meta: CIMeta
     let senderProfile: LocalProfile?
     var smallViewSize: CGFloat?
+    var inkColor: Color? = nil
+    var secondaryInkColor: Color? = nil
+
+    private var resolvedInk: Color { inkColor ?? theme.colors.onBackground }
+    private var resolvedSecondaryInk: Color { secondaryInkColor ?? theme.colors.secondary }
 
     var body: some View {
         if smallViewSize != nil {
@@ -31,12 +36,12 @@ struct CIFileView: View {
                         Text(file.fileName)
                             .lineLimit(1)
                             .multilineTextAlignment(.leading)
-                            .foregroundColor(theme.colors.onBackground)
+                            .foregroundColor(resolvedInk)
                         (Text(prettyFileSize) + metaReserve)
                             .font(.caption)
                             .lineLimit(1)
                             .multilineTextAlignment(.leading)
-                            .foregroundColor(theme.colors.secondary)
+                            .foregroundColor(resolvedSecondaryInk)
                     }
                 } else {
                     metaReserve.font(.caption)
@@ -161,7 +166,7 @@ struct CIFileView: View {
             case .sndWarning: fileIcon("doc.fill", innerIcon: "exclamationmark.triangle.fill", innerIconSize: 10)
             case .rcvInvitation:
                 if fileSizeValid(file, senderProfile) {
-                    fileIcon("arrow.down.doc.fill", color: theme.colors.primary)
+                    fileIcon("arrow.down.doc.fill", color: resolvedInk)
                 } else {
                     fileIcon("doc.fill", color: .orange, innerIcon: "exclamationmark", innerIconSize: 12)
                 }
@@ -173,7 +178,7 @@ struct CIFileView: View {
                     progressView()
                 }
             case .rcvAborted:
-                fileIcon("doc.fill", color: theme.colors.primary, innerIcon: "exclamationmark.arrow.circlepath", innerIconSize: 12)
+                fileIcon("doc.fill", color: resolvedInk, innerIcon: "exclamationmark.arrow.circlepath", innerIconSize: 12)
             case .rcvComplete: fileIcon("doc.fill")
             case .rcvCancelled: fileIcon("doc.fill", innerIcon: "xmark", innerIconSize: 10)
             case .rcvError: fileIcon("doc.fill", innerIcon: "xmark", innerIconSize: 10)
@@ -185,14 +190,15 @@ struct CIFileView: View {
         }
     }
 
-    private func fileIcon(_ icon: String, color: Color = Color(uiColor: .tertiaryLabel), innerIcon: String? = nil, innerIconSize: CGFloat? = nil) -> some View {
+    private func fileIcon(_ icon: String, color: Color? = nil, innerIcon: String? = nil, innerIconSize: CGFloat? = nil) -> some View {
         let size = smallViewSize ?? 30
+        let fillCol = color ?? resolvedInk.opacity(0.72)
         return ZStack(alignment: .center) {
             Image(systemName: icon)
                 .resizable()
                 .aspectRatio(contentMode: .fit)
                 .frame(width: size, height: size)
-                .foregroundColor(color)
+                .foregroundColor(fillCol)
             if let innerIcon = innerIcon,
                let innerIconSize = innerIconSize, (smallViewSize == nil || file?.showStatusIconInSmallView == true) {
                 Image(systemName: innerIcon)
@@ -200,7 +206,7 @@ struct CIFileView: View {
                     .aspectRatio(contentMode: .fit)
                     .frame(maxHeight: 16)
                     .frame(width: innerIconSize, height: innerIconSize)
-                    .foregroundColor(.white)
+                    .foregroundColor(fillCol.onSurfaceInk)
                     .padding(.top, size / 2.5)
             }
         }

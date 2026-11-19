@@ -3,7 +3,7 @@ import SwiftUI
 
 public let appSuspendTimeout: Int = 15
 
-public let defaultProfileImageCorner: Double = 22.5
+public let defaultProfileImageCorner: Double = 50.0
 
 let GROUP_DEFAULT_APP_STATE = "appState"
 let GROUP_DEFAULT_NSE_STATE = "nseState"
@@ -92,7 +92,7 @@ public let groupAppDefaults: [String: Any] = [
     GROUP_DEFAULT_CONFIRM_DB_UPGRADES: false,
     GROUP_DEFAULT_CALL_KIT_ENABLED: true,
     GROUP_DEFAULT_PQ_EXPERIMENTAL_ENABLED: false,
-    GROUP_DEFAULT_ONE_HAND_UI: true,
+    GROUP_DEFAULT_ONE_HAND_UI: false,
     GROUP_DEFAULT_CHAT_BOTTOM_BAR: true
 ]
 

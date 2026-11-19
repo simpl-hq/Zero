@@ -16,7 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import app.zero.core.common.ui.theme.ZeroTheme
+import app.zero.core.common.ui.theme.*
 import app.zero.core.common.views.helpers.annotatedStringResource
 import app.zero.core.common.views.onboarding.ReadableTextWithLink
 import app.zero.core.common.views.onboarding.openZeroGuidedTutorial
@@ -33,13 +33,14 @@ fun ChatHelpView(addContact: (() -> Unit)? = null) {
     Text(stringResource(MR.strings.thank_you_for_installing_zero), lineHeight = 22.sp)
 
     // quick guided walkthrough launcher card
+    val ctaInk = MaterialTheme.colors.primary.onSurfaceInk()
     Surface(
-      shape = RoundedCornerShape(14.dp),
+      shape = RoundedCornerShape(16.dp),
       color = MaterialTheme.colors.primary,
       modifier = Modifier
         .fillMaxWidth()
         .padding(vertical = 4.dp)
-        .clip(RoundedCornerShape(14.dp))
+        .clip(RoundedCornerShape(16.dp))
         .clickable { openZeroGuidedTutorial(allowSettingsShortcuts = true) }
     ) {
       Row(
@@ -50,7 +51,7 @@ fun ChatHelpView(addContact: (() -> Unit)? = null) {
         Icon(
           painterResource(MR.images.ic_help),
           contentDescription = null,
-          tint = Color.White,
+          tint = ctaInk,
           modifier = Modifier.size(22.dp)
         )
         Column(
@@ -59,20 +60,20 @@ fun ChatHelpView(addContact: (() -> Unit)? = null) {
         ) {
           Text(
             "Open Guided Setup Tutorial",
-            color = Color.White,
+            color = ctaInk,
             fontWeight = FontWeight.SemiBold,
             fontSize = 15.sp
           )
           Text(
             "4 interactive steps: phrase, pairing codes, onion routing & local lock",
-            color = Color.White.copy(alpha = 0.86f),
+            color = ctaInk.copy(alpha = 0.82f),
             fontSize = 12.sp
           )
         }
         Icon(
           painterResource(MR.images.ic_arrow_forward),
           contentDescription = null,
-          tint = Color.White.copy(alpha = 0.9f),
+          tint = ctaInk.copy(alpha = 0.9f),
           modifier = Modifier.size(16.dp)
         )
       }

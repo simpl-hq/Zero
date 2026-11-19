@@ -11,7 +11,7 @@ else
 fi
 
 vlc_tag='v3.0.23-2'
-vlc_url="${VLC_MIRROR_URL:-https://github.com/simpl-hq/vlc/releases/download}/${vlc_tag}/vlc-macos-${ARCH}.zip"
+vlc_url="${VLC_MIRROR_URL:-https://github.com/simplex-chat/vlc/releases/download}/${vlc_tag}/vlc-macos-${ARCH}.zip"
 
 function readlink() {
   echo "$(cd "$(dirname "$1")"; pwd -P)"

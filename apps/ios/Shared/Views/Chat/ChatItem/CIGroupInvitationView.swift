@@ -16,6 +16,10 @@ struct CIGroupInvitationView: View {
 
     @AppStorage(DEFAULT_SHOW_SENT_VIA_RPOXY) private var showSentViaProxy = false
 
+    private var bubbleColor: Color { chatItemFrameColor(chatItem, theme) }
+    private var bubbleInk: Color { bubbleColor.onSurfaceInk }
+    private var bubbleSecondaryInk: Color { bubbleColor.onSurfaceSecondaryInk }
+
     var body: some View {
         let action = !chatItem.chatDir.sent && groupInvitation.status == .pending
         let v = ZStack(alignment: .bottomTrailing) {
@@ -35,8 +39,9 @@ struct CIGroupInvitationView: View {
                                 .overlay(DetermineWidth())
                             (
                                 Text(chatIncognito ? "Tap to join incognito" : "Tap to join")
-                                    .foregroundColor(inProgress ? theme.colors.secondary : chatIncognito ? .indigo : theme.colors.primary)
+                                    .foregroundColor(inProgress ? bubbleSecondaryInk : bubbleInk)
                                     .font(.callout)
+                                    .fontWeight(.medium)
                                 + Text(verbatim: "   ")
                                 + ciMetaText(chatItem.meta, chatTTL: nil, encrypted: nil, colorMode: .transparent, showStatus: false, showEdited: false, showViaProxy: showSentViaProxy, showTimesamp: showTimestamp)
                             )
@@ -51,6 +56,7 @@ struct CIGroupInvitationView: View {
                         .overlay(DetermineWidth())
                     }
                 }
+                .foregroundColor(bubbleInk)
                 .padding(.bottom, 2)
 
                 if progressByTimeout {
@@ -58,11 +64,11 @@ struct CIGroupInvitationView: View {
                 }
             }
 
-            CIMetaView(chat: chat, chatItem: chatItem, metaColor: theme.colors.secondary, showStatus: false, showEdited: false)
+            CIMetaView(chat: chat, chatItem: chatItem, metaColor: bubbleSecondaryInk, primaryColor: bubbleInk, showStatus: false, showEdited: false)
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 6)
-        .background { chatItemFrameColor(chatItem, theme).modifier(ChatTailPadding()) }
+        .background { bubbleColor.modifier(ChatTailPadding()) }
         .textSelection(.disabled)
         .onPreferenceChange(DetermineWidth.Key.self) { frameWidth = $0 }
         .onChange(of: inProgress) { inProgress in
@@ -91,9 +97,9 @@ struct CIGroupInvitationView: View {
     private func groupInfoView(_ action: Bool) -> some View {
         var color: Color
         if action && !inProgress {
-            color = chatIncognito ? .indigo : theme.colors.primary
+            color = bubbleInk
         } else {
-            color = Color(uiColor: .tertiaryLabel)
+            color = bubbleSecondaryInk
         }
         return HStack(alignment: .top) {
             ProfileImage(

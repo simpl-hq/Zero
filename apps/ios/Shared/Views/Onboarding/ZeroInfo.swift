@@ -1,5 +1,7 @@
 import SwiftUI
+import CFNetwork
 import CryptoKit
+import Security
 import Zero
 
 private enum Argon2idPow {
@@ -271,40 +273,76 @@ struct ZeroPhraseIdentity {
     let slug: String
 }
 
+private final class BrokerPinningDelegate: NSObject, URLSessionDelegate {
+    private static let simplBrokerHosts: Set<String> = [
+        "zeroapi.simpl.global",
+        "zeroeu.simpl.global",
+        "zerona.simpl.global"
+    ]
+    private static let pinnedCaCertSha256: Set<String> = [
+        "7l96vWmBuwJVYyzY9JKDRRtLGIRNEgQLRO4A8HuP4sY=",
+        "D8CQHMorrp6f27AtUNAvEJT3s2ZyCGmRueiXYm3EhfA=",
+        "ojctBkMelxY2Xu7UfsAgNRSX0YL8wDjkV+WBaKA8rAc=",
+        "l2WN6MaN+pis4eUCimPVShqukRs+IUcQdsaFDNCMurQ="
+    ]
+
+    func urlSession(
+        _ session: URLSession,
+        didReceive challenge: URLAuthenticationChallenge,
+        completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void
+    ) {
+        guard challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust,
+              let serverTrust = challenge.protectionSpace.serverTrust else {
+            completionHandler(.performDefaultHandling, nil)
+            return
+        }
+        guard SecTrustEvaluateWithError(serverTrust, nil) else {
+            completionHandler(.cancelAuthenticationChallenge, nil)
+            return
+        }
+        let host = challenge.protectionSpace.host.lowercased()
+        guard Self.simplBrokerHosts.contains(host) else {
+            completionHandler(.useCredential, URLCredential(trust: serverTrust))
+            return
+        }
+        guard let chain = SecTrustCopyCertificateChain(serverTrust) as? [SecCertificate] else {
+            completionHandler(.cancelAuthenticationChallenge, nil)
+            return
+        }
+        let matched = chain.contains { cert in
+            let der = SecCertificateCopyData(cert) as Data
+            let digest = Data(SHA256.hash(data: der)).base64EncodedString()
+            return Self.pinnedCaCertSha256.contains(digest)
+        }
+        if matched {
+            completionHandler(.useCredential, URLCredential(trust: serverTrust))
+        } else {
+            completionHandler(.cancelAuthenticationChallenge, nil)
+        }
+    }
+}
+
 final class ZeroIdentityBridge {
     static let shared = ZeroIdentityBridge()
 
-    private let primaryDirectoryUrl = "https://zeroapi.simpl.global"
+    private let simplBrokerHosts: Set<String> = [
+        "zeroapi.simpl.global",
+        "zeroeu.simpl.global",
+        "zerona.simpl.global"
+    ]
+    private let directoryUrls = [
+        "https://zeroapi.simpl.global",
+        "https://zeroeu.simpl.global",
+        "https://zerona.simpl.global"
+    ]
     static let deepLinkPrefix = "https://simpl.global/add/"
     private let argon2Salt = Array("zero-argon2id-pow".utf8)
-    private let maxIterations: UInt64 = 50_000
+    private let maxIterations: UInt64 = 100_000
+    private let maskedUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+    private let directoryUrlKey = "app.zero.directory_url"
     private let phraseDefaultsKey = "app.zero.account.phrase"
     private let deepLinkDefaultsKey = "app.zero.account.deeplink"
     private let cacheDefaultsKey = "app.zero.account.identity_cache"
-
-    private static let fallbackWords = [
-        "Acorn", "Amber", "Anchor", "Apex", "Arbor", "Arctic", "Arrow", "Aspen",
-        "Atlas", "Aurora", "Azure", "Beacon", "Birch", "Blaze", "Boulder", "Breeze",
-        "Bridge", "Brook", "Canyon", "Carbon", "Cedar", "Cipher", "Cloud", "Cobalt",
-        "Comet", "Copper", "Coral", "Cosmos", "Crest", "Crimson", "Crystal", "Cypress",
-        "Dawn", "Delta", "Diamond", "Drift", "Dune", "Echo", "Eclipse", "Ember",
-        "Emerald", "Falcon", "Feather", "Fjord", "Flame", "Flint", "Forest", "Forge",
-        "Frost", "Galaxy", "Garnet", "Glacier", "Glade", "Granite", "Harbor", "Hawk",
-        "Heather", "Helix", "Horizon", "Indigo", "Iron", "Island", "Ivory", "Jade",
-        "Jasper", "Juniper", "Kestrel", "Lagoon", "Lantern", "Laurel", "Lotus", "Lunar",
-        "Lynx", "Magnet", "Maple", "Marble", "Meadow", "Mercury", "Meteor", "Mirror",
-        "Mist", "Monarch", "Moon", "Nebula", "Nimbus", "Noble", "North", "Nova",
-        "Oak", "Oasis", "Obsidian", "Ocean", "Onyx", "Opal", "Orbit", "Orchid",
-        "Osprey", "Otter", "Ozone", "Panther", "Pebble", "Phantom", "Phoenix", "Pine",
-        "Planet", "Polar", "Prism", "Quartz", "Quill", "Rain", "Raven", "Redwood",
-        "Reef", "Ridge", "Ripple", "River", "Rocket", "Ruby", "Sable", "Saffron",
-        "Sage", "Sapphire", "Scarlet", "Sequoia", "Shadow", "Shield", "Sierra", "Silver",
-        "Slate", "Snow", "Solar", "Solstice", "Spark", "Specter", "Sphere", "Spruce",
-        "Star", "Steel", "Stone", "Storm", "Summit", "Swift", "Tempest", "Thunder",
-        "Timber", "Topaz", "Torch", "Trail", "Tundra", "Valiant", "Valley", "Vapor",
-        "Vector", "Velvet", "Vertex", "Vesper", "Vortex", "Voyager", "Wave", "Whisper",
-        "Willow", "Winter", "Wolf", "Zenith", "Zephyr"
-    ]
 
     var currentPhrase: String? {
         get { UserDefaults.standard.string(forKey: phraseDefaultsKey) }
@@ -348,14 +386,96 @@ final class ZeroIdentityBridge {
         return trimmed
     }
 
-    func solveArgon2idPuzzle(ip: String, time: Int64) async throws -> String {
+    private func parseSocksProxy(_ raw: String) -> (host: String, port: Int, user: String?, pass: String?) {
+        var remaining = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        var user: String? = nil
+        var pass: String? = nil
+        if let atIdx = remaining.lastIndex(of: "@") {
+            let creds = String(remaining[..<atIdx])
+            remaining = String(remaining[remaining.index(after: atIdx)...])
+            if let colonIdx = creds.firstIndex(of: ":") {
+                user = String(creds[..<colonIdx])
+                pass = String(creds[creds.index(after: colonIdx)...])
+            } else if !creds.isEmpty {
+                user = creds
+            }
+        }
+        var host = "127.0.0.1"
+        var port = 9050
+        if remaining.hasPrefix("["), let closeIdx = remaining.firstIndex(of: "]") {
+            let inside = String(remaining[remaining.index(after: remaining.startIndex)..<closeIdx])
+            if !inside.isEmpty { host = inside }
+            let tail = remaining[remaining.index(after: closeIdx)...]
+            if tail.hasPrefix(":"), let parsed = Int(tail.dropFirst()) { port = parsed }
+        } else if let colonIdx = remaining.lastIndex(of: ":") {
+            let h = String(remaining[..<colonIdx]).trimmingCharacters(in: .whitespaces)
+            if !h.isEmpty { host = h }
+            if let parsed = Int(remaining[remaining.index(after: colonIdx)...]) { port = parsed }
+        } else if !remaining.isEmpty {
+            host = remaining
+        }
+        return (host, port, user, pass)
+    }
+
+    private func candidateDirectoryUrls() -> [String] {
+        if let raw = UserDefaults.standard.string(forKey: directoryUrlKey)?
+            .trimmingCharacters(in: .whitespacesAndNewlines) {
+            let low = raw.lowercased()
+            if low.isEmpty || low == "off" || low == "disabled" || low == "none" {
+                return []
+            }
+            if raw.lowercased().hasPrefix("https://"),
+               let host = URL(string: raw)?.host?.lowercased(),
+               !simplBrokerHosts.contains(host) {
+                return [raw.trimmingCharacters(in: CharacterSet(charactersIn: "/"))]
+            }
+        }
+        return directoryUrls
+    }
+
+    private func performRequest(_ req: URLRequest) async throws -> (Data, URLResponse) {
+        let config = URLSessionConfiguration.ephemeral
+        config.urlCache = nil
+        config.httpCookieStorage = nil
+        config.httpShouldSetCookies = false
+        config.waitsForConnectivity = false
+        config.requestCachePolicy = .reloadIgnoringLocalCacheData
+        if let rawProxy = groupDefaults.string(forKey: GROUP_DEFAULT_NETWORK_SOCKS_PROXY)?
+            .trimmingCharacters(in: .whitespacesAndNewlines),
+           !rawProxy.isEmpty {
+            let parsed = parseSocksProxy(rawProxy)
+            guard (1...65535).contains(parsed.port) else {
+                throw NSError(domain: "ZeroIdentityBridge", code: 400, userInfo: [NSLocalizedDescriptionKey: "Invalid SOCKS5 proxy port"])
+            }
+            var proxyDict: [AnyHashable: Any] = [
+                kCFStreamPropertySOCKSProxyHost as String: parsed.host,
+                kCFStreamPropertySOCKSProxyPort as String: parsed.port,
+                kCFStreamPropertySOCKSVersion as String: kCFStreamSocketSOCKSVersion5 as String,
+                "SOCKSEnable": 1,
+                "SOCKSProxy": parsed.host,
+                "SOCKSPort": parsed.port
+            ]
+            if let user = parsed.user, !user.isEmpty {
+                proxyDict[kCFStreamPropertySOCKSUser as String] = user
+                proxyDict[kCFStreamPropertySOCKSPassword as String] = parsed.pass ?? ""
+            }
+            config.connectionProxyDictionary = proxyDict
+        }
+        var securedReq = req
+        securedReq.httpShouldHandleCookies = false
+        let session = URLSession(configuration: config, delegate: BrokerPinningDelegate(), delegateQueue: nil)
+        defer { session.finishTasksAndInvalidate() }
+        return try await session.data(for: securedReq)
+    }
+
+    func solveArgon2idPuzzle(inviteUrl: String, time: Int64) async throws -> String {
         try await Task.detached(priority: .userInitiated) { [argon2Salt, maxIterations] in
             var nonce: UInt64 = 0
             while nonce < maxIterations {
                 try Task.checkCancellation()
-                let secret = Array("\(ip):\(time):\(nonce)".utf8)
+                let secret = Array("\(inviteUrl):\(time):\(nonce)".utf8)
                 let digest = Argon2idPow.hash(secret: secret, salt: argon2Salt)
-                if (digest[0] & 0xF0) == 0 {
+                if digest[0] == 0 && (digest[1] & 0xC0) == 0 {
                     return String(nonce)
                 }
                 nonce += 1
@@ -364,11 +484,13 @@ final class ZeroIdentityBridge {
         }.value
     }
 
-    func provisionPhraseAndDeepLink(localCryptoInviteUrl: String, dummyIp: String = "127.0.0.1") async throws -> ZeroPhraseIdentity {
-        let trimmedInvite = localCryptoInviteUrl.trimmingCharacters(in: .whitespacesAndNewlines)
-        let effectiveInvite = trimmedInvite.isEmpty ? "zero:/contact" : trimmedInvite
+    func provisionPhraseAndDeepLink(localCryptoInviteUrl: String) async throws -> ZeroPhraseIdentity {
+        let effectiveInvite = localCryptoInviteUrl.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !effectiveInvite.isEmpty else {
+            throw NSError(domain: "ZeroIdentityBridge", code: 400, userInfo: [NSLocalizedDescriptionKey: "Missing local invite URI"])
+        }
         let timestamp = Int64(Date().timeIntervalSince1970)
-        let verifiedNonce = try await solveArgon2idPuzzle(ip: dummyIp, time: timestamp)
+        let verifiedNonce = try await solveArgon2idPuzzle(inviteUrl: effectiveInvite, time: timestamp)
 
         let bodyData = try JSONSerialization.data(withJSONObject: [
             "invite_url": effectiveInvite,
@@ -376,15 +498,19 @@ final class ZeroIdentityBridge {
             "timestamp": timestamp
         ])
 
-        for base in [primaryDirectoryUrl] {
+        let candidates = candidateDirectoryUrls()
+        guard !candidates.isEmpty else {
+            throw NSError(domain: "ZeroIdentityBridge", code: 503, userInfo: [NSLocalizedDescriptionKey: "Contact discovery broker is disabled. Share a direct QR or 1-time link."])
+        }
+        for base in candidates {
             guard let url = URL(string: "\(base)/api/v1/identity/phrase") else { continue }
             var req = URLRequest(url: url, timeoutInterval: 8.0)
             req.httpMethod = "POST"
             req.setValue("application/json", forHTTPHeaderField: "Content-Type")
-            req.setValue("ZeroCore/1.0", forHTTPHeaderField: "User-Agent")
+            req.setValue(maskedUserAgent, forHTTPHeaderField: "User-Agent")
             req.httpBody = bodyData
             do {
-                let (data, resp) = try await URLSession.shared.data(for: req)
+                let (data, resp) = try await performRequest(req)
                 if let http = resp as? HTTPURLResponse, (200...299).contains(http.statusCode),
                    let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
                    let phrase = json["phrase"] as? String,
@@ -401,20 +527,16 @@ final class ZeroIdentityBridge {
             }
         }
 
-        let fallbackPhrase = (0..<4).map { _ in Self.fallbackWords.randomElement()! }.joined(separator: "-")
-        let fallbackSlug = fallbackPhrase.lowercased().replacingOccurrences(of: "-", with: "")
-        let fallbackLink = "\(Self.deepLinkPrefix)\(fallbackSlug)"
-        cacheIdentityMapping(key: fallbackPhrase, inviteUrl: effectiveInvite)
-        currentPhrase = fallbackPhrase
-        currentDeepLink = fallbackLink
-        return ZeroPhraseIdentity(phrase: fallbackPhrase, deepLink: fallbackLink, slug: fallbackSlug)
+        throw NSError(domain: "ZeroIdentityBridge", code: 503, userInfo: [NSLocalizedDescriptionKey: "Directory relay unreachable. Retry when online or share your QR invite directly."])
     }
 
-    func provisionEphemeral6DigitCode(localCryptoInviteUrl: String, dummyIp: String = "127.0.0.1") async throws -> String {
-        let trimmedInvite = localCryptoInviteUrl.trimmingCharacters(in: .whitespacesAndNewlines)
-        let effectiveInvite = trimmedInvite.isEmpty ? "zero:/contact" : trimmedInvite
+    func provisionEphemeral6DigitCode(localCryptoInviteUrl: String) async throws -> String {
+        let effectiveInvite = localCryptoInviteUrl.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !effectiveInvite.isEmpty else {
+            throw NSError(domain: "ZeroIdentityBridge", code: 400, userInfo: [NSLocalizedDescriptionKey: "Missing local invite URI"])
+        }
         let timestamp = Int64(Date().timeIntervalSince1970)
-        let verifiedNonce = try await solveArgon2idPuzzle(ip: dummyIp, time: timestamp)
+        let verifiedNonce = try await solveArgon2idPuzzle(inviteUrl: effectiveInvite, time: timestamp)
 
         let bodyData = try JSONSerialization.data(withJSONObject: [
             "invite_url": effectiveInvite,
@@ -422,15 +544,19 @@ final class ZeroIdentityBridge {
             "timestamp": timestamp
         ])
 
-        for base in [primaryDirectoryUrl] {
+        let candidates = candidateDirectoryUrls()
+        guard !candidates.isEmpty else {
+            throw NSError(domain: "ZeroIdentityBridge", code: 503, userInfo: [NSLocalizedDescriptionKey: "Contact discovery broker is disabled. Share a direct QR or 1-time link."])
+        }
+        for base in candidates {
             guard let url = URL(string: "\(base)/api/v1/identity/ephemeral") else { continue }
             var req = URLRequest(url: url, timeoutInterval: 8.0)
             req.httpMethod = "POST"
             req.setValue("application/json", forHTTPHeaderField: "Content-Type")
-            req.setValue("ZeroCore/1.0", forHTTPHeaderField: "User-Agent")
+            req.setValue(maskedUserAgent, forHTTPHeaderField: "User-Agent")
             req.httpBody = bodyData
             do {
-                let (data, resp) = try await URLSession.shared.data(for: req)
+                let (data, resp) = try await performRequest(req)
                 if let http = resp as? HTTPURLResponse, (200...299).contains(http.statusCode),
                    let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
                    let code = json["code"] as? String {
@@ -442,37 +568,40 @@ final class ZeroIdentityBridge {
             }
         }
 
-        let p1 = Int.random(in: 100...999)
-        let p2 = Int.random(in: 100...999)
-        let localCode = String(format: "%03d-%03d", p1, p2)
-        cacheIdentityMapping(key: localCode, inviteUrl: effectiveInvite)
-        return localCode
+        throw NSError(domain: "ZeroIdentityBridge", code: 503, userInfo: [NSLocalizedDescriptionKey: "Directory relay unreachable. Retry when online or share your QR invite directly."])
     }
 
     func resolveIdentity(rawTarget: String) async throws -> String {
         let target = Self.extractResolveTarget(rawTarget)
-        for base in [primaryDirectoryUrl] {
+        let candidates = candidateDirectoryUrls()
+        for base in candidates {
             guard let encoded = target.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed),
                   let url = URL(string: "\(base)/api/v1/identity/resolve/\(encoded)") else { continue }
             var req = URLRequest(url: url, timeoutInterval: 8.0)
             req.httpMethod = "GET"
-            req.setValue("ZeroCore/1.0", forHTTPHeaderField: "User-Agent")
+            req.setValue(maskedUserAgent, forHTTPHeaderField: "User-Agent")
             do {
-                let (data, resp) = try await URLSession.shared.data(for: req)
+                let (data, resp) = try await performRequest(req)
                 if let http = resp as? HTTPURLResponse, (200...299).contains(http.statusCode),
                    let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
-                   let inviteUrl = json["invite_url"] as? String,
-                   !inviteUrl.isEmpty {
-                    cacheIdentityMapping(key: target, inviteUrl: inviteUrl)
-                    return inviteUrl
+                   let inviteUrl = json["invite_url"] as? String {
+                    let cleanInvite = inviteUrl.trimmingCharacters(in: .whitespacesAndNewlines)
+                    if cleanInvite.hasPrefix("zero:/") {
+                        cacheIdentityMapping(key: target, inviteUrl: cleanInvite)
+                        return cleanInvite
+                    }
                 }
             } catch {
                 continue
             }
         }
 
-        if let cached = lookupCachedIdentity(key: target) {
+        if let cached = lookupCachedIdentity(key: target)?.trimmingCharacters(in: .whitespacesAndNewlines),
+           cached.hasPrefix("zero:/") {
             return cached
+        }
+        if candidates.isEmpty {
+            throw NSError(domain: "ZeroIdentityBridge", code: 503, userInfo: [NSLocalizedDescriptionKey: "Contact discovery broker is disabled. Share a direct QR or 1-time link."])
         }
         throw NSError(domain: "ZeroIdentityBridge", code: 404, userInfo: [NSLocalizedDescriptionKey: "Identity not found or expired"])
     }
@@ -572,9 +701,11 @@ struct ZeroInfo: View {
             Spacer()
 
             VStack(spacing: 12) {
-                Text("Zero")
-                    .font(.system(size: 48, weight: .bold, design: .rounded))
-                    .foregroundColor(theme.colors.onBackground)
+                Image(theme.colors.background.isLightSurface ? "logo" : "logo-light")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 44)
+                    .accessibilityLabel("Zero")
 
                 Text("Private messaging, made simple.\nNo phone number. No email. Nothing that identifies you.")
                     .font(.subheadline)
@@ -619,7 +750,11 @@ struct ZeroInfo: View {
                         .padding(18)
                         .background(
                             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                .fill(Color(uiColor: .secondarySystemBackground))
+                                .fill(theme.colors.surface)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                        .strokeBorder(theme.colors.secondary.opacity(0.22), lineWidth: 1)
+                                )
                         )
                     }
                     .buttonStyle(.plain)
@@ -629,11 +764,11 @@ struct ZeroInfo: View {
                     } label: {
                         Text("Start Quick Setup Guide")
                             .font(.headline)
-                            .foregroundColor(.white)
+                            .foregroundColor(theme.colors.onPrimary)
                             .frame(maxWidth: .infinity)
                             .frame(height: 54)
                             .background(
-                                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                Capsule()
                                     .fill(theme.colors.primary)
                             )
                     }
@@ -659,11 +794,11 @@ struct ZeroInfo: View {
                     } label: {
                         Text("Create Zero Identity")
                             .font(.headline)
-                            .foregroundColor(.white)
+                            .foregroundColor(theme.colors.onPrimary)
                             .frame(maxWidth: .infinity)
                             .frame(height: 56)
                             .background(
-                                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                Capsule()
                                     .fill(theme.colors.primary)
                             )
                     }
@@ -761,14 +896,15 @@ struct ZeroInfo: View {
                 Button {
                     restoreWithPhrase()
                 } label: {
+                    let validPhrase = ZeroIdentityBridge.isValid4WordPhrase(existingPhraseInput)
                     Text("Continue")
                         .font(.headline)
-                        .foregroundColor(.white)
+                        .foregroundColor(validPhrase ? theme.colors.onPrimary : .white)
                         .frame(maxWidth: .infinity)
                         .frame(height: 52)
                         .background(
-                            RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                .fill(ZeroIdentityBridge.isValid4WordPhrase(existingPhraseInput) ? theme.colors.primary : Color.gray.opacity(0.4))
+                            Capsule()
+                                .fill(validPhrase ? theme.colors.primary : Color.gray.opacity(0.4))
                         )
                 }
                 .disabled(!ZeroIdentityBridge.isValid4WordPhrase(existingPhraseInput))
@@ -844,8 +980,11 @@ struct ZeroInfo: View {
     @ViewBuilder
     private func aboutZeroView(_ g: GeometryProxy) -> some View {
         VStack(alignment: .center, spacing: 14) {
-            Text("Zero")
-                .font(.system(size: 40, weight: .bold, design: .rounded))
+            Image(theme.colors.background.isLightSurface ? "logo" : "logo-light")
+                .resizable()
+                .scaledToFit()
+                .frame(height: 36)
+                .accessibilityLabel("Zero")
                 .padding(.top, 32)
 
             Text("Privacy Should Be Effortless.")
@@ -882,11 +1021,11 @@ struct ZeroInfo: View {
             } label: {
                 Label("Start Quick Setup Guide", systemImage: "book.fill")
                     .font(.subheadline.weight(.semibold))
-                    .foregroundColor(.white)
+                    .foregroundColor(theme.colors.onPrimary)
                     .frame(maxWidth: 320)
                     .frame(height: 46)
                     .background(
-                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        Capsule()
                             .fill(theme.colors.primary)
                     )
             }

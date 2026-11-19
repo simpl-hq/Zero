@@ -340,10 +340,10 @@ struct ZeroGuidedTutorialView: View {
                     } label: {
                         Label("Connect Now", systemImage: "person.badge.plus")
                             .font(.caption.weight(.semibold))
-                            .foregroundColor(.white)
+                            .foregroundColor(theme.colors.onPrimary)
                             .frame(maxWidth: .infinity)
                             .frame(height: 40)
-                            .background(theme.colors.primary, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                            .background(theme.colors.primary, in: Capsule())
                     }
                     .buttonStyle(.plain)
                 }
@@ -444,10 +444,10 @@ struct ZeroGuidedTutorialView: View {
             } label: {
                 Text(currentStep < steps.count - 1 ? "Next Step" : (onComplete != nil ? "Start Using Zero" : "Done"))
                     .font(.headline)
-                    .foregroundColor(.white)
+                    .foregroundColor(theme.colors.onPrimary)
                     .frame(maxWidth: .infinity)
                     .frame(height: 50)
-                    .background(theme.colors.primary, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+                    .background(theme.colors.primary, in: Capsule())
             }
             .buttonStyle(.plain)
         }

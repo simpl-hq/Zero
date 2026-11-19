@@ -42,7 +42,8 @@ struct SendMessageView: View {
     @UserDefault(DEFAULT_SIGN_MESSAGE_ALERT_SHOWN) private var signMessageAlertShown = false
 
     var body: some View {
-        let composeShape = RoundedRectangle(cornerSize: CGSize(width: 20, height: 20))
+        let composeShape = RoundedRectangle(cornerSize: CGSize(width: 22, height: 22))
+        let borderColor = theme.colors.background.isLightSurface ? Color.black.opacity(0.10) : Color.white.opacity(0.14)
         ZStack(alignment: .leading) {
             if case .voicePreview = composeState.preview {
                 Text("Voice message…")
@@ -86,9 +87,9 @@ struct SendMessageView: View {
             }
         }
         .padding(.vertical, 1)
-        .background(theme.colors.background)
+        .background(theme.appColors.receivedMessage)
         .clipShape(composeShape)
-        .overlay(composeShape.strokeBorder(.secondary, lineWidth: 0.5).opacity(0.7))
+        .overlay(composeShape.strokeBorder(borderColor, lineWidth: 1))
         .onChange(of: composeState.message, perform: { text in updateFont(text) })
         .padding(.vertical, 8)
     }
@@ -151,7 +152,11 @@ struct SendMessageView: View {
         return Button(action: connect) {
             Image(systemName: "arrow.up.circle.fill")
                 .resizable()
-                .foregroundColor(disabled ? theme.colors.secondary.opacity(0.67) : sendButtonColor)
+                .symbolRenderingMode(.palette)
+                .foregroundStyle(
+                    disabled ? theme.colors.background : sendButtonColor.onSurfaceInk,
+                    disabled ? theme.colors.secondary.opacity(0.45) : sendButtonColor
+                )
                 .frame(width: sendButtonSize, height: sendButtonSize)
                 .opacity(sendButtonOpacity)
         }
@@ -161,24 +166,28 @@ struct SendMessageView: View {
     }
 
     private func sendMessageButton() -> some View {
-        Button {
+        let disabled =
+            !composeState.sendEnabled ||
+            composeState.inProgress ||
+            (!voiceMessageAllowed && composeState.voicePreview) ||
+            composeState.endLiveDisabled ||
+            disableSendButton
+        return Button {
             sendMessage(nil)
         } label: {
             Image(systemName: composeState.editing || composeState.liveMessage != nil
                   ? "checkmark.circle.fill"
                   : "arrow.up.circle.fill")
             .resizable()
-            .foregroundColor(sendButtonColor)
+            .symbolRenderingMode(.palette)
+            .foregroundStyle(
+                disabled ? theme.colors.background : sendButtonColor.onSurfaceInk,
+                disabled ? theme.colors.secondary.opacity(0.45) : sendButtonColor
+            )
             .frame(width: sendButtonSize, height: sendButtonSize)
             .opacity(sendButtonOpacity)
         }
-        .disabled(
-            !composeState.sendEnabled ||
-            composeState.inProgress ||
-            (!voiceMessageAllowed && composeState.voicePreview) ||
-            composeState.endLiveDisabled ||
-            disableSendButton
-        )
+        .disabled(disabled)
         .frame(width: 31, height: 31)
         .contextMenu{
             sendButtonContextMenuItems()

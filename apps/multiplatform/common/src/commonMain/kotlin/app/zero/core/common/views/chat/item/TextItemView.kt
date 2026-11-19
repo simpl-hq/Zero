@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.InlineTextContent
+import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -75,8 +76,8 @@ private val typingIndicators: List<AnnotatedString> = listOf(
   typing() + typing() + typing(FontWeight.Bold)
 )
 
-private fun typingIndicator(recent: Boolean, typingIdx: Int): AnnotatedString = buildAnnotatedString {
-  pushStyle(SpanStyle(color = CurrentColors.value.colors.secondary, fontFamily = FontFamily.Monospace, letterSpacing = (-1).sp))
+private fun typingIndicator(recent: Boolean, typingIdx: Int, color: Color): AnnotatedString = buildAnnotatedString {
+  pushStyle(SpanStyle(color = color, fontFamily = FontFamily.Monospace, letterSpacing = (-1).sp))
   append(if (recent) typingIndicators[typingIdx] else noTyping)
 }
 
@@ -125,7 +126,7 @@ fun MarkdownText (
   userMemberId: String? = null,
   toggleSecrets: Boolean,
   sendCommandMsg: ((String) -> Unit)? = null,
-  style: TextStyle = MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.onSurface, lineHeight = 22.sp),
+  style: TextStyle = MaterialTheme.typography.body1.copy(color = LocalContentColor.current, lineHeight = 22.sp),
   maxLines: Int = Int.MAX_VALUE,
   overflow: TextOverflow = TextOverflow.Clip,
   uriHandler: UriHandler? = null,
@@ -189,6 +190,7 @@ fun MarkdownText (
         }
       )
     }
+    val typingColor = LocalContentColor.current.copy(alpha = 0.68f)
     if (formattedText == null) {
       var selectableEnd = 0
       val annotatedText = buildAnnotatedString {
@@ -199,7 +201,7 @@ fun MarkdownText (
         else if (text is AnnotatedString) append(text)
         selectableEnd = this.length
         if (meta?.isLive == true) {
-          append(typingIndicator(meta.recent, typingIdx))
+          append(typingIndicator(meta.recent, typingIdx, typingColor))
         }
         if (meta != null) withStyle(reserveTimestampStyle) { append(reserve) }
       }
@@ -251,7 +253,7 @@ fun MarkdownText (
                   } else {
                     "${mention.memberRef.localAlias} ($displayName)"
                   }
-                  val mentionStyle = if (mention.memberId == userMemberId) ftStyle.copy(color = MaterialTheme.colors.primary) else ftStyle
+                  val mentionStyle = if (mention.memberId == userMemberId) ftStyle.copy(color = LocalContentColor.current, fontWeight = FontWeight.Bold) else ftStyle
                   withStyle(mentionStyle) { append(mentionText(name)) }
                 } else {
                   withStyle(ftStyle) { append(mentionText(ft.format.memberName)) }
@@ -336,7 +338,7 @@ fun MarkdownText (
         }
         selectableEnd = this.length
         if (meta?.isLive == true) {
-          append(typingIndicator(meta.recent, typingIdx))
+          append(typingIndicator(meta.recent, typingIdx, typingColor))
         }
 if (meta != null) withStyle(reserveTimestampStyle) { append(reserve) }
       }

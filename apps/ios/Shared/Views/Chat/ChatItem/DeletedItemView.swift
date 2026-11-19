@@ -7,16 +7,19 @@ struct DeletedItemView: View {
     var chatItem: ChatItem
 
     var body: some View {
+        let bubbleColor = chatItemFrameColor(chatItem, theme)
+        let bubbleInk = bubbleColor.onSurfaceInk
+        let bubbleSecondaryInk = bubbleColor.onSurfaceSecondaryInk
         HStack(alignment: .bottom, spacing: 0) {
             Text(chatItem.content.text)
-                .foregroundColor(theme.colors.secondary)
+                .foregroundColor(bubbleSecondaryInk)
                 .italic()
-            CIMetaView(chat: chat, chatItem: chatItem, metaColor: theme.colors.secondary)
+            CIMetaView(chat: chat, chatItem: chatItem, metaColor: bubbleSecondaryInk, primaryColor: bubbleInk)
                 .padding(.horizontal, 12)
         }
         .padding(.leading, 12)
         .padding(.vertical, 6)
-        .background(chatItemFrameColor(chatItem, theme))
+        .background(bubbleColor)
         .textSelection(.disabled)
     }
 }

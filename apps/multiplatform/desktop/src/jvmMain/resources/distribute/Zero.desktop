@@ -1,7 +1,13 @@
 [Desktop Entry]
 Type=Application
 Name=Zero
-Comment=Private and secure open-source messenger - no user IDs (not even random numbers)
-Exec=/opt/zero/bin/zero
+GenericName=Encrypted Messenger
+Comment=Private and secure post-quantum messenger — zero user identifiers
+Exec=/opt/zero/bin/zero %u
 Icon=/opt/zero/lib/zero
-Categories=Network;Chat;
+Terminal=false
+Categories=Network;InstantMessaging;Chat;
+Keywords=encrypted;messenger;privacy;post-quantum;zero;
+MimeType=x-scheme-handler/zero;
+StartupWMClass=app-zero-core-desktop-MainKt
+StartupNotify=true
