@@ -335,9 +335,7 @@ const processCommand = (function () {
   }
 
   const defaultIceServers: RTCIceServer[] = [
-    {urls: ["stuns:stun.zero.im:443"]},
-    {urls: ["stun:stun.zero.im:443"]},
-    {urls: ["turns:turn.zero.im:443?transport=tcp"], username: "private2", credential: "Hxuq2QxUjnhj96Zq2r4HjqHRj"},
+    {urls: ["stun:zeroturn.simpl.global:3478"]},
   ]
 
   function getCallConfig(encodedInsertableStreams: boolean, iceServers?: RTCIceServer[], relay?: boolean): CallConfig {

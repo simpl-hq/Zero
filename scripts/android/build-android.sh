@@ -102,13 +102,8 @@ build() {
   sed -i.bak "s/android.version_code=.*/android.version_code=${vercode}/" "$folder/apps/multiplatform/gradle.properties"
 
   for arch in $arches; do
-    if [ "$arch" = "armv7a" ]; then
-      android_zero_lib="${folder}#hydraJobs.${arch}-android:lib:zero-runtime.x86_64-linux"
-      android_support_lib="${folder}#hydraJobs.${arch}-android:lib:support.x86_64-linux"
-    else
-      android_zero_lib="${folder}#hydraJobs.x86_64-linux.${arch}-android:lib:zero-runtime"
-      android_support_lib="${folder}#hydraJobs.x86_64-linux.${arch}-android:lib:support"
-    fi
+    android_zero_lib="${folder}#hydraJobs.x86_64-linux.\"${arch}-android:lib:zero-runtime\""
+    android_support_lib="${folder}#hydraJobs.x86_64-linux.\"${arch}-android:lib:support\""
     
     android_zero_lib_output="${PWD}/result/pkg-${arch}-android-libzero.zip"
     android_support_lib_output="${PWD}/result/pkg-${arch}-android-libsupport.zip"

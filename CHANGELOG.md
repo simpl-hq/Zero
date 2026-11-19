@@ -1,27 +1,34 @@
-# Changelog
+<div align="center">
 
-All notable changes to **Zero** across core messaging, client applications (iOS, Android, macOS, Windows, Linux, CLI), SDK bindings, and relay infrastructure are documented in this file.
+<h1>Zero — Release Changelog</h1>
 
-See [README.md](README.md) for downloads, [WHITEPAPER.md](WHITEPAPER.md) for the protocol specification, and [simpl.global](https://simpl.global) for releases.
+<p>Versioned release history across core messaging, client applications (iOS, Android, macOS, Windows, Linux, CLI), SDK bindings, and relay infrastructure.</p>
+
+<p>
+  <a href="https://simpl.global"><img src="media-logos/btn-simpl-global.svg" alt="Website — simpl.global" height="38" /></a>
+  <a href="README.md"><img src="media-logos/btn-readme.svg" alt="README" height="38" /></a>
+  <a href="https://github.com/simpl-hq/zero/releases"><img src="media-logos/btn-releases.svg" alt="Releases" height="38" /></a>
+  <a href="WHITEPAPER.md"><img src="media-logos/btn-whitepaper.svg" alt="Whitepaper" height="38" /></a>
+</p>
+
+</div>
 
 ---
 
-## [1.0.0] — 2026-11-16
+## [1.0.0] — 2026-11-18
 
 ### Added
-- Initial open-source **`v1.0.0`** launch release of **Zero** across desktop (`macOS`, `Windows`, `Linux`), CLI, direct Android APK, multi-language runtime SDKs, and mobile clients submitted for App Store and Google Play review under Simpl (`simpl.global`).
-- Interactive 4-step Guided Setup Tutorial (`ZeroGuidedTutorialView` across iOS `HowItWorks.swift` and Compose Multiplatform `HowItWorks.kt`) integrated into onboarding, home cards, help views, and Desktop empty workspace navigation.
-- End-to-end test suite (`apps/zero-pin-broker/test_main.py`) verifying 4-word phrase provisioning, 6-digit ephemeral in-person pairing codes, replay rejection, sliding-window rate limits, HMAC-SHA1 TURN credentials, and `/health` + `/healthz` probes.
-- Updated `WHITEPAPER.md`, `README.md`, Flatpak `app.zero.core.zero.metainfo.xml`, and Linux AppStream `app.zero.chat.appdata.xml` release metadata.
+- Initial open-source **`v1.0.0`** launch release of **Zero** across desktop (`Windows`, `macOS`, `Linux`), CLI, signed Android APK (`arm64-v8a`, `armeabi-v7a`, `x86_64`), universal iOS sideload IPA (`iPhone & iPad`), and multi-language SDKs.
+- Monochrome black-and-white design system (`#000000` / `#FFFFFF`), adaptive monochrome app icons (`ic_zero_dark`, `ic_zero_light`, `AppIcon`, `DarkAppIcon`), luminance-aware bubble contrast, and an interactive 4-step Guided Setup Tutorial across SwiftUI and Compose Multiplatform.
+- Cross-platform native installers: Windows WPF Setup GUI (`ZeroSetup.exe`) with SHA-256 payload verification and Authenticode signing hooks, monochrome WiX `.msi` assets, macOS `.dmg` Finder canvas setup, and Linux `.deb` / `AppImage` / `install-linux.sh` packaging.
+- End-to-end test suites covering client `Argon2id` PoW vectors (`ZeroIdentityBridgeTest.kt`) and broker phrase/code provisioning, replay rejection, rate limits, and TURN credentials (`apps/zero-pin-broker/test_main.py`).
 
 ### Changed
-- Unified monorepo version tags to `1.0.0` (`1.0.0.0` in `zero-runtime.cabal` and renamed internal queue/transport engine `vendor/zeroq/zeroq.cabal`) and synchronized UI/FFI version strings across Haskell, Swift, Kotlin, and localized resources.
-- Standardized RFC 9106 Argon2id contact-code proof-of-work (`m=8 MiB, t=1, p=1`) consistently across iOS (`ZeroInfo.swift`), Android/Desktop (`Argon2idPow.kt`, `ZeroIdentityBridge.kt`), and the FastAPI broker (`apps/zero-pin-broker/main.py`).
-- Hardened `apps/zero-pin-broker` (volatile per-process HMAC-SHA256 rate-limit buckets over loopback `X-Real-IP`, bounded fallback state, fail-closed `TURN_AUTH_SECRET` placeholder validation, non-root `broker` container user, and Compose `cap_drop: ALL`) alongside strict HTTPS-only default broker resolution in iOS and Kotlin clients.
+- Standardized 10-bit RFC 9106 `Argon2id` proof-of-work (`m=8 MiB, t=1, p=1`), added TLS CA SPKI/DER certificate pinning on default `simpl.global` discovery endpoints (`zeroapi`, `zeroeu`, `zerona`), enforced fail-closed SOCKS5 proxy routing, and isolated custom/disabled broker settings (`ZeroDirectoryUrl = off` or custom HTTPS endpoint).
+- Unified monorepo release metadata to `1.0.0` across Haskell (`zero-runtime.cabal`, `vendor/zeroq`), SwiftUI (`Zero.xcodeproj`), Kotlin Multiplatform, Flatpak/AppStream, and `SECURITY.md` / `WHITEPAPER.md`.
 
 ### Fixed
-- Hardened cluster scripts and database configs (`deploy/bootstrap-node.sh` WireGuard `wg0` UFW rules + Docker boot ordering, `node3-db` `scram-sha-256` & fail-closed Redis checks, `node4-media/blob_cleanup.sh` `pipefail`-safe eviction, and `scripts/relay/{smp-server.ini, xftp-server.ini}` schema parity).
-- Normalized `simpl.global/add/...` deep-link validation in `apps/zero-pin-broker/main.py` (`400` on invalid URLs), fixed non-hex commit rendering in `VersionView.swift` / `VersionInfoView.kt`, fixed portable architecture detection (`uname -m`) in server install/update scripts, and cleaned up localization and onboarding strings ahead of the `v1.0.0` release.
+- Tightened resolved contact discovery URIs to strictly require the `zero:/` scheme, bounded `WRITE_EXTERNAL_STORAGE` in `AndroidManifest.xml` to `maxSdkVersion="28"`, resolved Xcode framework target header/bridging settings in `Zero.xcodeproj`, and aligned CI artifact names and SHA-256 verification checklists.
 
 ---
 
@@ -181,3 +188,17 @@ See [README.md](README.md) for downloads, [WHITEPAPER.md](WHITEPAPER.md) for the
 ### Added
 - Initial repository architecture: Haskell chat core (`zero-runtime.cabal`), messaging/transport runtime (`vendor/zeroq`), C FFI boundary (`Zero.Chat.Mobile`), and interactive terminal client (`Zero.Chat.Terminal`).
 - Automated Hspec integration suites (`tests/`, `vendor/zeroq/tests/`) for handshake, ratchet, serialization, and markdown link validation.
+
+---
+
+<div align="center">
+
+<p>
+  <a href="https://simpl.global"><img src="media-logos/btn-simpl-global.svg" alt="Website — simpl.global" height="38" /></a>
+  <a href="README.md"><img src="media-logos/btn-readme.svg" alt="README" height="38" /></a>
+  <a href="https://simpl.global/donate"><img src="media-logos/btn-donate.svg" alt="Support Zero" height="38" /></a>
+</p>
+
+<sub>**© 2026 Simpl.** Zero is free software licensed under the [GNU Affero General Public License v3.0](LICENSE). · [simpl.global](https://simpl.global) · [Donate](https://simpl.global/donate) · [README.md](README.md) · [WHITEPAPER.md](WHITEPAPER.md) · [CONTRIBUTING.md](CONTRIBUTING.md) · `support@simpl.global`</sub>
+
+</div>

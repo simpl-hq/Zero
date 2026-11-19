@@ -1,8 +1,17 @@
-# Contributing to Zero
+<div align="center">
 
-Thanks for helping improve **Zero** — an open-source, post-quantum, zero-identifier encrypted messenger maintained under [Simpl](https://simpl.global).
+<h1>Contributing to Zero</h1>
 
-See [README.md](README.md) for an overview, [WHITEPAPER.md](WHITEPAPER.md) for protocol cryptography details, and [CHANGELOG.md](CHANGELOG.md) for release history.
+<p>Architecture, verification suites, and contribution guidelines for the Zero post-quantum messenger.</p>
+
+<p>
+  <a href="https://simpl.global"><img src="media-logos/btn-simpl-global.svg" alt="Website — simpl.global" height="38" /></a>
+  <a href="README.md"><img src="media-logos/btn-readme.svg" alt="README" height="38" /></a>
+  <a href="WHITEPAPER.md"><img src="media-logos/btn-whitepaper.svg" alt="Whitepaper" height="38" /></a>
+  <a href="https://simpl.global/donate"><img src="media-logos/btn-donate.svg" alt="Support Zero" height="38" /></a>
+</p>
+
+</div>
 
 ---
 
@@ -65,6 +74,15 @@ If you discover a security or privacy vulnerability in the protocol, client apps
 
 Zero collects **zero user data. Ever.** No investors, no ads, no trackers. Development and stateless relay infrastructure are funded directly by the community at **[simpl.global/donate](https://simpl.global/donate)**:
 
+<div align="center">
+
+<a href="https://simpl.global"><img src="media-logos/btn-simpl-global.svg" alt="Website — simpl.global" height="38" /></a>
+<a href="https://simpl.global/donate"><img src="media-logos/btn-donate.svg" alt="Support Zero" height="38" /></a>
+
+</div>
+
+<br />
+
 | Channel | Address / Link |
 | :--- | :--- |
 | **`Buy Me a Coffee`** | [buymeacoffee.com/supportsimpl](https://buymeacoffee.com/supportsimpl) |
@@ -74,4 +92,12 @@ Zero collects **zero user data. Ever.** No investors, no ads, no trackers. Devel
 
 ## License
 
-Contributions to source code are licensed under the [GNU Affero General Public License v3.0](LICENSE). Visual brand assets remain covered by [assets/ASSETS_LICENSE.md](assets/ASSETS_LICENSE.md).
+Contributions to source code are licensed under the [GNU Affero General Public License v3.0](LICENSE) (upstream messaging and transport stack Copyright © 2021–2026 SimpleX Chat Ltd; Zero modifications and extensions Copyright © 2026 Simpl LLC). Visual brand assets remain covered by [assets/ASSETS_LICENSE.md](assets/ASSETS_LICENSE.md).
+
+---
+
+<div align="center">
+
+<sub>**© 2026 Simpl.** Zero is free software licensed under the [GNU Affero General Public License v3.0](LICENSE). · [simpl.global](https://simpl.global) · [Donate](https://simpl.global/donate) · [README.md](README.md) · [WHITEPAPER.md](WHITEPAPER.md) · [CHANGELOG.md](CHANGELOG.md) · `support@simpl.global`</sub>
+
+</div>

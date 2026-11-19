@@ -27,6 +27,7 @@ runs:
         file: ${{ inputs.bin_path }}
         asset_name: ${{ inputs.bin_name }}
         tag: ${{ inputs.github_ref }}
+        overwrite: true
 
     - name: Add hash to release notes
       if: startsWith(inputs.github_ref, 'refs/tags/v')

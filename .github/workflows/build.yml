@@ -1,8 +1,10 @@
 name: build
 
 on:
+  workflow_dispatch:
   push:
     branches:
+      - main
       - master
       - stable
     tags:
@@ -25,6 +27,9 @@ on:
       - "scripts/ci/**"
       - "scripts/desktop/**"
       - ".github/**"
+
+permissions:
+  contents: write
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -78,27 +83,14 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/v')
         uses: actions/checkout@v3
 
-      - name: Build changelog
-        id: build_changelog
-        if: startsWith(github.ref, 'refs/tags/v')
-        uses: mikepenz/release-changelog-builder-action@v5
-        with:
-          configuration: .github/changelog_conf.json
-          failOnError: true
-          ignorePreReleases: true
-          commitMode: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Create release
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          body: ${{ steps.build_changelog.outputs.changelog }}
-          prerelease: true
-          files: |
-            LICENSE
-          fail_on_unmatched_files: true
+          name: "Zero ${{ github.ref_name }}"
+          body_path: .github/RELEASE_TEMPLATE.md
+          prerelease: ${{ contains(github.ref, '-') }}
+          fail_on_unmatched_files: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -114,13 +106,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: 22.04
-            os_underscore: 22_04
-            arch: x86_64
-            runner: "ubuntu-22.04"
-            ghc: "8.10.7"
-            hash: 'sha256:5c8b2c0a6c745bc177669abfaa716b4bc57d58e2ea3882fb5da67f4d59e3dda5'
-            should_run: ${{ !(github.ref == 'refs/heads/stable' || startsWith(github.ref, 'refs/tags/v')) }}
           - os: 22.04
             os_underscore: 22_04
             arch: x86_64
@@ -519,7 +504,7 @@ jobs:
         run: |
           echo "ignore-project: False"                                                    >> cabal.project.local
           echo "package zeroq"                                                        >> cabal.project.local
-          echo "    extra-include-dirs: ${{ matrix.opnessl_dir }}/openssl@3.0/include"    >> cabal.project.local
+          echo "    extra-include-dirs: ${{ matrix.openssl_dir }}/openssl@3.0/include"    >> cabal.project.local
           echo "    extra-lib-dirs: ${{ matrix.openssl_dir}}/openssl@3.0/lib"             >> cabal.project.local
           echo ""                                                                         >> cabal.project.local
           echo "package direct-sqlcipher"                                                 >> cabal.project.local
@@ -532,7 +517,7 @@ jobs:
         shell: bash
         run: |
           cabal build -j --enable-tests
-          path=$(cabal list-bin zero-runtime)
+          path=$(cabal list-bin exe:zero-runtime | tail -n 1)
           echo "bin_path=$path" >> $GITHUB_OUTPUT
           echo "bin_hash=$(echo SHA2-256\(${{ matrix.cli_asset_name }}\)= $(openssl sha256 $path | cut -d' ' -f 2))" >> $GITHUB_OUTPUT
 
@@ -654,6 +639,9 @@ jobs:
           openssl_windows_style_path=$(echo `pwd`/dist-newstyle/openssl-3.0.15 | sed 's#/\([a-zA-Z]\)#\1:#' | sed 's#/#\\#g')
           rm cabal.project.local 2>/dev/null || true
           echo "ignore-project: False" >> cabal.project.local
+          echo "package zeroq" >> cabal.project.local
+          echo "    extra-include-dirs: $openssl_windows_style_path\include" >> cabal.project.local
+          echo "    extra-lib-dirs: $openssl_windows_style_path" >> cabal.project.local
           echo "package direct-sqlcipher" >> cabal.project.local
           echo "    flags: +openssl" >> cabal.project.local
           echo "    extra-include-dirs: $openssl_windows_style_path\include" >> cabal.project.local
@@ -663,7 +651,7 @@ jobs:
           sed -i "s/, unix /--, unix /" zero-runtime.cabal
           cabal build -j --enable-tests
           rm -rf dist-newstyle/src/direct-sq* dist-newstyle/src/zeroq*
-          path=$(cabal list-bin zero-runtime | tail -n 1)
+          path=$(cabal list-bin exe:zero-runtime | tail -n 1)
           echo "bin_path=$path" >> $GITHUB_OUTPUT
           echo "bin_hash=$(echo SHA2-256\(${{ matrix.cli_asset_name }}\)= $(openssl sha256 $path | cut -d' ' -f 2))" >> $GITHUB_OUTPUT
 
@@ -680,6 +668,9 @@ jobs:
       - name: Build Desktop
         id: windows_desktop_build
         if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          WINDOWS_CERT_BASE64: ${{ secrets.WINDOWS_CERT_BASE64 }}
+          WINDOWS_CERT_PASSWORD: ${{ secrets.WINDOWS_CERT_PASSWORD }}
         shell: msys2 {0}
         run: |
           export PATH=$PATH:/c/ghcup/bin:$(echo /c/tools/ghc-*/bin || echo)
@@ -690,6 +681,9 @@ jobs:
           path=$(echo $PWD/release/main/msi/*.msi | sed 's#/\([a-z]\)#\1:#' | sed 's#/#\\#g')
           echo "package_path=$path" >> $GITHUB_OUTPUT
           echo "package_hash=$(echo SHA2-256\(${{ matrix.desktop_asset_name }}\)= $(openssl sha256 $path | cut -d' ' -f 2))" >> $GITHUB_OUTPUT
+          setup_path=$(echo $PWD/release/main/exe/*-setup.exe | sed 's#/\([a-z]\)#\1:#' | sed 's#/#\\#g')
+          echo "setup_path=$setup_path" >> $GITHUB_OUTPUT
+          echo "setup_hash=$(echo SHA2-256\(zero-desktop-windows-x86_64-setup.exe\)= $(openssl sha256 $setup_path | cut -d' ' -f 2))" >> $GITHUB_OUTPUT
 
       - name: Upload Desktop
         if: startsWith(github.ref, 'refs/tags/v')
@@ -700,6 +694,237 @@ jobs:
           bin_hash: ${{ steps.windows_desktop_build.outputs.package_hash }}
           github_ref: ${{ github.ref }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Desktop Setup EXE
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: ./.github/actions/prepare-release
+        with:
+          bin_path: ${{ steps.windows_desktop_build.outputs.setup_path }}
+          bin_name: zero-desktop-windows-x86_64-setup.exe
+          bin_hash: ${{ steps.windows_desktop_build.outputs.setup_hash }}
+          github_ref: ${{ github.ref }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+# =========================
+#       Android Build
+# =========================
+
+  build-android:
+    name: "android-${{ matrix.android_abi }} (APK)"
+    needs: [maybe-release, variables]
+    runs-on: ubuntu-24.04
+    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
+    timeout-minutes: 300
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: aarch64
+            android_abi: arm64-v8a
+          - arch: armv7a
+            android_abi: armeabi-v7a
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Free disk space
+        shell: bash
+        run: ./scripts/ci/linux_util_free_space.sh
+
+      - name: Configure sysctl for Nix and 32-bit Android cross-build
+        shell: bash
+        run: |
+          sudo sysctl -w kernel.pid_max=65535
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0 || true
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+            max-jobs = auto
+            extra-substituters = https://cache.iog.io
+            extra-trusted-public-keys = hydra.iohk.io:f/Ea+s+dFdN+3Y/G+FDgSq+a5NEWhJGzdjvKNGv0/EQ=
+            access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Android native Haskell libraries (Nix)
+        shell: bash
+        run: |
+          LIBS_DIR="apps/multiplatform/common/src/commonMain/cpp/android/libs/${{ matrix.android_abi }}"
+          mkdir -p "$LIBS_DIR"
+          nix build ".#hydraJobs.x86_64-linux.\"${{ matrix.arch }}-android:lib:zero-runtime\"" -o result-zero
+          unzip -o "result-zero/pkg-${{ matrix.arch }}-android-libzero.zip" -d "$LIBS_DIR"
+          nix build ".#hydraJobs.x86_64-linux.\"${{ matrix.arch }}-android:lib:support\"" -o result-support
+          unzip -o "result-support/pkg-${{ matrix.arch }}-android-libsupport.zip" -d "$LIBS_DIR"
+          rm -f result-zero result-support
+          test -f "$LIBS_DIR/libzero.so" && test -f "$LIBS_DIR/libsupport.so"
+          ls -lh "$LIBS_DIR"
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'corretto'
+          java-version: ${{ needs.variables.outputs.JAVA_VER }}
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK components
+        shell: bash
+        run: |
+          yes | sdkmanager --licenses > /dev/null || true
+          sdkmanager --install "platforms;android-35" "build-tools;34.0.0" "ndk;23.1.7779620" "cmake;3.22.1"
+
+      - name: Build Android APK
+        id: android_apk_build
+        shell: bash
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          SIGNED=false
+          if [ -n "${ANDROID_KEYSTORE_BASE64}" ] && [ -n "${ANDROID_KEYSTORE_PASSWORD}" ] && [ -n "${ANDROID_KEY_ALIAS}" ] && [ -n "${ANDROID_KEY_PASSWORD}" ]; then
+            KEYSTORE_FILE="${RUNNER_TEMP}/zero-release.keystore"
+            printf '%s' "${ANDROID_KEYSTORE_BASE64}" | base64 --decode > "${KEYSTORE_FILE}"
+            export ZERO_RELEASE_STORE_FILE="${KEYSTORE_FILE}"
+            export ZERO_RELEASE_STORE_PASSWORD="${ANDROID_KEYSTORE_PASSWORD}"
+            export ZERO_RELEASE_KEY_ALIAS="${ANDROID_KEY_ALIAS}"
+            export ZERO_RELEASE_KEY_PASSWORD="${ANDROID_KEY_PASSWORD}"
+            SIGNED=true
+          fi
+
+          cd apps/multiplatform
+          ./gradlew -Pzero.assets.dir=../../assets -Pandroid.abi=${{ matrix.android_abi }} :android:assembleFossRelease --no-daemon
+
+          if [ "${SIGNED}" = "true" ]; then
+            ASSET_NAME="zero-android-${{ matrix.android_abi }}.apk"
+            cp "android/build/outputs/apk/foss/release/android-foss-${{ matrix.android_abi }}-release.apk" "${GITHUB_WORKSPACE}/${ASSET_NAME}"
+            "${ANDROID_HOME}/build-tools/34.0.0/apksigner" verify --print-certs "${GITHUB_WORKSPACE}/${ASSET_NAME}"
+          else
+            ASSET_NAME="zero-android-${{ matrix.android_abi }}-unsigned.apk"
+            "${ANDROID_HOME}/build-tools/34.0.0/zipalign" -p -f 4 \
+              "android/build/outputs/apk/foss/release/android-foss-${{ matrix.android_abi }}-release-unsigned.apk" \
+              "${GITHUB_WORKSPACE}/${ASSET_NAME}"
+          fi
+
+          HASH=$(openssl sha256 "${GITHUB_WORKSPACE}/${ASSET_NAME}" | awk '{print $NF}')
+          echo "apk_name=${ASSET_NAME}" >> "$GITHUB_OUTPUT"
+          echo "apk_path=${GITHUB_WORKSPACE}/${ASSET_NAME}" >> "$GITHUB_OUTPUT"
+          echo "apk_hash=SHA2-256(${ASSET_NAME})= ${HASH}" >> "$GITHUB_OUTPUT"
+
+      - name: Clean up temporary keystore
+        if: always()
+        shell: bash
+        run: rm -f "${RUNNER_TEMP}/zero-release.keystore"
+
+      - name: Upload Android APK to Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: ./.github/actions/prepare-release
+        with:
+          bin_path: ${{ steps.android_apk_build.outputs.apk_path }}
+          bin_name: ${{ steps.android_apk_build.outputs.apk_name }}
+          bin_hash: ${{ steps.android_apk_build.outputs.apk_hash }}
+          github_ref: ${{ github.ref }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Android APK artifact
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.android_apk_build.outputs.apk_name }}
+          path: ${{ steps.android_apk_build.outputs.apk_path }}
+
+# =========================
+#  iOS Build (iPhone+iPad)
+# =========================
+
+  build-ios:
+    name: "ios-universal (iPhone + iPad IPA)"
+    needs: [maybe-release, variables]
+    runs-on: macos-latest
+    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
+    timeout-minutes: 300
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+            max-jobs = auto
+            extra-substituters = https://cache.iog.io
+            extra-trusted-public-keys = hydra.iohk.io:f/Ea+s+dFdN+3Y/G+FDgSq+a5NEWhJGzdjvKNGv0/EQ=
+            access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build iOS Haskell static libraries (Nix)
+        shell: bash
+        run: |
+          nix build '.#hydraJobs.aarch64-darwin."aarch64-darwin-ios:lib:zero-runtime"' -o result-ios
+          mkdir -p apps/ios/Libraries/ios
+          unzip -o result-ios/pkg-ios-aarch64-swift-json.zip -d apps/ios/Libraries/ios
+          ls -lh apps/ios/Libraries/ios
+          rm -f result-ios
+          ./scripts/ios/update-pbxproj.sh
+
+      - name: Build Universal iOS App (iPhone + iPad)
+        id: ios_ipa_build
+        shell: bash
+        run: |
+          set -euo pipefail
+          xcodebuild \
+            -project apps/ios/Zero.xcodeproj \
+            -scheme "Zero (iOS)" \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination "generic/platform=iOS" \
+            -derivedDataPath build/ios \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            AD_HOC_CODE_SIGNING_ALLOWED=NO \
+            DEVELOPMENT_TEAM="" \
+            VALIDATE_PRODUCT=NO \
+            build
+
+          APP_PATH="build/ios/Build/Products/Release-iphoneos/Zero.app"
+          test -d "$APP_PATH"
+          /usr/libexec/PlistBuddy -c "Print :UIDeviceFamily" "$APP_PATH/Info.plist"
+
+          rm -rf build/ipa
+          mkdir -p build/ipa/Payload
+          cp -R "$APP_PATH" build/ipa/Payload/Zero.app
+          (cd build/ipa && zip -qry "$GITHUB_WORKSPACE/zero-ios-universal.ipa" Payload)
+
+          HASH=$(openssl sha256 "$GITHUB_WORKSPACE/zero-ios-universal.ipa" | awk '{print $NF}')
+          echo "ipa_name=zero-ios-universal.ipa" >> "$GITHUB_OUTPUT"
+          echo "ipa_path=$GITHUB_WORKSPACE/zero-ios-universal.ipa" >> "$GITHUB_OUTPUT"
+          echo "ipa_hash=SHA2-256(zero-ios-universal.ipa)= ${HASH}" >> "$GITHUB_OUTPUT"
+
+      - name: Upload iOS Universal IPA to Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: ./.github/actions/prepare-release
+        with:
+          bin_path: ${{ steps.ios_ipa_build.outputs.ipa_path }}
+          bin_name: ${{ steps.ios_ipa_build.outputs.ipa_name }}
+          bin_hash: ${{ steps.ios_ipa_build.outputs.ipa_hash }}
+          github_ref: ${{ github.ref }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload iOS Universal IPA artifact
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.ios_ipa_build.outputs.ipa_name }}
+          path: ${{ steps.ios_ipa_build.outputs.ipa_path }}
 
 # =========================
 #   NodeJS libs release
@@ -717,23 +942,38 @@ jobs:
 
   release-nodejs-libs:
     runs-on: ubuntu-latest
-    needs: [build-linux, build-linux-postgres, build-macos]
+    needs: [build-linux, build-linux-postgres, build-macos, build-windows]
     if: startsWith(github.ref, 'refs/tags/v') && (!cancelled())
     steps:
+      - name: Check NodeJS libs release token
+        id: check_token
+        env:
+          TOKEN: ${{ secrets.NODEJS_REPO_TOKEN }}
+        run: |
+          if [ -n "$TOKEN" ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "Skipping release-nodejs-libs: NODEJS_REPO_TOKEN secret is not configured."
+          fi
+
       - name: Checkout current repository
+        if: steps.check_token.outputs.enabled == 'true'
         uses: actions/checkout@v6
 
       - name: Install packages for archiving
+        if: steps.check_token.outputs.enabled == 'true'
         run: sudo apt install -y msitools gcc-mingw-w64
 
       - name: Download postgres libs artifact
-        if: needs.build-linux-postgres.result == 'success'
+        if: steps.check_token.outputs.enabled == 'true' && needs.build-linux-postgres.result == 'success'
         uses: actions/download-artifact@v4
         with:
           name: zero-libs-linux-postgres-x86_64
           path: ${{ runner.temp }}/postgres-libs
 
       - name: Build archives
+        if: steps.check_token.outputs.enabled == 'true'
         run: |
           INIT_DIR='${{ runner.temp }}/artifacts'
           RELEASE_DIR='${{ runner.temp }}/release-assets'
@@ -801,6 +1041,7 @@ jobs:
           fi
 
       - name: Create release in libs repo and upload artifacts
+        if: steps.check_token.outputs.enabled == 'true'
         uses: softprops/action-gh-release@v2
         with:
           repository: ${{ github.repository }}-libs
