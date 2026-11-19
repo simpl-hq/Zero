@@ -194,5 +194,24 @@ class ZeroIdentityBrokerTests(unittest.TestCase):
         finally:
             os.environ.pop("TURN_AUTH_SECRET", None)
 
+    def test_support_relay_success_and_rate_limit(self):
+        payload = {
+            "message": "Hello Simpl team, I have a question about Zero security.",
+            "sender_pin": "brave-falcon-ocean-stone",
+            "client_version": "1.0.0",
+            "platform": "Desktop",
+        }
+        res = self.client.post("/api/v1/support/relay", json=payload)
+        self.assertEqual(res.status_code, 200)
+        data = res.json()
+        self.assertEqual(data["status"], "received")
+        self.assertEqual(data["relayed_to"], "support@simpl.global")
+        self.assertTrue(len(data["ticket_id"]) >= 6)
+
+        # Trigger rate limiting (10 per minute)
+        for _ in range(12):
+            res = self.client.post("/api/v1/support/relay", json=payload)
+        self.assertEqual(res.status_code, 429)
+
 if __name__ == "__main__":
     unittest.main()

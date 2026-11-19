@@ -464,20 +464,7 @@ fun ActiveProfilePicker(
 private fun InviteView(rhId: Long?, connLinkInvitation: CreatedConnLink, contactConnection: MutableState<PendingContactConnection?>, onboarding: Boolean = false) {
   val showShortLink = remember { mutableStateOf(true) }
 
-  if (BuildConfigCommon.ZERO_ASSETS) {
-    Image(
-      painterResource(if (isInDarkTheme()) {
-        if (onboarding) MR.images.one_time_link_light else MR.images.one_time_link_small_light
-      } else {
-        if (onboarding) MR.images.one_time_link else MR.images.one_time_link_small
-      }),
-      contentDescription = null,
-      contentScale = ContentScale.Fit,
-      modifier = Modifier.fillMaxWidth()
-    )
-  } else {
-    Spacer(Modifier.height(10.dp))
-  }
+  Spacer(Modifier.height(10.dp))
 
   if (onboarding) {
     Text(
@@ -628,18 +615,7 @@ private fun ConnectView(rhId: Long?, showQRCodeScanner: MutableState<Boolean>, p
     }
   }
 
-  if (BuildConfigCommon.ZERO_ASSETS) {
-    Image(
-      painterResource(if (isInDarkTheme()) {
-        if (onboarding) MR.images.connect_via_link_light else MR.images.connect_via_link_small_light
-      } else {
-        if (onboarding) MR.images.connect_via_link else MR.images.connect_via_link_small
-      }),
-      contentDescription = null,
-      contentScale = ContentScale.Fit,
-      modifier = Modifier.fillMaxWidth()
-    )
-  }
+  Spacer(Modifier.height(10.dp))
 
   SectionView(stringResource(MR.strings.paste_the_link_you_received), headerBottomPadding = 5.dp) {
     PasteLinkView(rhId, pastedLink, showQRCodeScanner, close)

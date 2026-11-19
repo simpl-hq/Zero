@@ -904,7 +904,7 @@
   <string name="image_descr_qr_code">QR Code</string>
   <string name="icon_descr_address">Zero Address</string>
   <string name="icon_descr_help">help</string>
-  <string name="icon_descr_zero_team">Zero Team</string>
+  <string name="icon_descr_zero_team">Ask Zero</string>
   <string name="image_descr_zero_logo">Zero Logo</string>
   <string name="icon_descr_email">Email</string>
   <string name="icon_descr_more_button">More</string>
@@ -1108,8 +1108,8 @@
   <string name="port_verb">Port</string>
   <string name="network_enable_socks">Use SOCKS proxy?</string>
   <string name="network_enable_socks_info">Access the servers via SOCKS proxy on port %d? Proxy must be started before enabling this option.</string>
-  <string name="network_disable_socks">Use direct Internet connection?</string>
-  <string name="network_disable_socks_info">If you confirm, the messaging servers will be able to see your IP address, and your provider - which servers you are connecting to.</string>
+  <string name="network_disable_socks">Turn off Tor protection?</string>
+  <string name="network_disable_socks_info">Warning: without Tor, Zero servers can see your IP address and your internet provider can see which servers you connect to. Keep Tor on unless you understand the risk.</string>
   <string name="network_use_onion_hosts">Use .onion hosts</string>
   <string name="network_use_onion_hosts_prefer">When available</string>
   <string name="network_use_onion_hosts_no">No</string>
@@ -1221,14 +1221,14 @@
   <string name="invite_friends">Invite friends</string>
   <string name="email_invite_subject">Let\'s talk in Zero</string>
   <string name="email_invite_body">Hi!\nConnect to me via Zero: %s</string>
-  <string name="for_social_media">For social media</string>
+  <string name="for_social_media">Zero Address</string>
   <string name="or_to_share_privately">Or to share privately</string>
   <string name="zero_address_or_1_time_link">Zero address or 1-time link?</string>
   <string name="create_1_time_link">Create 1-time link</string>
   <string name="new_1_time_link">New 1-time link</string>
   <string name="onboarding_send_1_time_link">Send the link via any messenger - it\'s secure. Ask to paste into Zero.</string>
   <string name="onboarding_or_show_qr_code">Or show QR in person or via video call.</string>
-  <string name="onboarding_post_address">Use this address in your social media profile, website, or email signature.</string>
+  <string name="onboarding_post_address">Share your Zero address to connect privately without phone numbers or centralized IDs.</string>
   <string name="onboarding_or_use_qr_code">Or use this QR - print or show online.</string>
   <string name="address_settings">Address settings</string>
   <string name="business_address">Business address</string>

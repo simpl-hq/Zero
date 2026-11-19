@@ -3833,8 +3833,8 @@ testShortLinkChangePreparedContactUser = testChat2 aliceProfile bobProfile test
 
       alice @@@ [("@robert", "hey")]
       alice `hasContactProfiles` ["alice", "robert"]
-      bob #$> ("/_get chats 2 pcc=on", chats, [("@alice", "hey"), ("@Ask Zero Team", ""), ("*", "")])
-      bob `hasContactProfiles` ["robert", "alice", "Ask Zero Team"]
+      bob #$> ("/_get chats 2 pcc=on", chats, [("@alice", "hey"), ("@Ask Zero", ""), ("*", "")])
+      bob `hasContactProfiles` ["robert", "alice", "Ask Zero"]
       bob ##> "/user bob"
       showActiveUser bob "bob (Bob)"
       bob @@@ []
@@ -3886,8 +3886,8 @@ testShortLinkChangePreparedContactUserDuplicate = testChat2 aliceProfile bobProf
 
       alice @@@ [("@robert", "hey"), ("@robert_1", "hey")]
       alice `hasContactProfiles` ["alice", "robert", "robert"]
-      bob #$> ("/_get chats 2 pcc=on", chats, [("@alice", "hey"), ("@alice_1", "hey"), ("@Ask Zero Team", ""), ("*", "")])
-      bob `hasContactProfiles` ["robert", "alice", "alice", "Ask Zero Team"]
+      bob #$> ("/_get chats 2 pcc=on", chats, [("@alice", "hey"), ("@alice_1", "hey"), ("@Ask Zero", ""), ("*", "")])
+      bob `hasContactProfiles` ["robert", "alice", "alice", "Ask Zero"]
       bob ##> "/user bob"
       showActiveUser bob "bob (Bob)"
       bob @@@ []
@@ -3980,8 +3980,8 @@ testShortLinkChangePreparedGroupUser = testChat3 aliceProfile bobProfile cathPro
 
       alice @@@ [("#team", "3"), ("@cath","sent invitation to join group team as admin")]
       alice `hasContactProfiles` ["alice", "cath", "robert"]
-      bob #$> ("/_get chats 2 pcc=on", chats, [("#team", "3"), ("@Ask Zero Team", ""), ("*", "")])
-      bob `hasContactProfiles` ["robert", "alice", "cath", "Ask Zero Team"]
+      bob #$> ("/_get chats 2 pcc=on", chats, [("#team", "3"), ("@Ask Zero", ""), ("*", "")])
+      bob `hasContactProfiles` ["robert", "alice", "cath", "Ask Zero"]
       cath @@@ [("#team", "3"), ("@alice","received invitation to join group team as admin")]
       cath `hasContactProfiles` ["cath", "alice", "robert"]
       bob ##> "/user bob"
@@ -4092,7 +4092,7 @@ testShortLinkChangePreparedGroupUserDuplicate = testChat3 aliceProfile bobProfil
 
       alice @@@ [("#team", "7"), ("@cath","sent invitation to join group team as admin")]
       alice `hasContactProfiles` ["alice", "cath", "robert", "robert"]
-      bob `hasContactProfiles` ["robert", "robert", "robert", "alice", "alice", "cath", "cath", "Ask Zero Team"]
+      bob `hasContactProfiles` ["robert", "robert", "robert", "alice", "alice", "cath", "cath", "Ask Zero"]
       cath @@@ [("#team", "7"), ("@alice","received invitation to join group team as admin")]
       cath `hasContactProfiles` ["cath", "alice", "robert", "robert"]
       bob ##> "/user bob"

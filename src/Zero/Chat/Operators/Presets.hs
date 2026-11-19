@@ -20,7 +20,7 @@ operatorZero =
   ServerOperator
     { operatorId = DBNewEntity,
       operatorTag = Just OTZero,
-      tradeName = "Zero",
+      tradeName = "Zero NA",
       legalName = Just "Zero",
       serverDomains = ["simpl.global"],
       conditionsAcceptance = CARequired Nothing,
@@ -34,7 +34,7 @@ operatorFlux =
   ServerOperator
     { operatorId = DBNewEntity,
       operatorTag = Just OTFlux,
-      tradeName = "Simpl EU",
+      tradeName = "Zero EU",
       legalName = Just "Simpl LLC",
       serverDomains = ["eu.simpl.global"],
       conditionsAcceptance = CARequired Nothing,

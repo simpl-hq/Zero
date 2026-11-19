@@ -1351,6 +1351,16 @@ data class Chat(
 
   val id: String get() = chatInfo.id
 
+  val isAskZero: Boolean
+    get() = when (chatInfo) {
+      is ChatInfo.Direct -> {
+        val name = chatInfo.contact.localDisplayName.lowercase().trim()
+        val prof = chatInfo.contact.profile.displayName.lowercase().trim()
+        name == "ask zero" || name == "ask zero team" || prof == "ask zero" || prof == "ask zero team"
+      }
+      else -> false
+    }
+
   val supportUnreadCount: Int get() = when (chatInfo) {
     is ChatInfo.Group ->
       if (chatInfo.groupInfo.canModerate) {

@@ -1,4 +1,4 @@
-package app.zero.core.common.model
+﻿package app.zero.core.common.model
 
 import SectionItemView
 import androidx.compose.foundation.layout.*
@@ -144,7 +144,7 @@ class AppPreferences {
   val showInternalErrors = mkBoolPreference(SHARED_PREFS_SHOW_INTERNAL_ERRORS, false)
   val showSlowApiCalls = mkBoolPreference(SHARED_PREFS_SHOW_SLOW_API_CALLS, false)
   val terminalAlwaysVisible = mkBoolPreference(SHARED_PREFS_TERMINAL_ALWAYS_VISIBLE, false)
-  val networkUseSocksProxy = mkBoolPreference(SHARED_PREFS_NETWORK_USE_SOCKS_PROXY, false)
+  val networkUseSocksProxy = mkBoolPreference(SHARED_PREFS_NETWORK_USE_SOCKS_PROXY, true)
   val networkShowSubscriptionPercentage = mkBoolPreference(SHARED_PREFS_NETWORK_SHOW_SUBSCRIPTION_PERCENTAGE, false)
   private val _networkProxy = mkStrPreference(SHARED_PREFS_NETWORK_PROXY_HOST_PORT, json.encodeToString(NetworkProxy()))
   val networkProxy: SharedPreference<NetworkProxy> = SharedPreference(
@@ -5351,7 +5351,7 @@ data class TimedMessagesPreference(
 ): ChatPreference {
   companion object {
     val ttlValues: List<Int?>
-      get() = listOf(600, 3600, 86400, 7 * 86400, 30 * 86400, 3 * 30 * 86400, null)
+      get() = listOf(60, 300, 600, 1800, 3600, 12 * 3600, 86400, 7 * 86400, 30 * 86400, 3 * 30 * 86400, null)
 
     val profileLevelTTLValues: List<Int?>
       get() = listOf(7 * 86400, 30 * 86400, 3 * 30 * 86400, null)

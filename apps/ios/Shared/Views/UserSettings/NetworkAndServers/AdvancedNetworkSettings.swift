@@ -31,6 +31,7 @@ struct AdvancedNetworkSettings: View {
     @State private var netProxy = networkProxyDefault.get()
     @State private var currentNetProxy = networkProxyDefault.get()
     @State private var useNetProxy = false
+    @State private var showTorOffWarning = false
     @State private var netProxyAuth = false
 
     var body: some View {
@@ -99,7 +100,16 @@ struct AdvancedNetworkSettings: View {
                 }
 
                 Section {
-                    Toggle("Use SOCKS proxy", isOn: $useNetProxy)
+                    Toggle("Use SOCKS proxy (Tor)", isOn: $useNetProxy)
+                        .onChange(of: useNetProxy) { on in
+                            if !on && currentNetCfg.socksProxy != nil { showTorOffWarning = true }
+                        }
+                        .alert("Turn off Tor protection?", isPresented: $showTorOffWarning) {
+                            Button("Keep Tor on", role: .cancel) { useNetProxy = true }
+                            Button("Turn off", role: .destructive) {}
+                        } message: {
+                            Text("Warning: without Tor, Zero servers can see your IP address and your internet provider can see which servers you connect to. Keep Tor on unless you understand the risk.")
+                        }
                     Group {
                         TextField("IP address", text: $netProxy.host)
                         TextField(

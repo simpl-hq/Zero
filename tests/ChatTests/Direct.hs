@@ -1166,22 +1166,22 @@ testOperators =
       alice ##> "/_conditions"
       alice <##. "Current conditions: 2."
       alice ##> "/_operators"
-      alice <##. "1 (zero). Zero (Zero), domains: simpl.global, servers: enabled, conditions: required"
-      alice <## "2 (flux). Simpl EU (Simpl LLC), domains: eu.simpl.global, servers: SMP enabled proxy, XFTP enabled, conditions: required"
+      alice <##. "1 (zero). Zero NA (Zero), domains: simpl.global, servers: enabled, conditions: required"
+      alice <## "2 (flux). Zero EU (Simpl LLC), domains: eu.simpl.global, servers: SMP enabled proxy, XFTP enabled, conditions: required"
       alice <##. "The new conditions will be accepted for Zero, Simpl LLC at "
       alice ##> "/_conditions_notified 2"
       alice <## "ok"
       alice ##> "/_operators"
-      alice <##. "1 (zero). Zero (Zero), domains: simpl.global, servers: enabled, conditions: required"
-      alice <## "2 (flux). Simpl EU (Simpl LLC), domains: eu.simpl.global, servers: SMP enabled proxy, XFTP enabled, conditions: required"
+      alice <##. "1 (zero). Zero NA (Zero), domains: simpl.global, servers: enabled, conditions: required"
+      alice <## "2 (flux). Zero EU (Simpl LLC), domains: eu.simpl.global, servers: SMP enabled proxy, XFTP enabled, conditions: required"
       alice ##> "/_conditions"
       alice <##. "Current conditions: 2 (notified)."
       alice ##> "/_accept_conditions 2 1,2"
-      alice <##. "1 (zero). Zero (Zero), domains: simpl.global, servers: enabled, conditions: accepted ("
-      alice <##. "2 (flux). Simpl EU (Simpl LLC), domains: eu.simpl.global, servers: SMP enabled proxy, XFTP enabled, conditions: accepted ("
+      alice <##. "1 (zero). Zero NA (Zero), domains: simpl.global, servers: enabled, conditions: accepted ("
+      alice <##. "2 (flux). Zero EU (Simpl LLC), domains: eu.simpl.global, servers: SMP enabled proxy, XFTP enabled, conditions: accepted ("
       alice ##> "/operators 2:on:smp=proxy:xftp=off"
-      alice <##. "1 (zero). Zero (Zero), domains: simpl.global, servers: enabled, conditions: accepted ("
-      alice <##. "2 (flux). Simpl EU (Simpl LLC), domains: eu.simpl.global, servers: SMP enabled proxy, XFTP disabled (servers known), conditions: accepted ("
+      alice <##. "1 (zero). Zero NA (Zero), domains: simpl.global, servers: enabled, conditions: accepted ("
+      alice <##. "2 (flux). Zero EU (Simpl LLC), domains: eu.simpl.global, servers: SMP enabled proxy, XFTP disabled (servers known), conditions: accepted ("
   where
     opts' = testOpts {coreOptions = testCoreOpts {smpServers = [], xftpServers = []}}
 
@@ -1848,14 +1848,14 @@ testMultipleUserAddresses =
       cLinkAlisa <- getContactLink alice True
       bob ##> ("/c " <> cLinkAlisa)
       alice <#? bob
-      alice #$> ("/_get chats 2 pcc=on", chats, [("@bob", "Audio/video calls: enabled"), ("@Ask Zero Team", ""), ("*", "")])
+      alice #$> ("/_get chats 2 pcc=on", chats, [("@bob", "Audio/video calls: enabled"), ("@Ask Zero", ""), ("*", "")])
       alice ##> "/ac bob"
       alice <## "bob (Bob): accepting contact request, you can send messages to contact"
       concurrently_
         (bob <## "alisa: contact is connected")
         (alice <## "bob (Bob): contact is connected")
       threadDelay 100000
-      alice #$> ("/_get chats 2 pcc=on", chats, [("@bob", lastChatFeature), ("@Ask Zero Team", ""), ("*", "")])
+      alice #$> ("/_get chats 2 pcc=on", chats, [("@bob", lastChatFeature), ("@Ask Zero", ""), ("*", "")])
       alice <##> bob
 
       bob #> "@alice hey alice"
@@ -1883,7 +1883,7 @@ testMultipleUserAddresses =
         (cath <## "alisa: contact is connected")
         (alice <## "cath (Catherine): contact is connected")
       threadDelay 100000
-      alice #$> ("/_get chats 2 pcc=on", chats, [("@cath", lastChatFeature), ("@bob", "hey"), ("@Ask Zero Team", ""), ("*", "")])
+      alice #$> ("/_get chats 2 pcc=on", chats, [("@cath", lastChatFeature), ("@bob", "hey"), ("@Ask Zero", ""), ("*", "")])
       alice <##> cath
 
       alice ##> "/user alice"

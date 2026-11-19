@@ -563,6 +563,15 @@ fun ComposeView(
           chatsCtx.addChatItem(chat.remoteHostId, aChatItem.chatInfo, aChatItem.chatItem)
         }
       }
+      if (chat.isAskZero && mc.text.isNotBlank()) {
+        val msgText = mc.text
+        CoroutineScope(Dispatchers.IO).launch {
+          runCatching {
+            val userPin = runCatching { chatModel.controller.appPrefs.zeroAccountPin.get() }.getOrNull()
+            app.zero.core.network.ZeroIdentityBridge().relaySupportMessage(msgText, userPin)
+          }
+        }
+      }
       return chatItems.first().chatItem
     }
     if (file != null) removeFile(file.filePath)

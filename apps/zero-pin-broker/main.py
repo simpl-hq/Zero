@@ -2,11 +2,17 @@
 import base64
 import hashlib
 import hmac
+import json
+import logging
 import os
+from logging.handlers import RotatingFileHandler
 import re
 import secrets
+import smtplib
 import threading
 import time
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 from typing import Dict, List, Optional, Tuple
 from argon2.low_level import Type as Argon2Type, hash_secret_raw
 from fastapi import FastAPI, HTTPException, Request, Response
@@ -18,6 +24,24 @@ except ImportError:
     redis = None
 
 REDIS_HOST = os.environ.get("REDIS_HOST", "localhost")
+
+LOG_DIR = os.environ.get("BROKER_LOG_DIR", os.path.join(os.path.dirname(os.path.abspath(__file__)), "logs"))
+logger = logging.getLogger("zero.broker")
+if not logger.handlers:
+    logger.setLevel(os.environ.get("BROKER_LOG_LEVEL", "INFO").upper())
+    _fmt = logging.Formatter("%(asctime)s %(levelname)s %(name)s: %(message)s")
+    _sh = logging.StreamHandler()
+    _sh.setFormatter(_fmt)
+    logger.addHandler(_sh)
+    try:
+        os.makedirs(LOG_DIR, exist_ok=True)
+        _fh = RotatingFileHandler(os.path.join(LOG_DIR, "broker.log"), maxBytes=5 * 1024 * 1024, backupCount=5, encoding="utf-8")
+        _fh.setFormatter(_fmt)
+        logger.addHandler(_fh)
+    except OSError as _e:
+        logger.warning("file logging unavailable: %s", _e)
+    # Never log client IPs, invite URLs or phrases; only event metadata.
+    logger.info("broker starting; pow_bits=%s", os.environ.get("POW_LEADING_ZERO_BITS", "10"))
 REDIS_PORT = int(os.environ.get("REDIS_PORT", "6379"))
 REDIS_PASSWORD = os.environ.get("REDIS_PASSWORD") or None
 
@@ -1073,6 +1097,14 @@ def _sanitize_ip(raw_ip: str) -> str:
         return candidate
     return "127.0.0.1"
 
+def _client_ip(request: Request) -> str:
+    peer_host = request.client.host if request.client else "127.0.0.1"
+    if peer_host in ("127.0.0.1", "::1"):
+        forwarded_ip = request.headers.get("x-real-ip", "").strip()
+        if forwarded_ip and SAFE_IP_PATTERN.match(forwarded_ip):
+            return forwarded_ip
+    return _sanitize_ip(peer_host)
+
 def _rate_limit_hmac_key() -> bytes:
     # Derive a cross-worker key from deployment secrets that rotates at 00:00 UTC so IPs stay unlinkable across days.
     turn_secret = os.environ.get("TURN_AUTH_SECRET", "").strip()
@@ -1374,4 +1406,81 @@ def get_ephemeral_turn_credentials(request: Request):
         "ttl": TURN_CREDENTIAL_TTL_SECONDS,
         "uris": list(TURN_URIS),
         "video_max_bitrate_bps": 1_000_000,
+    }
+
+
+class SupportRelayPayload(BaseModel):
+    message: str = Field(..., min_length=1, max_length=5000)
+    sender_pin: Optional[str] = Field(None, max_length=128)
+    client_version: Optional[str] = Field(None, max_length=64)
+    platform: Optional[str] = Field(None, max_length=64)
+
+
+@app.post("/api/v1/support/relay")
+def relay_support_message(payload: SupportRelayPayload, request: Request):
+    bucket_id = _rate_limit_bucket_id(request)
+    if not _check_rate_limit(f"support:{bucket_id}", 10, 60):
+        raise HTTPException(status_code=429, detail="Too many support requests. Please try again shortly.")
+
+    ticket_id = secrets.token_hex(6).upper()
+    timestamp = time.strftime("%Y-%m-%d %H:%M:%S UTC", time.gmtime())
+
+    ticket_data = {
+        "ticket_id": ticket_id,
+        "message": payload.message,
+        "sender_pin": payload.sender_pin or "Anonymous",
+        "client_version": payload.client_version or "Unknown",
+        "platform": payload.platform or "Unknown",
+        "timestamp": timestamp,
+        "ip": _client_ip(request),
+    }
+
+    r = _get_redis()
+    if r is not None:
+        try:
+            r.lpush("support:messages", json.dumps(ticket_data))
+            r.ltrim("support:messages", 0, 999)
+        except Exception:
+            _trip_redis_circuit()
+
+    smtp_host = os.environ.get("SMTP_HOST")
+    smtp_port = int(os.environ.get("SMTP_PORT", "587"))
+    smtp_user = os.environ.get("SMTP_USER")
+    smtp_pass = os.environ.get("SMTP_PASSWORD")
+    sender_email = os.environ.get("SUPPORT_FROM_EMAIL", "support@simpl.global")
+    recipient_email = "support@simpl.global"
+
+    email_sent = False
+    if smtp_host and smtp_user and smtp_pass:
+        try:
+            msg = MIMEMultipart("alternative")
+            msg["Subject"] = f"[Ask Zero Ticket #{ticket_id}] Inquiry from {payload.sender_pin or 'User'}"
+            msg["From"] = sender_email
+            msg["To"] = recipient_email
+
+            body = (
+                f"New Ask Zero Message (Ticket #{ticket_id})\n"
+                f"Timestamp: {timestamp}\n"
+                f"Sender PIN: {payload.sender_pin or 'None (Direct Zero Client)'}\n"
+                f"Platform: {payload.platform or 'Unknown'}\n"
+                f"Client Version: {payload.client_version or 'Unknown'}\n\n"
+                f"----------------------------------------\n"
+                f"{payload.message}\n"
+                f"----------------------------------------\n"
+            )
+            msg.attach(MIMEText(body, "plain"))
+
+            with smtplib.SMTP(smtp_host, smtp_port, timeout=5) as server:
+                server.starttls()
+                server.login(smtp_user, smtp_pass)
+                server.sendmail(sender_email, [recipient_email], msg.as_string())
+            email_sent = True
+        except Exception:
+            pass
+
+    return {
+        "status": "received",
+        "ticket_id": ticket_id,
+        "relayed_to": recipient_email,
+        "email_dispatched": email_sent,
     }

@@ -80,7 +80,7 @@ struct UserAddressView: View {
                 Section {
                     createAddressButton()
                 } header: {
-                    Text("For social media")
+                    Text("Zero Address")
                         .foregroundColor(theme.colors.secondary)
                 }
 
@@ -162,19 +162,7 @@ struct UserAddressView: View {
             }
             addressSettingsButton(userAddress)
         } header: {
-            #if ZERO_ASSETS
-            VStack(alignment: .leading, spacing: 0) {
-                Image(colorScheme == .light ? "zero-address-small" : "zero-address-small-light")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(maxWidth: .infinity)
-                    .padding(.top, -20)
-                ToggleShortLinkHeader(text: Text("For social media"), link: userAddress.connLinkContact, short: $showShortLink)
-            }
-            .padding(.bottom, 4)
-            #else
-            ToggleShortLinkHeader(text: Text("For social media"), link: userAddress.connLinkContact, short: $showShortLink)
-            #endif
+            ToggleShortLinkHeader(text: Text("Zero Address"), link: userAddress.connLinkContact, short: $showShortLink)
         } footer: {
             if settings.businessAddress {
                 Text("Add your team members to the conversations.")
@@ -865,10 +853,10 @@ struct SetZeroDomainView: View {
             Section {
                 if editing {
                     Button {
-                        openBrowserAlert(uri: "https://zero.domains/#testing")
+                        openBrowserAlert(uri: "https://simpl.global/zero/domain")
                     } label: {
                         HStack {
-                            Text("How to register a test name")
+                            Text("Zero Domain Registration")
                             Image(systemName: "arrow.up.right.circle")
                         }
                     }
@@ -895,16 +883,16 @@ struct SetZeroDomainView: View {
             }
             Section {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(verbatim: saleCountdown(timeToSaleStart))
-                    Text(timeToSaleStart > 0 ? "until you can register a Zero domain" : "Update the app to register a Zero domain")
+                    Text("Registration in Progress")
+                    Text("Decentralized Zero domain verification is currently being deployed. Public registration ETA is to be announced.")
                         .font(.caption)
                         .foregroundColor(theme.colors.secondary)
                 }
             } header: {
-                Text("Zero name sale starts in")
+                Text("Zero Domain Registration")
                     .foregroundColor(theme.colors.secondary)
             } footer: {
-                Text("Crowdfunding investors can reserve names before the sale starts: [zero.domains](https://zero.domains/)")
+                Text("Learn more and track rollout updates at: [simpl.global/zero/domain](https://simpl.global/zero/domain)")
                     .foregroundColor(theme.colors.secondary)
                     .padding(.bottom)
             }

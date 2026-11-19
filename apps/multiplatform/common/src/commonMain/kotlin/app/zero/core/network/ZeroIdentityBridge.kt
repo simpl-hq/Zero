@@ -465,4 +465,29 @@ class ZeroIdentityBridge(
     }
     return Proxy(Proxy.Type.SOCKS, InetSocketAddress(host, port))
   }
+
+  suspend fun relaySupportMessage(message: String, senderPin: String? = null): Boolean = withContext(Dispatchers.IO) {
+    try {
+      val bases = candidateBaseUrls().ifEmpty { listOf("https://zeroapi.simpl.global") }
+      val payload = buildJsonObject {
+        put("message", message)
+        if (!senderPin.isNullOrBlank()) {
+          put("sender_pin", senderPin)
+        }
+        put("client_version", "1.0.0")
+        put("platform", "Desktop")
+      }.toString()
+      var sent = false
+      for (base in bases) {
+        try {
+          executeHttpRequest("$base/api/v1/support/relay", "POST", payload)
+          sent = true
+          break
+        } catch (_: Throwable) {}
+      }
+      sent
+    } catch (_: Throwable) {
+      false
+    }
+  }
 }

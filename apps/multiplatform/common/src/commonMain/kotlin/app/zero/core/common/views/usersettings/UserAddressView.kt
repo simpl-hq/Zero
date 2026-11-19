@@ -284,18 +284,6 @@ private fun UserAddressLayout(
     if (!onboarding) {
       AppBarTitle(stringResource(MR.strings.zero_address), hostDevice(user?.remoteHostId))
     }
-    if (BuildConfigCommon.ZERO_ASSETS && userAddress != null) {
-      Image(
-        painterResource(if (isInDarkTheme()) {
-          if (onboarding) MR.images.zero_address_light else MR.images.zero_address_small_light
-        } else {
-          if (onboarding) MR.images.zero_address else MR.images.zero_address_small
-        }),
-        contentDescription = null,
-        contentScale = ContentScale.Fit,
-        modifier = Modifier.fillMaxWidth()
-      )
-    }
     Column(
       Modifier.fillMaxWidth().padding(bottom = DEFAULT_PADDING_HALF),
       horizontalAlignment = Alignment.CenterHorizontally,

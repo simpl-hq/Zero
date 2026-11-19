@@ -290,21 +290,8 @@ private struct InviteView: View {
     }
 
     private var sectionHeader: some View {
-        #if ZERO_ASSETS
-        VStack(alignment: .leading, spacing: 0) {
-            Image(colorScheme == .light
-                ? (onboarding ? "one-time-link" : "one-time-link-small")
-                : (onboarding ? "one-time-link-light" : "one-time-link-small-light"))
-                .resizable()
-                .scaledToFit()
-                .frame(maxWidth: .infinity)
-            sectionHeaderText
-        }
-        .padding(.bottom, 6)
-        #else
         sectionHeaderText
             .if(onboarding) { $0.padding(.bottom, 6) }
-        #endif
     }
 
     @ViewBuilder private var sectionHeaderText: some View {
@@ -688,20 +675,7 @@ private struct ConnectView: View {
     }
 
     private var connectSectionHeader: some View {
-        #if ZERO_ASSETS
-        VStack(alignment: .leading, spacing: 0) {
-            Image(colorScheme == .light
-                ? (onboarding ? "connect-via-link" : "connect-via-link-small")
-                : (onboarding ? "connect-via-link-light" : "connect-via-link-small-light"))
-                .resizable()
-                .scaledToFit()
-                .frame(maxWidth: .infinity)
-            Text("Paste the link you received").foregroundColor(theme.colors.secondary)
-        }
-        .padding(.bottom, 4)
-        #else
         Text("Paste the link you received").foregroundColor(theme.colors.secondary)
-        #endif
     }
 
     private func connect(_ link: String) {
