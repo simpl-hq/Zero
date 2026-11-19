@@ -653,12 +653,12 @@ getProtocolServers db p User {userId} =
 insertProtocolServer :: forall p. ProtocolTypeI p => DB.Connection -> SProtocolType p -> User -> UTCTime -> NewUserServer p -> IO (UserServer p)
 insertProtocolServer db p User {userId} ts srv@UserServer {server, preset, tested, enabled, roles} = do
   let (_, host, port, _, _) = serverColumns p server
-  existing <- maybeFirstRow fromOnly $ DB.query db
+  (existing :: Maybe Int64) <- maybeFirstRow fromOnly $ DB.query db
     "SELECT smp_server_id FROM protocol_servers WHERE user_id = ? AND host = ? AND port = ? LIMIT 1"
     (userId, host, port)
   case existing of
     Just sId -> do
-      let srv' = srv {serverId = DBEntityId sId}
+      let srv' = (srv :: NewUserServer p) {serverId = DBEntityId sId}
       updateProtocolServer db p ts srv'
       pure srv'
     Nothing -> do

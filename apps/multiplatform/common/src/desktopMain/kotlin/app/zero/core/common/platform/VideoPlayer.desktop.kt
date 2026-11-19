@@ -234,7 +234,6 @@ actual class VideoPlayer actual constructor(
         VideoOrientation.LEFT_BOTTOM -> snap?.rotate(-90.0)
         VideoOrientation.RIGHT_TOP -> snap?.rotate(90.0)
         VideoOrientation.RIGHT_BOTTOM -> snap
-        else -> snap
       }?.toComposeImageBitmap()
       val duration = player.duration.toLong()
       player.stop()
