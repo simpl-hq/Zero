@@ -322,6 +322,33 @@ private final class BrokerPinningDelegate: NSObject, URLSessionDelegate {
     }
 }
 
+enum ZeroDiscoveryMode: String, CaseIterable, Identifiable {
+    case simplNetwork = "simpl_network"
+    case selfHosted   = "self_hosted"
+    case airGapped    = "air_gapped"
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .simplNetwork: return "Simpl Network (Default)"
+        case .selfHosted:   return "Self-Hosted Broker"
+        case .airGapped:    return "Air-Gapped / Direct Only"
+        }
+    }
+
+    var subtitle: String {
+        switch self {
+        case .simplNetwork:
+            return "Encrypted rendezvous via pinned zeroapi/zeroeu/zerona.simpl.global cluster with SPKI verification."
+        case .selfHosted:
+            return "Discovery routes exclusively through your custom HTTPS endpoint with zero fallback to Simpl servers."
+        case .airGapped:
+            return "Disables all broker network lookups. Exchange contacts via direct QR code or 1-time links only."
+        }
+    }
+}
+
 final class ZeroIdentityBridge {
     static let shared = ZeroIdentityBridge()
 
@@ -340,9 +367,69 @@ final class ZeroIdentityBridge {
     private let maxIterations: UInt64 = 100_000
     private let maskedUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
     private let directoryUrlKey = "app.zero.directory_url"
+    private let discoveryModeKey = "app.zero.discovery_mode"
+    private let customBrokerUrlKey = "app.zero.custom_broker_url"
     private let phraseDefaultsKey = "app.zero.account.phrase"
     private let deepLinkDefaultsKey = "app.zero.account.deeplink"
     private let cacheDefaultsKey = "app.zero.account.identity_cache"
+
+    var discoveryMode: ZeroDiscoveryMode {
+        get {
+            if let raw = UserDefaults.standard.string(forKey: discoveryModeKey),
+               let mode = ZeroDiscoveryMode(rawValue: raw) {
+                return mode
+            }
+            if let legacy = UserDefaults.standard.string(forKey: directoryUrlKey)?
+                .trimmingCharacters(in: .whitespacesAndNewlines).lowercased() {
+                if legacy == "off" || legacy == "disabled" || legacy == "none" || legacy == "air_gapped" || legacy == "direct_only" {
+                    return .airGapped
+                }
+                if legacy.hasPrefix("https://") {
+                    return .selfHosted
+                }
+            }
+            return .simplNetwork
+        }
+        set {
+            UserDefaults.standard.set(newValue.rawValue, forKey: discoveryModeKey)
+            switch newValue {
+            case .simplNetwork:
+                UserDefaults.standard.removeObject(forKey: directoryUrlKey)
+            case .selfHosted:
+                if let url = customBrokerUrl {
+                    UserDefaults.standard.set(url, forKey: directoryUrlKey)
+                }
+            case .airGapped:
+                UserDefaults.standard.set("air_gapped", forKey: directoryUrlKey)
+            }
+        }
+    }
+
+    var customBrokerUrl: String? {
+        get {
+            let custom = UserDefaults.standard.string(forKey: customBrokerUrlKey)?
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+            if let custom = custom, !custom.isEmpty {
+                return custom
+            }
+            let legacy = UserDefaults.standard.string(forKey: directoryUrlKey)?
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+            if let legacy = legacy, legacy.lowercased().hasPrefix("https://") {
+                return legacy
+            }
+            return nil
+        }
+        set {
+            if let val = newValue?.trimmingCharacters(in: .whitespacesAndNewlines), !val.isEmpty {
+                UserDefaults.standard.set(val, forKey: customBrokerUrlKey)
+                if discoveryMode == .selfHosted {
+                    UserDefaults.standard.set(val, forKey: directoryUrlKey)
+                }
+            } else {
+                UserDefaults.standard.removeObject(forKey: customBrokerUrlKey)
+            }
+        }
+    }
 
     var currentPhrase: String? {
         get { UserDefaults.standard.string(forKey: phraseDefaultsKey) }
@@ -418,19 +505,24 @@ final class ZeroIdentityBridge {
     }
 
     private func candidateDirectoryUrls() -> [String] {
-        if let raw = UserDefaults.standard.string(forKey: directoryUrlKey)?
-            .trimmingCharacters(in: .whitespacesAndNewlines) {
-            let low = raw.lowercased()
-            if low.isEmpty || low == "off" || low == "disabled" || low == "none" {
+        switch discoveryMode {
+        case .airGapped:
+            // Air-gapped / Direct P2P mode: never make any network discovery requests
+            return []
+        case .selfHosted:
+            guard let custom = customBrokerUrl?.trimmingCharacters(in: .whitespacesAndNewlines),
+                  custom.lowercased().hasPrefix("https://"),
+                  let parsed = URL(string: custom),
+                  let host = parsed.host?.lowercased(),
+                  !host.isEmpty,
+                  !simplBrokerHosts.contains(host) else {
+                // If custom broker URL is invalid or pointing to Simpl, fail closed with zero silent fallback
                 return []
             }
-            if raw.lowercased().hasPrefix("https://"),
-               let host = URL(string: raw)?.host?.lowercased(),
-               !simplBrokerHosts.contains(host) {
-                return [raw.trimmingCharacters(in: CharacterSet(charactersIn: "/"))]
-            }
+            return [custom.trimmingCharacters(in: CharacterSet(charactersIn: "/"))]
+        case .simplNetwork:
+            return directoryUrls
         }
-        return directoryUrls
     }
 
     private func performRequest(_ req: URLRequest) async throws -> (Data, URLResponse) {
@@ -676,6 +768,7 @@ struct ZeroInfo: View {
     @State private var copiedCreatedPhrase = false
     @State private var showGuidedTutorial = false
     @State private var showExistingPhraseSheet = false
+    @State private var showDiscoverySettings = false
     @State private var existingPhraseInput = ""
     @State private var errorMessage: String? = nil
     var onboarding: Bool
@@ -1017,6 +1110,32 @@ struct ZeroInfo: View {
             }
 
             Button {
+                showDiscoverySettings = true
+            } label: {
+                HStack {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Rendezvous Discovery")
+                            .font(.caption)
+                            .foregroundColor(theme.colors.secondary)
+                        Text(ZeroIdentityBridge.shared.discoveryMode.title)
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundColor(theme.colors.onBackground)
+                    }
+                    Spacer()
+                    Image(systemName: "slider.horizontal.3")
+                        .font(.footnote.weight(.semibold))
+                        .foregroundColor(theme.colors.secondary)
+                }
+                .padding(14)
+                .background(
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .fill(Color(uiColor: .secondarySystemBackground))
+                )
+            }
+            .buttonStyle(.plain)
+            .padding(.top, 4)
+
+            Button {
                 showGuidedTutorial = true
             } label: {
                 Label("Start Quick Setup Guide", systemImage: "book.fill")
@@ -1042,6 +1161,96 @@ struct ZeroInfo: View {
             }
             .environmentObject(m)
             .environmentObject(theme)
+        }
+        .sheet(isPresented: $showDiscoverySettings) {
+            ZeroDiscoverySettingsView()
+                .environmentObject(theme)
+        }
+    }
+}
+
+struct ZeroDiscoverySettingsView: View {
+    @Environment(\.presentationMode) var presentationMode
+    @EnvironmentObject var theme: AppTheme
+    @State private var selectedMode: ZeroDiscoveryMode = ZeroIdentityBridge.shared.discoveryMode
+    @State private var customUrlInput: String = ZeroIdentityBridge.shared.customBrokerUrl ?? ""
+    @State private var statusMessage: String? = nil
+
+    var body: some View {
+        NavigationView {
+            Form {
+                Section(header: Text("Discovery Mode").font(.caption)) {
+                    ForEach(ZeroDiscoveryMode.allCases) { mode in
+                        Button {
+                            selectedMode = mode
+                        } label: {
+                            HStack(alignment: .top, spacing: 12) {
+                                Image(systemName: selectedMode == mode ? "largecircle.fill.circle" : "circle")
+                                    .foregroundColor(selectedMode == mode ? theme.colors.primary : theme.colors.secondary)
+                                    .imageScale(.medium)
+                                    .padding(.top, 2)
+
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(mode.title)
+                                        .font(.subheadline.weight(.semibold))
+                                        .foregroundColor(theme.colors.onBackground)
+                                    Text(mode.subtitle)
+                                        .font(.caption)
+                                        .foregroundColor(theme.colors.secondary)
+                                        .fixedSize(horizontal: false, vertical: true)
+                                }
+                                Spacer()
+                            }
+                            .padding(.vertical, 4)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+
+                if selectedMode == .selfHosted {
+                    Section(header: Text("Custom Broker HTTPS URL").font(.caption), footer: Text("Strictly connects only to this server. Zero silent fallback to Simpl servers.").font(.caption)) {
+                        TextField("https://broker.example.com", text: $customUrlInput)
+                            .keyboardType(.URL)
+                            .autocapitalization(.none)
+                            .disableAutocorrection(true)
+                            .font(.system(.body, design: .monospaced))
+                    }
+                }
+
+                if let msg = statusMessage {
+                    Section {
+                        Text(msg)
+                            .font(.caption)
+                            .foregroundColor(.red)
+                    }
+                }
+            }
+            .navigationTitle("Discovery Broker")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") {
+                        presentationMode.wrappedValue.dismiss()
+                    }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Save") {
+                        if selectedMode == .selfHosted {
+                            let trimmed = customUrlInput.trimmingCharacters(in: .whitespacesAndNewlines)
+                            guard trimmed.lowercased().hasPrefix("https://"),
+                                  let url = URL(string: trimmed),
+                                  let host = url.host, !host.isEmpty else {
+                                statusMessage = "Please enter a valid https:// URL"
+                                return
+                            }
+                            ZeroIdentityBridge.shared.customBrokerUrl = trimmed
+                        }
+                        ZeroIdentityBridge.shared.discoveryMode = selectedMode
+                        presentationMode.wrappedValue.dismiss()
+                    }
+                    .font(.body.weight(.bold))
+                }
+            }
         }
     }
 }

@@ -66,4 +66,18 @@ class ZeroIdentityBridgeTest {
       ZeroIdentityBridge.validateResolvedInviteUrl("https://evil.example/phish")
     }
   }
+
+  @Test
+  fun testDiscoveryModeParsing() {
+    assertEquals(ZeroDiscoveryMode.AIR_GAPPED, ZeroDiscoveryMode.fromConfig("air_gapped"))
+    assertEquals(ZeroDiscoveryMode.AIR_GAPPED, ZeroDiscoveryMode.fromConfig("off"))
+    assertEquals(ZeroDiscoveryMode.AIR_GAPPED, ZeroDiscoveryMode.fromConfig("disabled"))
+    assertEquals(ZeroDiscoveryMode.AIR_GAPPED, ZeroDiscoveryMode.fromConfig("none"))
+    assertEquals(ZeroDiscoveryMode.AIR_GAPPED, ZeroDiscoveryMode.fromConfig("direct_only"))
+    assertEquals(ZeroDiscoveryMode.AIR_GAPPED, ZeroDiscoveryMode.fromConfig(""))
+    assertEquals(ZeroDiscoveryMode.SELF_HOSTED, ZeroDiscoveryMode.fromConfig("https://broker.example.com"))
+    assertEquals(ZeroDiscoveryMode.SELF_HOSTED, ZeroDiscoveryMode.fromConfig("self_hosted"))
+    assertEquals(ZeroDiscoveryMode.SIMPL_NETWORK, ZeroDiscoveryMode.fromConfig(null))
+    assertEquals(ZeroDiscoveryMode.SIMPL_NETWORK, ZeroDiscoveryMode.fromConfig("simpl_network"))
+  }
 }

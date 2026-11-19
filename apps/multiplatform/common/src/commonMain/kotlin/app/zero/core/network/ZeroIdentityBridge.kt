@@ -37,6 +37,35 @@ data class ZeroEphemeralCode(
   val expiresInSeconds: Int
 )
 
+enum class ZeroDiscoveryMode(val id: String, val title: String, val description: String) {
+  SIMPL_NETWORK(
+    "simpl_network",
+    "Simpl Network (Default)",
+    "Encrypted rendezvous via pinned zeroapi/zeroeu/zerona.simpl.global cluster."
+  ),
+  SELF_HOSTED(
+    "self_hosted",
+    "Self-Hosted Broker",
+    "Route discovery exclusively to your verified HTTPS endpoint with zero silent fallback."
+  ),
+  AIR_GAPPED(
+    "air_gapped",
+    "Air-Gapped / Direct Only",
+    "Completely disable broker network activity. Exchange contacts via direct QR or 1-time links."
+  );
+
+  companion object {
+    fun fromConfig(configured: String?): ZeroDiscoveryMode {
+      val trimmed = configured?.trim()?.lowercase() ?: return SIMPL_NETWORK
+      return when {
+        trimmed in setOf("air_gapped", "airgapped", "direct_only", "off", "disabled", "none", "") -> AIR_GAPPED
+        trimmed.startsWith("https://") || trimmed == "self_hosted" || trimmed == "custom" -> SELF_HOSTED
+        else -> SIMPL_NETWORK
+      }
+    }
+  }
+}
+
 class ZeroIdentityBridge(
   private val directoryUrl: String = DEFAULT_DIRECTORY_URL,
   private val leadingHexZeros: Int? = null,
@@ -151,20 +180,29 @@ class ZeroIdentityBridge(
 
   private fun candidateBaseUrls(): List<String> {
     val configured = runCatching { appPrefs.zeroDirectoryUrl.get() }.getOrNull()?.trim()
-    if (configured != null && configured.lowercase() in setOf("", "off", "disabled", "none")) {
-      return emptyList()
-    }
-    if (configured != null && configured.startsWith("https://", ignoreCase = true)) {
-      val host = runCatching { URL(configured).host.lowercase() }.getOrNull()
-      if (host != null && host !in SIMPL_BROKER_HOSTS) {
-        // Custom/self-hosted broker configured: never silently fall back to simpl.global
-        return listOf(configured.trimEnd('/'))
+    val mode = ZeroDiscoveryMode.fromConfig(configured)
+    return when (mode) {
+      ZeroDiscoveryMode.AIR_GAPPED -> emptyList()
+      ZeroDiscoveryMode.SELF_HOSTED -> {
+        if (configured != null && configured.startsWith("https://", ignoreCase = true)) {
+          val host = runCatching { URL(configured).host.lowercase() }.getOrNull()
+          if (!host.isNullOrEmpty() && host !in SIMPL_BROKER_HOSTS) {
+            listOf(configured.trimEnd('/'))
+          } else {
+            // Strictly zero silent fallback to simpl.global if self-hosted endpoint is invalid
+            emptyList()
+          }
+        } else {
+          emptyList()
+        }
+      }
+      ZeroDiscoveryMode.SIMPL_NETWORK -> {
+        (listOfNotNull(
+          configured?.takeIf { it.startsWith("https://", ignoreCase = true) },
+          directoryUrl.takeIf { it.startsWith("https://", ignoreCase = true) }
+        ) + FALLBACK_DIRECTORY_URLS).map { it.trimEnd('/') }.distinct()
       }
     }
-    return (listOfNotNull(
-      configured?.takeIf { it.startsWith("https://", ignoreCase = true) },
-      directoryUrl.takeIf { it.startsWith("https://", ignoreCase = true) }
-    ) + FALLBACK_DIRECTORY_URLS).map { it.trimEnd('/') }.distinct()
   }
 
   private fun cacheIdentityLocally(key: String, inviteUrl: String) {
