@@ -361,6 +361,13 @@ class ZeroIdentityBridge(
       return@withContext validateResolvedInviteUrl(cached)
     }
 
+    if (lastError != null && hasActiveProxy() && bases.isNotEmpty()) {
+      throw IllegalStateException(
+        "Tor protection is on, but no Tor proxy answered. Start Tor or Orbot (localhost:9050) and try again. " +
+          "You can turn Tor off under Settings > Network & servers, but that exposes your IP address.",
+        lastError
+      )
+    }
     throw lastError ?: IllegalStateException("Identity could not be resolved")
   }
 
