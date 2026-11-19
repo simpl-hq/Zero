@@ -171,6 +171,12 @@
         android:foregroundServiceType="remoteMessaging"
     />
 
+    <!-- Embedded Tor daemon (Guardian Project tor-android) -->
+    <service
+        android:name="org.torproject.jni.TorService"
+        android:enabled="true"
+        android:exported="false" />
+
     <!-- ZeroService restart on reboot -->
 
     <service

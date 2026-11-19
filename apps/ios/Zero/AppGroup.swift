@@ -59,6 +59,7 @@ public let groupDefaults = UserDefaults(suiteName: APP_GROUP_NAME)!
 public let groupAppDefaults: [String: Any] = [
     GROUP_DEFAULT_NTF_ENABLE_LOCAL: false,
     GROUP_DEFAULT_NTF_ENABLE_PERIODIC: false,
+    GROUP_DEFAULT_NETWORK_SOCKS_PROXY: "127.0.0.1:9050",
     GROUP_DEFAULT_NETWORK_USE_ONION_HOSTS: OnionHosts.no.rawValue,
     GROUP_DEFAULT_NETWORK_SESSION_MODE: TransportSessionMode.session.rawValue,
     GROUP_DEFAULT_NETWORK_SMP_PROXY_MODE: SMPProxyMode.unknown.rawValue,

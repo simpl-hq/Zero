@@ -199,6 +199,8 @@ dependencies {
     implementation("androidx.work:work-multiprocess:$workVersion")
 
     implementation("com.jakewharton:process-phoenix:3.0.0")
+    implementation("info.guardianproject:tor-android:0.4.8.16.1")
+    implementation("info.guardianproject:jtorctl:0.4.5.7")
 
     //Camera Permission
     implementation("com.google.accompanist:accompanist-permissions:0.34.0")

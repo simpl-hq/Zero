@@ -52,6 +52,7 @@ cp dist-newstyle/openssl-3.0.15/libcrypto-3-x64.dll apps/multiplatform/common/sr
 cp libzero.dll apps/multiplatform/common/src/commonMain/cpp/desktop/libs/$OS-$ARCH/
 
 scripts/desktop/prepare-vlc-windows.sh
+bash scripts/desktop/prepare-tor.sh windows "$ARCH" "apps/multiplatform/common/src/commonMain/cpp/desktop/libs/$OS-$ARCH/tor"
 
 links_dir=apps/multiplatform/build/links
 mkdir -p $links_dir

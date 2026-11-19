@@ -76,6 +76,7 @@ mkdir -p apps/multiplatform/common/src/commonMain/cpp/desktop/libs/$OS-$ARCH/
 cp -r $BUILD_DIR/build/deps/* apps/multiplatform/common/src/commonMain/cpp/desktop/libs/$OS-$ARCH/
 cp $BUILD_DIR/build/libzero.so apps/multiplatform/common/src/commonMain/cpp/desktop/libs/$OS-$ARCH/
 scripts/desktop/prepare-vlc-linux.sh
+bash scripts/desktop/prepare-tor.sh linux "$ARCH" "apps/multiplatform/common/src/commonMain/cpp/desktop/libs/$OS-$ARCH/tor"
 
 links_dir=apps/multiplatform/build/links
 mkdir -p $links_dir

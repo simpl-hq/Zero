@@ -31,6 +31,9 @@ object TorDesktop {
   private suspend fun start(dataRoot: File): Boolean {
     if (process?.isAlive == true) return true
     val bin = findBinary() ?: return false
+    if (!System.getProperty("os.name").lowercase().contains("win")) {
+      runCatching { bin.setExecutable(true) }
+    }
     val dataDir = File(dataRoot, "tor-data").apply { mkdirs() }
     val pb = ProcessBuilder(
       bin.absolutePath,
@@ -39,7 +42,18 @@ object TorDesktop {
       "--ClientOnly", "1",
       "--AvoidDiskWrites", "1"
     ).redirectErrorStream(true).redirectOutput(ProcessBuilder.Redirect.DISCARD)
-    bin.parentFile?.let { pb.directory(it) }
+    bin.parentFile?.let { dir ->
+      pb.directory(dir)
+      val env = pb.environment()
+      val os = System.getProperty("os.name").lowercase()
+      if (os.contains("linux")) {
+        val prev = env["LD_LIBRARY_PATH"]
+        env["LD_LIBRARY_PATH"] = if (prev.isNullOrBlank()) dir.absolutePath else "${dir.absolutePath}:$prev"
+      } else if (os.contains("mac")) {
+        val prev = env["DYLD_LIBRARY_PATH"]
+        env["DYLD_LIBRARY_PATH"] = if (prev.isNullOrBlank()) dir.absolutePath else "${dir.absolutePath}:$prev"
+      }
+    }
     process = pb.start()
     Runtime.getRuntime().addShutdownHook(Thread { process?.destroy() })
     repeat(60) {

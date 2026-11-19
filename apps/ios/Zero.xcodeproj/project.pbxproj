@@ -35,6 +35,8 @@
 		5C35CFC827B2782E00FB6C6D /* BGManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C35CFC727B2782E00FB6C6D /* BGManager.swift */; };
 		5C35CFCB27B2E91D00FB6C6D /* NtfManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C35CFCA27B2E91D00FB6C6D /* NtfManager.swift */; };
 		5C36027327F47AD5009F19D9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C36027227F47AD5009F19D9 /* AppDelegate.swift */; };
+		A1B2C3D42D16000400000001 /* TorManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D42D16000500000001 /* TorManager.swift */; };
+		A1B2C3D42D16000100000001 /* CTor in Frameworks */ = {isa = PBXBuildFile; productRef = A1B2C3D42D16000200000001 /* CTor */; };
 		5C3A88CE27DF50170060F1C2 /* DetermineWidth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C3A88CD27DF50170060F1C2 /* DetermineWidth.swift */; };
 		5C3A88D127DF57800060F1C2 /* FramedItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C3A88D027DF57800060F1C2 /* FramedItemView.swift */; };
 		5C3CCFCC2AE6BD3100C3F0C3 /* ConnectDesktopView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C3CCFCB2AE6BD3100C3F0C3 /* ConnectDesktopView.swift */; };
@@ -373,6 +375,7 @@
 		5C35CFC727B2782E00FB6C6D /* BGManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BGManager.swift; sourceTree = "<group>"; };
 		5C35CFCA27B2E91D00FB6C6D /* NtfManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NtfManager.swift; sourceTree = "<group>"; };
 		5C36027227F47AD5009F19D9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		A1B2C3D42D16000500000001 /* TorManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TorManager.swift; sourceTree = "<group>"; };
 		5C371E4E2BA9AAA200100AD3 /* hu */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = hu; path = hu.lproj/Localizable.strings; sourceTree = "<group>"; };
 		5C371E4F2BA9AB6400100AD3 /* hu */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = hu; path = "hu.lproj/Zero--iOS--InfoPlist.strings"; sourceTree = "<group>"; };
 		5C371E502BA9AB6400100AD3 /* hu */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = hu; path = hu.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -701,6 +704,7 @@
 				5CE2BA702845308900EC33A6 /* Zero.framework in Frameworks */,
 				B728945B2D0C62BF00F7A19A /* ElegantEmojiPicker in Frameworks */,
 				8C8118722C220B5B00E6FC94 /* Yams in Frameworks */,
+				A1B2C3D42D16000100000001 /* CTor in Frameworks */,
 				8CB3476C2CF5CFFA006787A5 /* Ink in Frameworks */,
 				D741547829AF89AF0022400A /* StoreKit.framework in Frameworks */,
 				D7197A1829AE89660055C05A /* WebRTC in Frameworks */,
@@ -916,6 +920,7 @@
 				8C74C3E92C1B909200039E77 /* Theme */,
 				5CA059C3279559F40002BEB4 /* ZeroApp.swift */,
 				5C36027227F47AD5009F19D9 /* AppDelegate.swift */,
+				A1B2C3D42D16000500000001 /* TorManager.swift */,
 				5CA059C4279559F40002BEB4 /* ContentView.swift */,
 				5C764E87279CBC8E000C6508 /* Model */,
 				5C2E260D27A30E2400F70299 /* Views */,
@@ -1281,6 +1286,7 @@
 				D7F0E33829964E7E0068AF69 /* LZString */,
 				D7197A1729AE89660055C05A /* WebRTC */,
 				8C8118712C220B5B00E6FC94 /* Yams */,
+				A1B2C3D42D16000200000001 /* CTor */,
 				8CB3476B2CF5CFFA006787A5 /* Ink */,
 				B728945A2D0C62BF00F7A19A /* ElegantEmojiPicker */,
 			);
@@ -1426,6 +1432,7 @@
 				D7F0E33729964E7D0068AF69 /* XCRemoteSwiftPackageReference "lzstring-swift" */,
 				D7197A1629AE89660055C05A /* XCRemoteSwiftPackageReference "WebRTC" */,
 				8C73C1162C21E17B00892670 /* XCRemoteSwiftPackageReference "Yams" */,
+				A1B2C3D42D16000300000001 /* XCRemoteSwiftPackageReference "Tor.framework" */,
 				8CB3476A2CF5CFFA006787A5 /* XCRemoteSwiftPackageReference "ink" */,
 				B72894592D0C62BF00F7A19A /* XCRemoteSwiftPackageReference "Elegant-Emoji-Picker" */,
 			);
@@ -1534,6 +1541,7 @@
 				E51CC1E62C62085600DB91FE /* OneHandUICard.swift in Sources */,
 				5C65DAF929D0CC20003CEE45 /* DeveloperView.swift in Sources */,
 				5C36027327F47AD5009F19D9 /* AppDelegate.swift in Sources */,
+				A1B2C3D42D16000400000001 /* TorManager.swift in Sources */,
 				5CB924E127A867BA00ACCCDD /* UserProfile.swift in Sources */,
 				5CB0BA9A2827FD8800B3292C /* HowItWorks.swift in Sources */,
 				5C13730B28156D2700F43030 /* ContactConnectionView.swift in Sources */,
@@ -2534,6 +2542,14 @@
 				version = 5.1.2;
 			};
 		};
+		A1B2C3D42D16000300000001 /* XCRemoteSwiftPackageReference "Tor.framework" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/iCepa/Tor.framework";
+			requirement = {
+				kind = exactVersion;
+				version = 409.17.1;
+			};
+		};
 		8CB3476A2CF5CFFA006787A5 /* XCRemoteSwiftPackageReference "ink" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/johnsundell/ink";
@@ -2586,6 +2602,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 8C73C1162C21E17B00892670 /* XCRemoteSwiftPackageReference "Yams" */;
 			productName = Yams;
+		};
+		A1B2C3D42D16000200000001 /* CTor */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A1B2C3D42D16000300000001 /* XCRemoteSwiftPackageReference "Tor.framework" */;
+			productName = CTor;
 		};
 		8CB3476B2CF5CFFA006787A5 /* Ink */ = {
 			isa = XCSwiftPackageProductDependency;

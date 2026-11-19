@@ -159,6 +159,7 @@ fi
 
 cd -
 scripts/desktop/prepare-vlc-mac.sh
+bash scripts/desktop/prepare-tor.sh macos "$ARCH" "apps/multiplatform/common/src/commonMain/cpp/desktop/libs/$OS-$ARCH/tor"
 
 links_dir=apps/multiplatform/build/links
 mkdir -p $links_dir

@@ -768,6 +768,10 @@ jobs:
           distribution: 'corretto'
           java-version: ${{ needs.variables.outputs.JAVA_VER }}
 
+      - name: Ensure Android SDK directory permissions
+        shell: bash
+        run: sudo mkdir -p /usr/local/lib/android && sudo chown -R "$(id -u):$(id -g)" /usr/local/lib/android
+
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 

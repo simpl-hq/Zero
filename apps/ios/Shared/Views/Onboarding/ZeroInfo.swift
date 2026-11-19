@@ -546,6 +546,7 @@ final class ZeroIdentityBridge {
         if let rawProxy = groupDefaults.string(forKey: GROUP_DEFAULT_NETWORK_SOCKS_PROXY)?
             .trimmingCharacters(in: .whitespacesAndNewlines),
            !rawProxy.isEmpty {
+            _ = await TorManager.shared.ensureStarted()
             let parsed = parseSocksProxy(rawProxy)
             guard (1...65535).contains(parsed.port) else {
                 throw NSError(domain: "ZeroIdentityBridge", code: 400, userInfo: [NSLocalizedDescriptionKey: "Invalid SOCKS5 proxy port"])

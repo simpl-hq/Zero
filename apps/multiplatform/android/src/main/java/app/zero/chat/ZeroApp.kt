@@ -69,6 +69,10 @@ class ZeroApp: Application(), LifecycleEventObserver {
     context = this
     initHaskell(packageName)
     initMultiplatform()
+    TorAndroid.register(this)
+    if (appPrefs.networkUseSocksProxy.get()) {
+      TorAndroid.startAsync(this)
+    }
     reconfigureBroadcastReceivers()
     runMigrations()
     tmpDir.deleteRecursively()
