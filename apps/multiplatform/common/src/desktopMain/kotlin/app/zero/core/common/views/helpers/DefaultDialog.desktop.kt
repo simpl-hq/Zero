@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package app.zero.core.common.views.helpers
 
 import androidx.compose.foundation.*
@@ -21,6 +23,7 @@ import javax.swing.filechooser.FileFilter
 import javax.swing.filechooser.FileNameExtensionFilter
 import javax.swing.plaf.basic.BasicFileChooserUI
 
+@Suppress("DEPRECATION")
 @Composable
 actual fun DefaultDialog(
   onDismissRequest: () -> Unit,

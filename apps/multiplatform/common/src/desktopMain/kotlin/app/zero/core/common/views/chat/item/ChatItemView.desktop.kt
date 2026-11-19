@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package app.zero.core.common.views.chat.item
 
 import androidx.compose.foundation.Image
@@ -51,6 +53,7 @@ actual fun SaveContentItemAction(cItem: ChatItem, saveFileLauncher: FileChooserL
   })
 }
 
+@Suppress("DEPRECATION")
 actual fun copyItemToClipboard(cItem: ChatItem, clipboard: ClipboardManager) = withLongRunningApi(slow = 600_000) {
   var fileSource = getLoadedFileSource(cItem.file)
   if (chatModel.connectedToRemote() && fileSource == null) {
