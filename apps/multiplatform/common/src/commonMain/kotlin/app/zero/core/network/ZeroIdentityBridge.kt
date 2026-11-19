@@ -55,11 +55,27 @@ enum class ZeroDiscoveryMode(val id: String, val title: String, val description:
   );
 
   companion object {
+    private val SIMPL_BROKER_HOSTS_SET = setOf(
+      "zeroapi.simpl.global",
+      "zeroeu.simpl.global",
+      "zerona.simpl.global"
+    )
+
     fun fromConfig(configured: String?): ZeroDiscoveryMode {
       val trimmed = configured?.trim()?.lowercase() ?: return SIMPL_NETWORK
+      val clean = trimmed.trimEnd('/')
       return when {
-        trimmed in setOf("air_gapped", "airgapped", "direct_only", "off", "disabled", "none", "") -> AIR_GAPPED
-        trimmed.startsWith("https://") || trimmed == "self_hosted" || trimmed == "custom" -> SELF_HOSTED
+        clean in setOf("air_gapped", "airgapped", "direct_only", "off", "disabled", "none", "") -> AIR_GAPPED
+        clean in setOf("simpl_network", "default", "simpl") -> SIMPL_NETWORK
+        clean.startsWith("https://") -> {
+          val host = runCatching { URL(clean).host.lowercase() }.getOrNull()
+          if (host != null && host in SIMPL_BROKER_HOSTS_SET) {
+            SIMPL_NETWORK
+          } else {
+            SELF_HOSTED
+          }
+        }
+        clean == "self_hosted" || clean == "custom" -> SELF_HOSTED
         else -> SIMPL_NETWORK
       }
     }
@@ -83,8 +99,9 @@ class ZeroIdentityBridge(
       "https://zeroeu.simpl.global",
       "https://zerona.simpl.global"
     )
-    // Verified CA SPKI SHA-256 pins (ISRG Root X2, Root YE, Let's Encrypt YE1/YE2) — survives 90-day leaf cert renewal while blocking rogue CAs.
+    // Verified CA SPKI SHA-256 pins (ISRG Root X2, Root YE, Let's Encrypt YE1/YE2, and current leaf) — survives 90-day leaf cert renewal while blocking rogue CAs.
     private val SIMPL_BROKER_SPKI_PINS = setOf(
+      "YT1BaAU+tF7D8nnZSqBZCa+EB1XjRmCnTMv82dPAPno=",
       "diGVwiVYbubAI3RW4hB9xU8e/CH2GnkuvVFZE8zmgzI=",
       "sCkq5UWXjg+7mKu9lMhhYF5bGLsy7VI/UNW3tccdR7w=",
       "brzvtCELCIZUo4sD/qPX0ccRtPsd3DY6RfmxpOU9oB4=",

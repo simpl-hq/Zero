@@ -274,7 +274,7 @@ struct ZeroPhraseIdentity {
 }
 
 private final class BrokerPinningDelegate: NSObject, URLSessionDelegate {
-    private static let simplBrokerHosts: Set<String> = [
+    fileprivate static let simplBrokerHosts: Set<String> = [
         "zeroapi.simpl.global",
         "zeroeu.simpl.global",
         "zerona.simpl.global"
@@ -385,6 +385,9 @@ final class ZeroIdentityBridge {
                     return .airGapped
                 }
                 if legacy.hasPrefix("https://") {
+                    if let url = URL(string: legacy), let host = url.host?.lowercased(), BrokerPinningDelegate.simplBrokerHosts.contains(host) {
+                        return .simplNetwork
+                    }
                     return .selfHosted
                 }
             }

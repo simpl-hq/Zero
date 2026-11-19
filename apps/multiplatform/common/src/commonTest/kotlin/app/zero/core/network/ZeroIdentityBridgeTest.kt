@@ -79,5 +79,7 @@ class ZeroIdentityBridgeTest {
     assertEquals(ZeroDiscoveryMode.SELF_HOSTED, ZeroDiscoveryMode.fromConfig("self_hosted"))
     assertEquals(ZeroDiscoveryMode.SIMPL_NETWORK, ZeroDiscoveryMode.fromConfig(null))
     assertEquals(ZeroDiscoveryMode.SIMPL_NETWORK, ZeroDiscoveryMode.fromConfig("simpl_network"))
+    assertEquals(ZeroDiscoveryMode.SIMPL_NETWORK, ZeroDiscoveryMode.fromConfig("https://zeroapi.simpl.global"))
+    assertEquals(ZeroDiscoveryMode.SIMPL_NETWORK, ZeroDiscoveryMode.fromConfig("https://zeroeu.simpl.global/"))
   }
 }
