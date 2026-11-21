@@ -100,7 +100,7 @@ fun DefaultAppBar(
         },
         navigationIcon = navigationButton,
         buttons = if (!showSearch) buttons else {{}},
-        centered = !showSearch && (title != null || !onTop),
+        centered = !showSearch,
         onTop = onTop,
       )
       AppBarDivider(onTop, title != null || fixedTitleText != null, connection)

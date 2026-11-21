@@ -317,6 +317,18 @@ class CallController: NSObject, CXProviderDelegate, PKPushRegistryDelegate, Obse
     }
 
     func startCall(_ contact: Contact, _ media: CallMediaType) {
+        showAlert(
+            title: NSLocalizedString("Encrypted P2P call", comment: "alert title"),
+            message: NSLocalizedString("Calls and video calls are end-to-end encrypted, but connect peer-to-peer rather than through Tor and may temporarily expose your device's IP address.", comment: "alert message"),
+            buttonTitle: NSLocalizedString("Call", comment: "alert button"),
+            buttonAction: {
+                self.performStartCall(contact, media)
+            },
+            cancelButton: true
+        )
+    }
+
+    private func performStartCall(_ contact: Contact, _ media: CallMediaType) {
         logger.debug("CallController.startCall")
         let callUUID = callManager.newOutgoingCall(contact, media)
         guard let uuid = UUID(uuidString: callUUID) else {
@@ -341,6 +353,18 @@ class CallController: NSObject, CXProviderDelegate, PKPushRegistryDelegate, Obse
     }
 
     func answerCall(invitation: RcvCallInvitation) {
+        showAlert(
+            title: NSLocalizedString("Encrypted P2P call", comment: "alert title"),
+            message: NSLocalizedString("Calls and video calls are end-to-end encrypted, but connect peer-to-peer rather than through Tor and may temporarily expose your device's IP address.", comment: "alert message"),
+            buttonTitle: NSLocalizedString("Answer", comment: "alert button"),
+            buttonAction: {
+                self.performAnswerCall(invitation: invitation)
+            },
+            cancelButton: true
+        )
+    }
+
+    private func performAnswerCall(invitation: RcvCallInvitation) {
         logger.debug("CallController: answering a call")
         if CallController.useCallKit(), let callUUID = invitation.callUUID, let uuid = UUID(uuidString: callUUID) {
             requestTransaction(with: CXAnswerCallAction(call: uuid))

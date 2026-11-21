@@ -1,9 +1,17 @@
+// API Commands
+// This file is generated automatically.
+
 import * as T from "./types"
 
 import {CR} from "./responses"
 
+// Address commands
+// Bots can use these commands to automatically check and create address when initialized
+
+// Create bot address.
+// Network usage: interactive.
 export interface APICreateMyAddress {
-  userId: number
+  userId: number // int64
 }
 
 export namespace APICreateMyAddress {
@@ -14,8 +22,10 @@ export namespace APICreateMyAddress {
   }
 }
 
+// Delete bot address.
+// Network usage: background.
 export interface APIDeleteMyAddress {
-  userId: number
+  userId: number // int64
 }
 
 export namespace APIDeleteMyAddress {
@@ -26,8 +36,10 @@ export namespace APIDeleteMyAddress {
   }
 }
 
+// Get bot address and settings.
+// Network usage: no.
 export interface APIShowMyAddress {
-  userId: number
+  userId: number // int64
 }
 
 export namespace APIShowMyAddress {
@@ -38,8 +50,10 @@ export namespace APIShowMyAddress {
   }
 }
 
+// Add address to bot profile.
+// Network usage: interactive.
 export interface APISetProfileAddress {
-  userId: number
+  userId: number // int64
   enable: boolean
 }
 
@@ -51,8 +65,10 @@ export namespace APISetProfileAddress {
   }
 }
 
+// Set bot address settings.
+// Network usage: interactive.
 export interface APISetAddressSettings {
-  userId: number
+  userId: number // int64
   settings: T.AddressSettings
 }
 
@@ -64,12 +80,17 @@ export namespace APISetAddressSettings {
   }
 }
 
+// Message commands
+// Commands to send, update, delete, moderate messages and set message reactions
+
+// Send messages.
+// Network usage: background.
 export interface APISendMessages {
   sendRef: T.ChatRef
   liveMessage: boolean
-  ttl?: number
+  ttl?: number // int
   signMessages: boolean
-  composedMessages: T.ComposedMessage[]
+  composedMessages: T.ComposedMessage[] // non-empty
 }
 
 export namespace APISendMessages {
@@ -80,9 +101,11 @@ export namespace APISendMessages {
   }
 }
 
+// Update message.
+// Network usage: background.
 export interface APIUpdateChatItem {
   chatRef: T.ChatRef
-  chatItemId: number
+  chatItemId: number // int64
   liveMessage: boolean
   updatedMessage: T.UpdatedMessage
 }
@@ -95,9 +118,11 @@ export namespace APIUpdateChatItem {
   }
 }
 
+// Delete message.
+// Network usage: background.
 export interface APIDeleteChatItem {
   chatRef: T.ChatRef
-  chatItemIds: number[]
+  chatItemIds: number[] // int64, non-empty
   deleteMode: T.CIDeleteMode
 }
 
@@ -109,9 +134,11 @@ export namespace APIDeleteChatItem {
   }
 }
 
+// Moderate message. Requires Moderator role (and higher than message author's).
+// Network usage: background.
 export interface APIDeleteMemberChatItem {
-  groupId: number
-  chatItemIds: number[]
+  groupId: number // int64
+  chatItemIds: number[] // int64, non-empty
 }
 
 export namespace APIDeleteMemberChatItem {
@@ -122,9 +149,11 @@ export namespace APIDeleteMemberChatItem {
   }
 }
 
+// Add/remove message reaction.
+// Network usage: background.
 export interface APIChatItemReaction {
   chatRef: T.ChatRef
-  chatItemId: number
+  chatItemId: number // int64
   add: boolean
   reaction: T.MsgReaction
 }
@@ -137,8 +166,13 @@ export namespace APIChatItemReaction {
   }
 }
 
+// File commands
+// Commands to receive and to cancel files. Files are sent as part of the message, there are no separate commands to send files.
+
+// Receive file.
+// Network usage: no.
 export interface ReceiveFile {
-  fileId: number
+  fileId: number // int64
   userApprovedRelays: boolean
   storeEncrypted?: boolean
   fileInline?: boolean
@@ -153,8 +187,10 @@ export namespace ReceiveFile {
   }
 }
 
+// Cancel file.
+// Network usage: background.
 export interface CancelFile {
-  fileId: number
+  fileId: number // int64
 }
 
 export namespace CancelFile {
@@ -165,9 +201,14 @@ export namespace CancelFile {
   }
 }
 
+// Group commands
+// Commands to manage and moderate groups. These commands can be used with business chats as well - they are groups. E.g., a common scenario would be to add human agents to business chat with the customer who connected via business address.
+
+// Add contact to group. Requires bot to have Admin role.
+// Network usage: interactive.
 export interface APIAddMember {
-  groupId: number
-  contactId: number
+  groupId: number // int64
+  contactId: number // int64
   memberRole: T.GroupMemberRole
 }
 
@@ -179,8 +220,10 @@ export namespace APIAddMember {
   }
 }
 
+// Join group.
+// Network usage: interactive.
 export interface APIJoinGroup {
-  groupId: number
+  groupId: number // int64
 }
 
 export namespace APIJoinGroup {
@@ -191,9 +234,11 @@ export namespace APIJoinGroup {
   }
 }
 
+// Accept group member. Requires Admin role.
+// Network usage: background.
 export interface APIAcceptMember {
-  groupId: number
-  groupMemberId: number
+  groupId: number // int64
+  groupMemberId: number // int64
   memberRole: T.GroupMemberRole
 }
 
@@ -205,9 +250,11 @@ export namespace APIAcceptMember {
   }
 }
 
+// Set members role. Requires Admin role.
+// Network usage: background.
 export interface APIMembersRole {
-  groupId: number
-  groupMemberIds: number[]
+  groupId: number // int64
+  groupMemberIds: number[] // int64, non-empty
   memberRole: T.GroupMemberRole
 }
 
@@ -219,9 +266,11 @@ export namespace APIMembersRole {
   }
 }
 
+// Block members. Requires Moderator role.
+// Network usage: background.
 export interface APIBlockMembersForAll {
-  groupId: number
-  groupMemberIds: number[]
+  groupId: number // int64
+  groupMemberIds: number[] // int64, non-empty
   blocked: boolean
 }
 
@@ -233,9 +282,11 @@ export namespace APIBlockMembersForAll {
   }
 }
 
+// Remove members. Requires Admin role.
+// Network usage: background.
 export interface APIRemoveMembers {
-  groupId: number
-  groupMemberIds: number[]
+  groupId: number // int64
+  groupMemberIds: number[] // int64, non-empty
   withMessages: boolean
 }
 
@@ -247,8 +298,10 @@ export namespace APIRemoveMembers {
   }
 }
 
+// Leave group.
+// Network usage: background.
 export interface APILeaveGroup {
-  groupId: number
+  groupId: number // int64
 }
 
 export namespace APILeaveGroup {
@@ -259,8 +312,10 @@ export namespace APILeaveGroup {
   }
 }
 
+// Get group members.
+// Network usage: no.
 export interface APIListMembers {
-  groupId: number
+  groupId: number // int64
 }
 
 export namespace APIListMembers {
@@ -271,8 +326,10 @@ export namespace APIListMembers {
   }
 }
 
+// Create group.
+// Network usage: no.
 export interface APINewGroup {
-  userId: number
+  userId: number // int64
   incognito: boolean
   groupProfile: T.GroupProfile
 }
@@ -285,10 +342,12 @@ export namespace APINewGroup {
   }
 }
 
+// Create public group.
+// Network usage: interactive.
 export interface APINewPublicGroup {
-  userId: number
+  userId: number // int64
   incognito: boolean
-  relayIds: number[]
+  relayIds: number[] // int64, non-empty
   groupProfile: T.GroupProfile
 }
 
@@ -300,8 +359,10 @@ export namespace APINewPublicGroup {
   }
 }
 
+// Get group relays.
+// Network usage: no.
 export interface APIGetGroupRelays {
-  groupId: number
+  groupId: number // int64
 }
 
 export namespace APIGetGroupRelays {
@@ -312,9 +373,11 @@ export namespace APIGetGroupRelays {
   }
 }
 
+// Add relays to group.
+// Network usage: interactive.
 export interface APIAddGroupRelays {
-  groupId: number
-  relayIds: number[]
+  groupId: number // int64
+  relayIds: number[] // int64, non-empty
 }
 
 export namespace APIAddGroupRelays {
@@ -325,8 +388,10 @@ export namespace APIAddGroupRelays {
   }
 }
 
+// Clear relay rejection for a channel (relay operator).
+// Network usage: background.
 export interface APIAllowRelayGroup {
-  groupId: number
+  groupId: number // int64
 }
 
 export namespace APIAllowRelayGroup {
@@ -337,8 +402,10 @@ export namespace APIAllowRelayGroup {
   }
 }
 
+// Update group profile.
+// Network usage: background.
 export interface APIUpdateGroupProfile {
-  groupId: number
+  groupId: number // int64
   groupProfile: T.GroupProfile
 }
 
@@ -350,8 +417,13 @@ export namespace APIUpdateGroupProfile {
   }
 }
 
+// Group link commands
+// These commands can be used by bots that manage multiple public groups
+
+// Create group link.
+// Network usage: interactive.
 export interface APICreateGroupLink {
-  groupId: number
+  groupId: number // int64
   memberRole: T.GroupMemberRole
 }
 
@@ -363,8 +435,10 @@ export namespace APICreateGroupLink {
   }
 }
 
+// Set member role for group link.
+// Network usage: no.
 export interface APIGroupLinkMemberRole {
-  groupId: number
+  groupId: number // int64
   memberRole: T.GroupMemberRole
 }
 
@@ -376,8 +450,10 @@ export namespace APIGroupLinkMemberRole {
   }
 }
 
+// Delete group link.
+// Network usage: background.
 export interface APIDeleteGroupLink {
-  groupId: number
+  groupId: number // int64
 }
 
 export namespace APIDeleteGroupLink {
@@ -388,8 +464,10 @@ export namespace APIDeleteGroupLink {
   }
 }
 
+// Get group link.
+// Network usage: no.
 export interface APIGetGroupLink {
-  groupId: number
+  groupId: number // int64
 }
 
 export namespace APIGetGroupLink {
@@ -400,8 +478,13 @@ export namespace APIGetGroupLink {
   }
 }
 
+// Connection commands
+// These commands may be used to create connections. Most bots do not need to use them - bot users will connect via bot address with auto-accept enabled.
+
+// Create 1-time invitation link.
+// Network usage: interactive.
 export interface APIAddContact {
-  userId: number
+  userId: number // int64
   incognito: boolean
 }
 
@@ -413,8 +496,10 @@ export namespace APIAddContact {
   }
 }
 
+// Determine Zero link type and if the bot is already connected via this link or name.
+// Network usage: interactive.
 export interface APIConnectPlan {
-  userId: number
+  userId: number // int64
   connectTarget?: string
   resolveMode: T.PlanResolveMode
   linkOwnerSig?: T.LinkOwnerSig
@@ -428,8 +513,10 @@ export namespace APIConnectPlan {
   }
 }
 
+// Connect via prepared Zero link. The link can be 1-time invitation link, contact address or group link.
+// Network usage: interactive.
 export interface APIConnect {
-  userId: number
+  userId: number // int64
   incognito: boolean
   preparedLink_?: T.CreatedConnLink
 }
@@ -442,6 +529,8 @@ export namespace APIConnect {
   }
 }
 
+// Connect via Zero link or name as string in the active user profile.
+// Network usage: interactive.
 export interface Connect {
   incognito: boolean
   connTarget_?: string
@@ -455,8 +544,10 @@ export namespace Connect {
   }
 }
 
+// Accept contact request.
+// Network usage: interactive.
 export interface APIAcceptContact {
-  contactReqId: number
+  contactReqId: number // int64
 }
 
 export namespace APIAcceptContact {
@@ -467,8 +558,10 @@ export namespace APIAcceptContact {
   }
 }
 
+// Reject contact request. The user who sent the request is **not notified**.
+// Network usage: no.
 export interface APIRejectContact {
-  contactReqId: number
+  contactReqId: number // int64
 }
 
 export namespace APIRejectContact {
@@ -479,8 +572,13 @@ export namespace APIRejectContact {
   }
 }
 
+// Chat commands
+// Commands to list and delete conversations.
+
+// Get contacts.
+// Network usage: no.
 export interface APIListContacts {
-  userId: number
+  userId: number // int64
 }
 
 export namespace APIListContacts {
@@ -491,9 +589,11 @@ export namespace APIListContacts {
   }
 }
 
+// Get groups.
+// Network usage: no.
 export interface APIListGroups {
-  userId: number
-  contactId_?: number
+  userId: number // int64
+  contactId_?: number // int64
   search?: string
 }
 
@@ -505,8 +605,10 @@ export namespace APIListGroups {
   }
 }
 
+// Get chat previews. Supports time-based pagination — use this instead of APIListContacts / APIListGroups when scanning at scale (those load every record into memory and fail on large databases).
+// Network usage: no.
 export interface APIGetChats {
-  userId: number
+  userId: number // int64
   pendingConnections: boolean
   pagination: T.PaginationByTime
   query: T.ChatListQuery
@@ -520,6 +622,8 @@ export namespace APIGetChats {
   }
 }
 
+// Delete chat.
+// Network usage: background.
 export interface APIDeleteChat {
   chatRef: T.ChatRef
   chatDeleteMode: T.ChatDeleteMode
@@ -533,8 +637,10 @@ export namespace APIDeleteChat {
   }
 }
 
+// Set group custom data.
+// Network usage: no.
 export interface APISetGroupCustomData {
-  groupId: number
+  groupId: number // int64
   customData?: object
 }
 
@@ -546,8 +652,10 @@ export namespace APISetGroupCustomData {
   }
 }
 
+// Set contact custom data.
+// Network usage: no.
 export interface APISetContactCustomData {
-  contactId: number
+  contactId: number // int64
   customData?: object
 }
 
@@ -559,8 +667,10 @@ export namespace APISetContactCustomData {
   }
 }
 
+// Set auto-accept member contacts.
+// Network usage: no.
 export interface APISetUserAutoAcceptMemberContacts {
-  userId: number
+  userId: number // int64
   onOff: boolean
 }
 
@@ -572,6 +682,11 @@ export namespace APISetUserAutoAcceptMemberContacts {
   }
 }
 
+// User profile commands
+// Most bots don't need to use these commands, as bot profile can be configured manually via CLI or desktop client. These commands can be used by bots that need to manage multiple user profiles (e.g., the profiles of support agents).
+
+// Get active user profile.
+// Network usage: no.
 export interface ShowActiveUser {
 }
 
@@ -583,6 +698,8 @@ export namespace ShowActiveUser {
   }
 }
 
+// Create new user profile.
+// Network usage: no.
 export interface CreateActiveUser {
   newUser: T.NewUser
 }
@@ -595,6 +712,8 @@ export namespace CreateActiveUser {
   }
 }
 
+// Get all user profiles.
+// Network usage: no.
 export interface ListUsers {
 }
 
@@ -606,8 +725,10 @@ export namespace ListUsers {
   }
 }
 
+// Set active user profile.
+// Network usage: no.
 export interface APISetActiveUser {
-  userId: number
+  userId: number // int64
   viewPwd?: string
 }
 
@@ -619,8 +740,10 @@ export namespace APISetActiveUser {
   }
 }
 
+// Delete user profile.
+// Network usage: background.
 export interface APIDeleteUser {
-  userId: number
+  userId: number // int64
   delSMPQueues: boolean
   viewPwd?: string
 }
@@ -633,8 +756,10 @@ export namespace APIDeleteUser {
   }
 }
 
+// Update user profile.
+// Network usage: background.
 export interface APIUpdateProfile {
-  userId: number
+  userId: number // int64
   profile: T.Profile
 }
 
@@ -646,8 +771,10 @@ export namespace APIUpdateProfile {
   }
 }
 
+// Configure chat preference overrides for the contact.
+// Network usage: background.
 export interface APISetContactPrefs {
-  contactId: number
+  contactId: number // int64
   preferences: T.Preferences
 }
 
@@ -659,6 +786,11 @@ export namespace APISetContactPrefs {
   }
 }
 
+// Chat management
+// These commands should not be used with CLI-based bots
+
+// Start chat controller.
+// Network usage: no.
 export interface StartChat {
   mainApp: boolean
   enableSndFiles: boolean
@@ -672,6 +804,8 @@ export namespace StartChat {
   }
 }
 
+// Stop chat controller.
+// Network usage: no.
 export interface APIStopChat {
 }
 

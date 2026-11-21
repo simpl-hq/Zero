@@ -123,17 +123,17 @@ private fun AboutZeroView() {
       ZeroLogo()
     }
     Text(
-      text = "Privacy Should Be Effortless.",
+      text = "Private by design.",
       style = MaterialTheme.typography.h2,
-      fontWeight = FontWeight.SemiBold,
+      fontWeight = FontWeight.Black,
       textAlign = TextAlign.Center
     )
     Text(
-      text = "Post-quantum Double Ratchet encryption over unidirectional queues, 2-hop private onion routing, XFTP media transfers, and local SQLCipher storage.",
+      text = "End-to-end encrypted messaging over private onion routing, stored locally on your device.",
       style = MaterialTheme.typography.body2,
       color = MaterialTheme.colors.secondary,
       textAlign = TextAlign.Center,
-      modifier = Modifier.widthIn(max = 460.dp)
+      modifier = Modifier.widthIn(max = 420.dp)
     )
 
     if (!savedPhrase.isNullOrBlank()) {
@@ -180,7 +180,7 @@ private fun AboutZeroView() {
       colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary),
       modifier = Modifier.widthIn(max = 320.dp).fillMaxWidth().height(50.dp)
     ) {
-      Text("Start Quick Setup Guide", color = MaterialTheme.colors.onPrimary, fontWeight = FontWeight.SemiBold)
+      Text("Setup Guide", color = MaterialTheme.colors.onPrimary, fontWeight = FontWeight.SemiBold)
     }
   }
 }
@@ -243,7 +243,7 @@ private fun MinimalistZeroOnboarding(chatModel: ChatModel) {
                   identityBridge.provisionPhraseAndDeepLink(inviteUrl).phrase
                 }.getOrNull()
                 if (phrase == null) {
-                  statusError = "Unable to reach Zero identity broker. Check your connection and try again."
+                  statusError = "Couldn't reach the Zero network. Check your connection and try again."
                   mode = ZeroPinMode.INITIAL
                   return@withBGApi
                 }
@@ -258,14 +258,14 @@ private fun MinimalistZeroOnboarding(chatModel: ChatModel) {
             colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary)
           ) {
             Text(
-              "Create Zero Identity",
+              "Get Started",
               color = MaterialTheme.colors.onPrimary,
               fontSize = 17.sp,
-              fontWeight = FontWeight.Medium
+              fontWeight = FontWeight.SemiBold
             )
           }
 
-          Spacer(Modifier.height(16.dp))
+          Spacer(Modifier.height(14.dp))
 
           OutlinedButton(
             onClick = {
@@ -281,7 +281,7 @@ private fun MinimalistZeroOnboarding(chatModel: ChatModel) {
             )
           ) {
             Text(
-              "I Already Have a Phrase",
+              "Restore with Phrase",
               fontSize = 17.sp,
               fontWeight = FontWeight.Medium
             )
@@ -306,7 +306,7 @@ private fun MinimalistZeroOnboarding(chatModel: ChatModel) {
           )
           Spacer(Modifier.height(16.dp))
           Text(
-            "Securing your Zero identity (Argon2id)…",
+            "Creating your private identity…",
             style = MaterialTheme.typography.body2,
             color = MaterialTheme.colors.secondary,
             textAlign = TextAlign.Center
@@ -482,13 +482,14 @@ fun ZeroInfoLayout(
 
 @Composable
 fun ZeroLogo() {
-  Image(
-    painter = painterResource(if (isInDarkTheme()) MR.images.logo_light else MR.images.logo),
-    contentDescription = stringResource(MR.strings.image_descr_zero_logo),
-    contentScale = ContentScale.FillWidth,
-    modifier = Modifier
-      .padding(bottom = 10.dp)
-      .fillMaxWidth()
+  Text(
+    text = "Zero",
+    fontSize = 44.sp,
+    fontWeight = FontWeight.Black,
+    letterSpacing = (-1.5).sp,
+    color = MaterialTheme.colors.onBackground,
+    textAlign = TextAlign.Center,
+    modifier = Modifier.padding(bottom = 10.dp)
   )
 }
 

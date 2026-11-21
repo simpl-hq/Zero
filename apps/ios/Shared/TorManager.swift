@@ -1,6 +1,7 @@
 import Foundation
 import CTor
 import Network
+import Zero
 
 /// Embedded Tor daemon manager for iOS using iCepa/Tor.framework (CTor).
 /// Starts a local SOCKS5 listener on 127.0.0.1:9050 when Tor protection is enabled.
@@ -26,7 +27,7 @@ final class TorManager {
     func startIfNeeded() {
         lock.lock()
         defer { lock.unlock() }
-        if torThread != nil || TorThread.activeThread != nil { return }
+        if torThread != nil || TorThread.active != nil { return }
 
         let baseDir = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
             ?? FileManager.default.temporaryDirectory
@@ -53,7 +54,7 @@ final class TorManager {
             if await isLocalSocksListening() {
                 return true
             }
-            try? await Task.sleep(nanoseconds: 500_000_000)
+            try? await Task.sleep(nanoseconds: 150_000_000)
         }
         return await isLocalSocksListening()
     }

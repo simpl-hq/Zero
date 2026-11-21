@@ -47,7 +47,7 @@ struct PrivacySettings: View {
                 Section(header: Text("Device").foregroundColor(theme.colors.secondary)) {
                     NavigationLink {
                         ZeroLockView(prefPerformLA: $prefPerformLA, currentLAMode: $currentLAMode)
-                            .navigationTitle("Zero Lock")
+                            .navigationBarTitle("", displayMode: .inline)
                             .modifier(ThemedBackground(grouped: true))
                     } label: {
                         if prefPerformLA {
@@ -220,7 +220,7 @@ struct PrivacySettings: View {
                             }
                         }
                     }
-                    .navigationTitle("Show preview")
+                    .navigationBarTitle("", displayMode: .inline)
                     .modifier(ThemedBackground(grouped: true))
                     .navigationBarTitleDisplayMode(.inline)
                 } label: {
@@ -304,7 +304,7 @@ struct PrivacySettings: View {
                 }
             }
         }
-        .navigationTitle("More privacy")
+        .navigationBarTitle("", displayMode: .inline)
         .modifier(ThemedBackground(grouped: true))
     }
 

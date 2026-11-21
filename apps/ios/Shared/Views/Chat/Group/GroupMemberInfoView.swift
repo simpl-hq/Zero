@@ -582,7 +582,7 @@ struct GroupMemberInfoView: View {
                 verificationText: groupInfo.useRelays ? "To verify keys with this subscriber, compare (or scan) the code on your devices." : nil
             )
             .navigationBarTitleDisplayMode(.inline)
-            .navigationTitle("Security code")
+            .navigationBarTitle("", displayMode: .inline)
             .modifier(ThemedBackground())
         } label: {
             Label(

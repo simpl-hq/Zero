@@ -14,7 +14,7 @@ struct ZeroHybridConnectSheet: View {
     var body: some View {
         NavigationView {
             VStack(spacing: 20) {
-                Text("Connect Privately")
+                Text("New message")
                     .font(.title3)
                     .bold()
                     .padding(.top, 24)
@@ -267,7 +267,7 @@ struct ConnectBannerCard: View {
         .sheet(isPresented: $showAdvancedNetwork) {
             NavigationView {
                 NetworkAndServers()
-                    .navigationTitle("Network & servers")
+                    .navigationBarTitle("", displayMode: .inline)
                     .modifier(ThemedBackground(grouped: true))
                     .environmentObject(ss)
             }

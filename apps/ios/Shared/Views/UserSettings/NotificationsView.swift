@@ -44,7 +44,7 @@ struct NotificationsView: View {
                             .padding(.top, 1)
                         }
                     }
-                    .navigationTitle("Send notifications")
+                    .navigationBarTitle("", displayMode: .inline)
                     .modifier(ThemedBackground(grouped: true))
                     .navigationBarTitleDisplayMode(.inline)
                 } label: {

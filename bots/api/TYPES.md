@@ -175,14 +175,6 @@ This file is generated automatically.
 - [SMPAgentError](#smpagenterror)
 - [SecurityCode](#securitycode)
 - [SimplePreference](#simplepreference)
-- [ZeroDomain](#zerodomain)
-- [ZeroDomainClaim](#zerodomainclaim)
-- [ZeroDomainError](#zerodomainerror)
-- [ZeroDomainProof](#zerodomainproof)
-- [ZeroLinkType](#zerolinktype)
-- [ZeroNameInfo](#zeronameinfo)
-- [ZeroNameType](#zeronametype)
-- [ZeroTLD](#zerotld)
 - [SndCIStatusProgress](#sndcistatusprogress)
 - [SndConnEvent](#sndconnevent)
 - [SndError](#snderror)
@@ -213,6 +205,14 @@ This file is generated automatically.
 - [XFTPErrorType](#xftperrortype)
 - [XFTPRcvFile](#xftprcvfile)
 - [XFTPSndFile](#xftpsndfile)
+- [ZeroDomain](#zerodomain)
+- [ZeroDomainClaim](#zerodomainclaim)
+- [ZeroDomainError](#zerodomainerror)
+- [ZeroDomainProof](#zerodomainproof)
+- [ZeroLinkType](#zerolinktype)
+- [ZeroNameInfo](#zeronameinfo)
+- [ZeroNameType](#zeronametype)
+- [ZeroTLD](#zerotld)
 
 
 ---
@@ -3605,88 +3605,6 @@ A_QUEUE:
 
 ---
 
-## ZeroDomain
-
-**Record type**:
-- nameTLD: [ZeroTLD](#zerotld)
-- domain: string
-- subDomain: [string]
-
-
----
-
-## ZeroDomainClaim
-
-**Record type**:
-- domain: string
-- proof: [ZeroDomainProof](#zerodomainproof)?
-
-
----
-
-## ZeroDomainError
-
-**Discriminated union type**:
-
-NoValidLink:
-- type: "noValidLink"
-
-UnknownDomain:
-- type: "unknownDomain"
-
-
----
-
-## ZeroDomainProof
-
-**Record type**:
-- linkOwnerId: string?
-- presHeader: string
-- signature: string
-
-
----
-
-## ZeroLinkType
-
-**Enum type**:
-- "contact"
-- "invitation"
-- "group"
-- "channel"
-- "relay"
-
-
----
-
-## ZeroNameInfo
-
-**Record type**:
-- nameType: [ZeroNameType](#zeronametype)
-- nameDomain: [ZeroDomain](#zerodomain)
-
-
----
-
-## ZeroNameType
-
-**Enum type**:
-- "publicGroup"
-- "contact"
-
-
----
-
-## ZeroTLD
-
-**Enum type**:
-- "zero"
-- "testing"
-- "web"
-
-
----
-
 ## SndCIStatusProgress
 
 **Enum type**:
@@ -4513,3 +4431,85 @@ DUPLICATE_:
 - privateSndFileDescr: string?
 - agentSndFileDeleted: bool
 - cryptoArgs: [CryptoFileArgs](#cryptofileargs)?
+
+
+---
+
+## ZeroDomain
+
+**Record type**:
+- nameTLD: [ZeroTLD](#zerotld)
+- domain: string
+- subDomain: [string]
+
+
+---
+
+## ZeroDomainClaim
+
+**Record type**:
+- domain: string
+- proof: [ZeroDomainProof](#zerodomainproof)?
+
+
+---
+
+## ZeroDomainError
+
+**Discriminated union type**:
+
+NoValidLink:
+- type: "noValidLink"
+
+UnknownDomain:
+- type: "unknownDomain"
+
+
+---
+
+## ZeroDomainProof
+
+**Record type**:
+- linkOwnerId: string?
+- presHeader: string
+- signature: string
+
+
+---
+
+## ZeroLinkType
+
+**Enum type**:
+- "contact"
+- "invitation"
+- "group"
+- "channel"
+- "relay"
+
+
+---
+
+## ZeroNameInfo
+
+**Record type**:
+- nameType: [ZeroNameType](#zeronametype)
+- nameDomain: [ZeroDomain](#zerodomain)
+
+
+---
+
+## ZeroNameType
+
+**Enum type**:
+- "publicGroup"
+- "contact"
+
+
+---
+
+## ZeroTLD
+
+**Enum type**:
+- "zero"
+- "testing"
+- "web"

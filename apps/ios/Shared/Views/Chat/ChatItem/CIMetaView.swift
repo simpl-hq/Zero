@@ -138,6 +138,9 @@ func ciMetaText(
                 colorMode.resolve(statusColor)
             }
             r = r + colored(Text(image), metaColor)
+        } else if case .sndNew = meta.itemStatus {
+            let metaColor = onlyOverrides ? Color.clear : colorMode.resolve(color)
+            r = r + colored(Text(Image("checkmark.wide")), metaColor)
         } else if !meta.disappearing {
             r = r + colorMode.statusSpacer(meta.itemStatus.sent)
         }

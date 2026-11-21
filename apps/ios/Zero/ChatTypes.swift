@@ -542,7 +542,7 @@ public struct TimedMessagesPreference: Preference, Hashable {
     }
 
     public static var profileLevelTTLValues: [Int?] {
-        [7 * 86400, 30 * 86400, 3 * 30 * 86400, nil]
+        [60, 300, 1800, 3600, 86400, 7 * 86400, 30 * 86400, 3 * 30 * 86400, nil]
     }
 }
 

@@ -27,8 +27,8 @@ struct ServersSummaryView: View {
     var body: some View {
         NavigationView {
             viewBody()
-                .navigationTitle("Servers info")
-                .navigationBarTitleDisplayMode(.large)
+                .navigationBarTitle("", displayMode: .inline)
+                .navigationBarTitleDisplayMode(.inline)
                 .modifier(ThemedBackground(grouped: true))
                 .toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {
@@ -269,8 +269,8 @@ struct ServersSummaryView: View {
                 summary: srvSumm,
                 statsStartedAt: statsStartedAt
             )
-            .navigationBarTitle("SMP server")
-            .navigationBarTitleDisplayMode(.large)
+            .navigationBarTitle("", displayMode: .inline)
+            .navigationBarTitleDisplayMode(.inline)
             .modifier(ThemedBackground(grouped: true))
         } label: {
             HStack {
@@ -338,8 +338,8 @@ struct ServersSummaryView: View {
                 summary: srvSumm,
                 statsStartedAt: statsStartedAt
             )
-            .navigationBarTitle("XFTP server")
-            .navigationBarTitleDisplayMode(.large)
+            .navigationBarTitle("", displayMode: .inline)
+            .navigationBarTitleDisplayMode(.inline)
             .modifier(ThemedBackground(grouped: true))
         } label: {
             HStack {
@@ -566,8 +566,8 @@ struct SMPStatsView: View {
             infoRow("Messages received", numOrDash(stats._recvMsgs))
             NavigationLink {
                 DetailedSMPStatsView(stats: stats, statsStartedAt: statsStartedAt)
-                    .navigationTitle("Detailed statistics")
-                    .navigationBarTitleDisplayMode(.large)
+                    .navigationBarTitle("", displayMode: .inline)
+                    .navigationBarTitleDisplayMode(.inline)
                     .modifier(ThemedBackground(grouped: true))
             } label: {
                 Text("Details")
@@ -682,8 +682,8 @@ struct XFTPStatsView: View {
             infoRow("Downloaded", prettySize(stats._downloadsSize))
             NavigationLink {
                 DetailedXFTPStatsView(stats: stats, statsStartedAt: statsStartedAt)
-                    .navigationTitle("Detailed statistics")
-                    .navigationBarTitleDisplayMode(.large)
+                    .navigationBarTitle("", displayMode: .inline)
+                    .navigationBarTitleDisplayMode(.inline)
                     .modifier(ThemedBackground(grouped: true))
             } label: {
                 Text("Details")

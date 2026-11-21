@@ -88,7 +88,7 @@
   <!-- PendingContactConnection - ChatModel.kt -->
   <string name="connection_local_display_name">connection %1$d</string>
   <string name="display_name_connection_established">connection established</string>
-  <string name="display_name_invited_to_connect">invited to connect</string>
+  <string name="display_name_invited_to_connect">Invite someone</string>
   <string name="display_name_requested_to_connect">requested to connect</string>
   <string name="display_name_accepted_invitation">accepted invitation</string>
   <string name="display_name_connecting">connecting…</string>
@@ -394,7 +394,7 @@
   <string name="share_verb">Share</string>
   <string name="copy_verb">Copy</string>
   <string name="save_zero_name_question">Save Zero name?</string>
-  <string name="get_zero_name_beta">Get Zero name (BETA)</string>
+  <string name="get_zero_name_beta">Zero Name (Coming Soon)</string>
   <string name="channel_zero_name">Channel Zero name</string>
   <string name="register_test_name">How to register a test name</string>
   <string name="zero_name_sales">Zero name sale starts in</string>
@@ -1024,17 +1024,17 @@
   <string name="is_not_verified">%s is not verified</string>
 
   <!-- settings - SettingsView.kt -->
-  <string name="your_settings">Your settings</string>
-  <string name="your_zero_contact_address">Your Zero address</string>
+  <string name="your_settings">Settings</string>
+  <string name="your_zero_contact_address">My address</string>
   <string name="your_chat_profiles">Your chat profiles</string>
   <string name="create_chat_profile">Create chat profile</string>
   <string name="database_passphrase_and_export">Database passphrase &amp; export</string>
   <string name="about_zero_core_runtime">About Zero</string>
-  <string name="how_to_use_zero_core_runtime">How to use it</string>
+  <string name="how_to_use_zero_core_runtime">How to use</string>
   <string name="markdown_help">Markdown help</string>
   <string name="markdown_in_messages">Markdown in messages</string>
-  <string name="chat_with_the_founder">Send questions and ideas</string>
-  <string name="send_us_an_email">Send us email</string>
+  <string name="chat_with_the_founder">Share feedback</string>
+  <string name="send_us_an_email">Email us at: support@simpl.global</string>
   <string name="follow_zero_network_news">Follow Zero Network News</string>
   <string name="chat_lock">Zero Lock</string>
   <string name="chat_console">Chat console</string>
@@ -1090,9 +1090,9 @@
   <string name="network_and_servers">Network &amp; servers</string>
   <string name="network_settings">Advanced network settings</string>
   <string name="network_settings_title">Advanced settings</string>
-  <string name="network_socks_proxy">SOCKS proxy</string>
-  <string name="network_socks_proxy_settings">SOCKS proxy settings</string>
-  <string name="network_socks_toggle_use_socks_proxy">Use SOCKS proxy</string>
+  <string name="network_socks_proxy">Tor</string>
+  <string name="network_socks_proxy_settings">Tor settings</string>
+  <string name="network_socks_toggle_use_socks_proxy">Tor</string>
   <string name="network_proxy_auth">Proxy authentication</string>
   <string name="network_proxy_random_credentials">Use random credentials</string>
   <string name="network_proxy_auth_mode_isolate_by_auth_user">Use different proxy credentials for each profile.</string>
@@ -1106,8 +1106,8 @@
   <string name="network_proxy_incorrect_config_desc">Make sure proxy configuration is correct.</string>
   <string name="host_verb">Host</string>
   <string name="port_verb">Port</string>
-  <string name="network_enable_socks">Use SOCKS proxy?</string>
-  <string name="network_enable_socks_info">Access the servers via SOCKS proxy on port %d? Proxy must be started before enabling this option.</string>
+  <string name="network_enable_socks">Turn on Tor protection?</string>
+  <string name="network_enable_socks_info">Route server traffic through Tor on port %d?</string>
   <string name="network_disable_socks">Turn off Tor protection?</string>
   <string name="network_disable_socks_info">Warning: without Tor, Zero servers can see your IP address and your internet provider can see which servers you connect to. Keep Tor on unless you understand the risk.</string>
   <string name="network_use_onion_hosts">Use .onion hosts</string>
@@ -1122,13 +1122,13 @@
   <string name="network_session_mode_session">App session</string>
   <string name="network_session_mode_server">Server</string>
   <string name="network_session_mode_entity">Connection</string>
-  <string name="network_session_mode_user_description"><![CDATA[A separate TCP connection (and SOCKS credential) will be used <b>for each chat profile you have in the app</b>.]]></string>
-  <string name="network_session_mode_session_description">New SOCKS credentials will be used every time you start the app.</string>
-  <string name="network_session_mode_server_description">New SOCKS credentials will be used for each server.</string>
-  <string name="network_session_mode_entity_description"><![CDATA[A separate TCP connection (and SOCKS credential) will be used <b>for each contact and group member</b>.\n<b>Please note</b>: if you have many connections, your battery and traffic consumption can be substantially higher and some connections may fail.]]></string>
+  <string name="network_session_mode_user_description"><![CDATA[A separate Tor circuit and connection will be used <b>for each chat profile you have in the app</b>.]]></string>
+  <string name="network_session_mode_session_description">New Tor circuit credentials will be used every time you start the app.</string>
+  <string name="network_session_mode_server_description">New Tor circuit credentials will be used for each server.</string>
+  <string name="network_session_mode_entity_description"><![CDATA[A separate Tor circuit and connection will be used <b>for each contact and group member</b>.\n<b>Please note</b>: if you have many connections, your battery and traffic consumption can be substantially higher and some connections may fail.]]></string>
   <string name="update_network_session_mode_question">Update transport isolation mode?</string>
-  <string name="disable_onion_hosts_when_not_supported"><![CDATA[Set <i>Use .onion hosts</i> to No if SOCKS proxy does not support them.]]></string>
-  <string name="socks_proxy_setting_limitations"><![CDATA[<b>Please note</b>: message and file relays are connected via SOCKS proxy. Calls use direct connection.]]></string>
+  <string name="disable_onion_hosts_when_not_supported"><![CDATA[Set <i>Use .onion hosts</i> to No if your Tor connection does not support them.]]></string>
+  <string name="socks_proxy_setting_limitations"><![CDATA[<b>Please note</b>: message and file relays connect through Tor. Voice and video calls are end-to-end encrypted, but connect peer-to-peer rather than through Tor and may temporarily expose your device\'s IP address.]]></string>
   <string name="network_smp_proxy_mode_private_routing">Private routing</string>
   <string name="network_smp_proxy_mode_always">Always</string>
   <string name="network_smp_proxy_mode_unknown">Unknown servers</string>
@@ -1201,14 +1201,14 @@
   <string name="delete_address__question">Delete address?</string>
   <string name="your_contacts_will_remain_connected">Your contacts will remain connected.</string>
   <string name="all_your_contacts_will_remain_connected">All your contacts will remain connected.</string>
-  <string name="all_your_contacts_will_remain_connected_update_sent">All your contacts will remain connected. Profile update will be sent to your contacts.</string>
+  <string name="all_your_contacts_will_remain_connected_update_sent">All your contacts will remain connected.</string>
   <string name="share_link">Share link</string>
-  <string name="add_address_to_your_profile">Add address to your profile, so that your Zero contacts can share it with other people. Profile update will be sent to your Zero contacts.</string>
+  <string name="add_address_to_your_profile">Add address to your profile.</string>
   <string name="create_address_and_let_people_connect">Create an address to let people connect with you.</string>
-  <string name="create_zero_address">Create Zero address</string>
+  <string name="create_zero_address">Create my address</string>
   <string name="share_with_contacts">Share with Zero contacts</string>
   <string name="share_address_with_contacts_question">Share address with Zero contacts?</string>
-  <string name="profile_update_will_be_sent_to_contacts">Profile update will be sent to your Zero contacts.</string>
+  <string name="profile_update_will_be_sent_to_contacts"></string>
   <string name="stop_sharing_address">Stop sharing address?</string>
   <string name="stop_sharing">Stop sharing</string>
   <string name="auto_accept_contact">Auto-accept</string>
@@ -1251,22 +1251,22 @@
   <string name="invite_friends_short">Invite</string>
 
   <!-- User profile details - UserProfileView.kt -->
-  <string name="display_name__field">Profile name:</string>
-  <string name="full_name__field">Full name:</string>
-  <string name="short_descr__field">Bio:</string>
+  <string name="display_name__field">Name</string>
+  <string name="full_name__field">Full name</string>
+  <string name="short_descr__field">About</string>
   <string name="bio_too_large">Bio too large</string>
   <string name="profile_description__field">Description</string>
   <string name="add_description">Add description</string>
   <string name="edit_description">Edit description</string>
   <string name="enter_description_optional">Enter description (optional)</string>
-  <string name="your_current_profile">Your current profile</string>
+  <string name="your_current_profile">Edit profile</string>
   <string name="your_profile_is_stored_on_device_and_shared_only_with_contacts_zero_cannot_see_it">Your profile is stored on your device and shared only with your contacts. Zero servers cannot see your profile.</string>
   <string name="edit_image">Edit image</string>
   <string name="delete_image">Delete image</string>
   <string name="save_admission_question">Save admission settings?</string>
   <string name="save_preferences_question">Save preferences?</string>
   <string name="save_and_notify_contact">Save and notify contact</string>
-  <string name="save_and_notify_contacts">Save and notify contacts</string>
+  <string name="save_and_notify_contacts">Save</string>
   <string name="save_and_notify_group_members">Save and notify group members</string>
   <string name="save_and_notify_channel_subscribers">Save and notify channel subscribers</string>
   <string name="exit_without_saving">Exit without saving</string>
@@ -1355,7 +1355,7 @@
   <string name="opensource_protocol_and_code_anybody_can_run_servers">Anybody can host servers.</string>
   <string name="create_your_profile">Create your profile</string>
   <string name="make_private_connection">Make a private connection</string>
-  <string name="migrate_from_another_device">Migrate from another device</string>
+  <string name="migrate_from_another_device">Transfer from another device</string>
   <string name="how_it_works">How it works</string>
   <string name="onboarding_be_free">Be free\nin your network</string>
   <string name="onboarding_private_and_secure">Private and secure messaging.</string>
@@ -1519,12 +1519,12 @@
 
   <!-- Privacy settings -->
   <string name="privacy_and_security">Privacy &amp; security</string>
-  <string name="your_privacy">Your privacy</string>
+  <string name="your_privacy">Privacy</string>
   <string name="protect_app_screen">Protect app screen</string>
   <string name="encrypt_local_files">Encrypt local files</string>
   <string name="auto_accept_images">Auto-accept images</string>
   <string name="protect_ip_address">Protect IP address</string>
-  <string name="app_will_ask_to_confirm_unknown_file_servers">The app will ask to confirm downloads from unknown file servers (except .onion or when SOCKS proxy is enabled).</string>
+  <string name="app_will_ask_to_confirm_unknown_file_servers">The app will ask to confirm downloads from unknown file servers (except .onion or when Tor is enabled).</string>
   <string name="without_tor_or_vpn_ip_address_will_be_visible_to_file_servers">Without Tor or VPN, your IP address will be visible to file servers.</string>
   <string name="send_link_previews">Send link previews</string>
   <string name="sanitize_links_toggle">Remove link tracking</string>
@@ -1612,17 +1612,17 @@
   <string name="settings_section_title_about">About</string>
   <string name="settings_section_title_contact">Contact</string>
   <string name="settings_section_title_support_project">Support the project</string>
-  <string name="chat_data">Chat data</string>
-  <string name="help_and_support">Help &amp; support</string>
+  <string name="chat_data">Chat settings</string>
+  <string name="help_and_support">Help</string>
   <string name="more_privacy">More privacy</string>
   <string name="advanced_settings">Advanced settings</string>
   <string name="settings_restart_app">Restart</string>
   <string name="settings_shutdown">Shutdown</string>
   <string name="settings_developer_tools">Developer tools</string>
   <string name="settings_experimental_features">Experimental features</string>
-  <string name="settings_section_title_socks">SOCKS proxy</string>
+  <string name="settings_section_title_socks">Tor</string>
   <string name="settings_section_title_interface" translatable="false">Interface</string>
-  <string name="settings_section_title_language" translatable="false">LANGUAGE</string>
+  <string name="settings_section_title_language" translatable="false">Language</string>
   <string name="settings_section_title_icon">App icon</string>
   <string name="settings_section_title_themes">Themes</string>
   <string name="settings_section_title_profile_images">Profile images</string>
@@ -2739,7 +2739,7 @@
   <string name="v6_5_invite_friends">Easier to invite your friends 👋</string>
   <string name="v6_5_invite_friends_descr">We made connecting simpler for new users.</string>
   <string name="v6_5_safe_web_links">Safe web links</string>
-  <string name="v6_5_safe_web_links_descr">- opt-in to send link previews.\n- use SOCKS proxy if enabled.\n- prevent hyperlink phishing.\n- remove link tracking.</string>
+  <string name="v6_5_safe_web_links_descr">- opt-in to send link previews.\n- route through Tor if enabled.\n- prevent hyperlink phishing.\n- remove link tracking.</string>
   <string name="v6_5_non_profit_governance">Independent relay network</string>
   <string name="v6_5_non_profit_governance_descr">Self-hostable relays operated under Simpl.</string>
   <string name="v7_0_invest" translatable="false">Support Zero</string>
@@ -2775,7 +2775,7 @@
   <string name="dont_enable_receipts">Don\'t enable</string>
   <string name="you_can_enable_delivery_receipts_later">You can enable later via Settings</string>
   <string name="delivery_receipts_are_disabled">Delivery receipts are disabled!</string>
-  <string name="you_can_enable_delivery_receipts_later_alert">You can enable them later via app Your privacy settings.</string>
+  <string name="you_can_enable_delivery_receipts_later_alert">You can enable them later in Privacy settings.</string>
   <string name="error_enabling_delivery_receipts">Error enabling delivery receipts!</string>
 
   <!-- Remote access -->
@@ -2914,8 +2914,8 @@
   <string name="migrate_to_device_apply_onion">Apply</string>
 
   <!--  MigrateFromDevice.kt -->
-  <string name="migrate_from_device_title">Migrate device</string>
-  <string name="migrate_from_device_to_another_device">Migrate to another device</string>
+  <string name="migrate_from_device_title">Transfer device</string>
+  <string name="migrate_from_device_to_another_device">Transfer to a new device</string>
   <string name="migrate_from_device_error_saving_settings">Error saving settings</string>
   <string name="migrate_from_device_exported_file_doesnt_exist">Exported file doesn\'t exist</string>
   <string name="migrate_from_device_error_exporting_archive">Error exporting chat database</string>
@@ -3187,7 +3187,7 @@
   <!-- ComposeView.kt link previews opt-in alert -->
   <string name="link_previews_alert_title">Enable link previews?</string>
   <string name="link_previews_alert_desc">Sending a link preview may reveal your IP address to the website. You can change this in Privacy settings later.</string>
-  <string name="link_previews_alert_desc_socks">Link preview will be requested via SOCKS proxy. DNS lookup may still happen locally via your DNS resolver.</string>
+  <string name="link_previews_alert_desc_socks">Link preview will be requested through Tor. DNS lookup may still happen locally via your DNS resolver.</string>
   <string name="link_previews_alert_enable">Enable</string>
   <string name="link_previews_alert_disable">Disable</string>
 

@@ -147,7 +147,7 @@ struct ConnectDesktopView: View {
                 desktopAddressView()
             }
         }
-        .navigationTitle("Connect to desktop")
+        .navigationBarTitle("", displayMode: .inline)
         .modifier(ThemedBackground(grouped: true))
     }
 
@@ -169,7 +169,7 @@ struct ConnectDesktopView: View {
                     disconnectButton()
                 }
             }
-            .navigationTitle("Connecting to desktop")
+            .navigationBarTitle("", displayMode: .inline)
 
             ProgressView().scaleEffect(2)
         }
@@ -190,7 +190,7 @@ struct ConnectDesktopView: View {
                 }
             }
         }
-        .navigationTitle("Connecting to desktop")
+        .navigationBarTitle("", displayMode: .inline)
         .modifier(ThemedBackground(grouped: true))
     }
 
@@ -218,7 +218,7 @@ struct ConnectDesktopView: View {
                 }
             }
         }
-        .navigationTitle("Found desktop")
+        .navigationBarTitle("", displayMode: .inline)
         .modifier(ThemedBackground(grouped: true))
 
         if compatible && connectRemoteViaMulticastAuto {
@@ -248,7 +248,7 @@ struct ConnectDesktopView: View {
                 disconnectButton()
             }
         }
-        .navigationTitle("Verify connection")
+        .navigationBarTitle("", displayMode: .inline)
         .modifier(ThemedBackground(grouped: true))
     }
 
@@ -289,7 +289,7 @@ struct ConnectDesktopView: View {
                     .foregroundColor(theme.colors.secondary)
             }
         }
-        .navigationTitle("Connected to desktop")
+        .navigationBarTitle("", displayMode: .inline)
         .modifier(ThemedBackground(grouped: true))
     }
 
@@ -364,7 +364,7 @@ struct ConnectDesktopView: View {
                 }
             }
         }
-        .navigationTitle("Linked desktops")
+        .navigationBarTitle("", displayMode: .inline)
         .modifier(ThemedBackground(grouped: true))
     }
 

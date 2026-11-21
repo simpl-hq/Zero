@@ -79,30 +79,38 @@ private fun PreferencesLayout(
       preferences,
       timedMessages,
       onSelected = {
-        applyPrefs(preferences.copy(timedMessages = TimedMessagesPreference(allow = if (it) FeatureAllowed.YES else FeatureAllowed.NO)))
+        applyPrefs(
+          preferences.copy(
+            timedMessages = TimedMessagesPreference(allow = if (it) FeatureAllowed.YES else FeatureAllowed.NO),
+            fullDelete = SimpleChatPreference(allow = FeatureAllowed.YES),
+            reactions = SimpleChatPreference(allow = FeatureAllowed.YES),
+            voice = SimpleChatPreference(allow = FeatureAllowed.YES),
+          )
+        )
       },
-      onTTLUpdated = onTTLUpdated
+      onTTLUpdated = { ttl ->
+        applyPrefs(
+          preferences.copy(
+            timedMessages = preferences.timedMessages.copy(ttl = ttl),
+            fullDelete = SimpleChatPreference(allow = FeatureAllowed.YES),
+            reactions = SimpleChatPreference(allow = FeatureAllowed.YES),
+            voice = SimpleChatPreference(allow = FeatureAllowed.YES),
+          )
+        )
+      }
     )
 
     SectionDividerSpaced()
-    val allowFullDeletion = remember(preferences) { mutableStateOf(preferences.fullDelete.allow) }
-    FeatureSection(ChatFeature.FullDelete, allowFullDeletion) {
-      applyPrefs(preferences.copy(fullDelete = SimpleChatPreference(allow = it)))
-    }
-    SectionDividerSpaced()
-    val allowReactions = remember(preferences) { mutableStateOf(preferences.reactions.allow) }
-    FeatureSection(ChatFeature.Reactions, allowReactions) {
-      applyPrefs(preferences.copy(reactions = SimpleChatPreference(allow = it)))
-    }
-    SectionDividerSpaced()
-    val allowVoice = remember(preferences) { mutableStateOf(preferences.voice.allow) }
-    FeatureSection(ChatFeature.Voice, allowVoice) {
-      applyPrefs(preferences.copy(voice = SimpleChatPreference(allow = it)))
-    }
-    SectionDividerSpaced()
     val allowCalls = remember(preferences) { mutableStateOf(preferences.calls.allow) }
     FeatureSection(ChatFeature.Calls, allowCalls) {
-      applyPrefs(preferences.copy(calls = SimpleChatPreference(allow = it)))
+      applyPrefs(
+        preferences.copy(
+          fullDelete = SimpleChatPreference(allow = FeatureAllowed.YES),
+          reactions = SimpleChatPreference(allow = FeatureAllowed.YES),
+          voice = SimpleChatPreference(allow = FeatureAllowed.YES),
+          calls = SimpleChatPreference(allow = it),
+        )
+      )
     }
     SectionDividerSpaced()
     ResetSaveButtons(

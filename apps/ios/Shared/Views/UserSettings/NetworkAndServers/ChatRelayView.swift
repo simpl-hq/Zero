@@ -248,9 +248,9 @@ struct ChatRelayViewLink: View {
                 relayToEdit: relay,
                 backLabel: backLabel
             )
-            .navigationBarTitle("Chat relay")
+            .navigationBarTitle("", displayMode: .inline)
             .modifier(ThemedBackground(grouped: true))
-            .navigationBarTitleDisplayMode(.large)
+            .navigationBarTitleDisplayMode(.inline)
         } label: {
             HStack {
                 Group {

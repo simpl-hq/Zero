@@ -170,9 +170,9 @@ private func shareLinkButton(_ connLinkInvitation: CreatedConnLink, short: Bool)
 private func oneTimeLinkLearnMoreButton() -> some View {
     NavigationLink {
         AddContactLearnMore(showTitle: false)
-            .navigationTitle("One-time invitation link")
+            .navigationBarTitle("", displayMode: .inline)
             .modifier(ThemedBackground())
-            .navigationBarTitleDisplayMode(.large)
+            .navigationBarTitleDisplayMode(.inline)
     } label: {
         Label("Learn more", systemImage: "info.circle")
     }

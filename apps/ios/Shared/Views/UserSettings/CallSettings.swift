@@ -14,7 +14,7 @@ struct CallSettings: View {
                 Section {
                     NavigationLink {
                         RTCServers()
-                            .navigationTitle("Your ICE servers")
+                            .navigationBarTitle("", displayMode: .inline)
                             .modifier(ThemedBackground(grouped: true))
                     } label: {
                         Text("WebRTC ICE servers")

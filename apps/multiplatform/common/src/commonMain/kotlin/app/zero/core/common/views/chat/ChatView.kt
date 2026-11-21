@@ -592,7 +592,14 @@ fun ChatView(
                 if (invitation == null) {
                   AlertManager.shared.showAlertMsg(generalGetString(MR.strings.call_already_ended))
                 } else {
-                  chatModel.callManager.acceptIncomingCall(invitation = invitation)
+                  AlertManager.shared.showAlertDialog(
+                    title = "Encrypted P2P call",
+                    text = "Calls and video calls are end-to-end encrypted, but connect peer-to-peer rather than through Tor and may temporarily expose your device's IP address.",
+                    confirmText = "Answer",
+                    onConfirm = {
+                      withBGApi { chatModel.callManager.acceptIncomingCall(invitation = invitation) }
+                    }
+                  )
                 }
               }
             },
@@ -871,6 +878,17 @@ private fun connectingText(chatInfo: ChatInfo): String? {
 }
 
 fun startChatCall(remoteHostId: Long?, chatInfo: ChatInfo, media: CallMediaType) {
+  AlertManager.shared.showAlertDialog(
+    title = "Encrypted P2P call",
+    text = "Calls and video calls are end-to-end encrypted, but connect peer-to-peer rather than through Tor and may temporarily expose your device's IP address.",
+    confirmText = "Call",
+    onConfirm = {
+      launchChatCall(remoteHostId, chatInfo, media)
+    }
+  )
+}
+
+private fun launchChatCall(remoteHostId: Long?, chatInfo: ChatInfo, media: CallMediaType) {
   withBGApi {
     if (chatInfo is ChatInfo.Direct) {
       val contactInfo = chatModel.controller.apiContactInfo(remoteHostId, chatInfo.contact.contactId)

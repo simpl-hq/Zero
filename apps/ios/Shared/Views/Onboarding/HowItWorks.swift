@@ -69,7 +69,7 @@ struct ZeroGuidedTutorialView: View {
             title: "Lock Your Device",
             summary: "Because Zero servers keep no message history, securing the phone or desktop in your hand protects everything.",
             highlights: [
-                ("lock.shield.fill", "Face ID & Screen Blur", "Enable biometric app lock and blur previews in Recent Apps under Your privacy."),
+                ("lock.shield.fill", "Face ID & Screen Blur", "Enable biometric app lock and blur previews in Recent Apps under Privacy."),
                 ("externaldrive.badge.checkmark", "Passphrase & Backups", "Back up your local archive before switching phones or wiping device storage.")
             ]
         )
@@ -103,7 +103,7 @@ struct ZeroGuidedTutorialView: View {
         .sheet(isPresented: $showNetworkSettings) {
             NavigationView {
                 NetworkAndServers()
-                    .navigationTitle("Network & servers")
+                    .navigationBarTitle("", displayMode: .inline)
                     .modifier(ThemedBackground(grouped: true))
                     .environmentObject(m)
                     .environmentObject(theme)
@@ -118,7 +118,7 @@ struct ZeroGuidedTutorialView: View {
         .sheet(isPresented: $showPrivacySettings) {
             NavigationView {
                 PrivacySettings()
-                    .navigationTitle("Your privacy")
+                    .navigationBarTitle("", displayMode: .inline)
                     .modifier(ThemedBackground(grouped: true))
                     .environmentObject(m)
                     .environmentObject(theme)

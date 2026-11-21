@@ -45,8 +45,8 @@ struct NewChatSheet: View {
         let showArchive = chatModel.chats.contains { $0.chatInfo.contact?.chatDeleted == true }
         let v = NavigationView {
             viewBody(showArchive)
-                .navigationTitle("New chat")
-                .navigationBarTitleDisplayMode(.large)
+                .navigationBarTitle("", displayMode: .inline)
+                .navigationBarTitleDisplayMode(.inline)
                 .navigationBarHidden(searchMode)
                 .modifier(ThemedBackground(grouped: true))
                 .alert(item: $alert) { a in
@@ -117,17 +117,17 @@ struct NewChatSheet: View {
                     }
                     NavigationLink {
                         AddGroupView()
-                            .navigationTitle("Create group")
+                            .navigationBarTitle("", displayMode: .inline)
                             .modifier(ThemedBackground(grouped: true))
-                            .navigationBarTitleDisplayMode(.large)
+                            .navigationBarTitleDisplayMode(.inline)
                     } label: {
                         Label("Create group", systemImage: "person.2.circle.fill")
                     }
                     NavigationLink {
                         AddChannelView()
-                            .navigationTitle("Create public channel")
+                            .navigationBarTitle("", displayMode: .inline)
                             .modifier(ThemedBackground(grouped: true))
-                            .navigationBarTitleDisplayMode(.large)
+                            .navigationBarTitleDisplayMode(.inline)
                     } label: {
                         Label("Create public channel", systemImage: "antenna.radiowaves.left.and.right")
                     }
@@ -470,8 +470,8 @@ struct DeletedChats: View {
                 showDeletedChatIcon: false
             )
         }
-        .navigationTitle("Archived contacts")
-        .navigationBarTitleDisplayMode(.large)
+        .navigationBarTitle("", displayMode: .inline)
+        .navigationBarTitleDisplayMode(.inline)
         .navigationBarHidden(searchMode)
         .modifier(ThemedBackground(grouped: true))
 

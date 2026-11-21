@@ -2247,7 +2247,7 @@
     <string name="zero_link_invitation">Πρόσκληση 1-χρήσης Zero</string>
     <string name="v6_1_better_security_descr">Post-quantum hybrid ratchet and transport security updates.</string>
     <string name="zero_link_relay">Σύνδεσμος αναμεταδότη Zero</string>
-    <string name="icon_descr_zero_team">Zero Team</string>
+    <string name="icon_descr_zero_team">Ask Zero</string>
     <string name="v5_3_simpler_incognito_mode">Απλοποιημένη ανώνυμη λειτουργία</string>
     <string name="is_not_verified">%s δεν έχει επαληθευτεί</string>
     <string name="is_verified">%s έχει επαληθευτεί</string>

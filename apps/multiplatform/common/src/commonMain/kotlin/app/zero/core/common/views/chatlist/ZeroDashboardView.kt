@@ -33,6 +33,7 @@ import app.zero.core.common.model.ChatModel
 import app.zero.core.common.platform.chatModel
 import app.zero.core.common.views.helpers.ModalManager
 import app.zero.core.common.views.helpers.withBGApi
+import app.zero.core.common.views.newchat.AddGroupView
 import app.zero.core.common.views.onboarding.openZeroGuidedTutorial
 import app.zero.core.common.views.usersettings.networkAndServers.NetworkAndServersView
 import app.zero.core.network.ZeroIdentityBridge
@@ -49,7 +50,8 @@ fun ZeroDashboardView(
   deepLink: String? = null,
   ephemeralCode: String? = null,
   onGenerateInPersonCode: (() -> Unit)? = null,
-  onOpenTutorialClick: (() -> Unit)? = null
+  onOpenTutorialClick: (() -> Unit)? = null,
+  onCreateGroupClick: (() -> Unit)? = null
 ) {
   val clipboardManager = LocalClipboardManager.current
   var copiedLabel by remember { mutableStateOf<String?>(null) }
@@ -60,21 +62,20 @@ fun ZeroDashboardView(
         backgroundColor = MaterialTheme.colors.background,
         elevation = 0.dp,
         title = {
-          Column(verticalArrangement = Arrangement.spacedBy(1.dp)) {
+          Column(verticalArrangement = Arrangement.spacedBy(0.dp)) {
             Text(
-              "ZERO",
+              "Zero",
               style = MaterialTheme.typography.h1,
-              fontSize = 18.sp,
-              fontWeight = FontWeight.Bold,
-              letterSpacing = 2.4.sp,
+              fontSize = 21.sp,
+              fontWeight = FontWeight.Black,
+              letterSpacing = (-0.5).sp,
               color = MaterialTheme.colors.onBackground
             )
             Text(
-              "BY SIMPL",
-              fontSize = 9.sp,
-              fontFamily = FontFamily.Monospace,
+              "by Simpl",
+              fontSize = 10.sp,
               fontWeight = FontWeight.Medium,
-              letterSpacing = 1.4.sp,
+              letterSpacing = 0.6.sp,
               color = MaterialTheme.colors.secondary
             )
           }
@@ -206,17 +207,10 @@ fun ZeroDashboardView(
         ) {
           Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-              "Your private space",
+              "Messages",
               style = MaterialTheme.typography.h2,
               fontWeight = FontWeight.SemiBold,
               color = MaterialTheme.colors.onBackground,
-              textAlign = TextAlign.Center
-            )
-            Spacer(Modifier.height(8.dp))
-            Text(
-              "Connect with someone to start a conversation.",
-              style = MaterialTheme.typography.body2,
-              color = MaterialTheme.colors.secondary,
               textAlign = TextAlign.Center
             )
           }
@@ -284,11 +278,27 @@ fun ZeroDashboardView(
         colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary)
       ) {
         Text(
-          "Connect privately",
+          "New message",
           color = MaterialTheme.colors.onPrimary,
           fontSize = 15.sp,
           fontWeight = FontWeight.Medium
         )
+      }
+      if (onCreateGroupClick != null) {
+        Spacer(Modifier.height(10.dp))
+        OutlinedButton(
+          onClick = onCreateGroupClick,
+          modifier = Modifier.fillMaxWidth().height(48.dp),
+          shape = RoundedCornerShape(999.dp),
+          border = BorderStroke(1.dp, MaterialTheme.colors.onSurface.copy(alpha = 0.16f))
+        ) {
+          Text(
+            "Start a group",
+            color = MaterialTheme.colors.onBackground,
+            fontSize = 15.sp,
+            fontWeight = FontWeight.Medium
+          )
+        }
       }
     }
   }
@@ -307,7 +317,7 @@ fun ZeroConnectByPinDialog(
     shape = RoundedCornerShape(16.dp),
     title = {
       Text(
-        "Connect Privately",
+        "New message",
         fontWeight = FontWeight.SemiBold,
         fontSize = 18.sp
       )
@@ -597,6 +607,11 @@ fun ZeroIntegratedDashboard(
     },
     onOpenTutorialClick = {
       openZeroGuidedTutorial(allowSettingsShortcuts = true)
+    },
+    onCreateGroupClick = {
+      ModalManager.start.showModalCloseable { close ->
+        AddGroupView(model, model.currentRemoteHost.value, close = close, closeAll = close)
+      }
     }
   )
 

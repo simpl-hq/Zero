@@ -74,7 +74,7 @@ struct AddChannelView: View {
                 channelNameTextField()
                 NavigationLink {
                     NetworkAndServers()
-                        .navigationTitle("Network & servers")
+                        .navigationBarTitle("", displayMode: .inline)
                         .modifier(ThemedBackground(grouped: true))
                         .environmentObject(ss)
                 } label: {
@@ -349,7 +349,7 @@ struct AddChannelView: View {
                 .disabled(activeCount == 0)
             }
         }
-        .navigationTitle("Creating channel")
+        .navigationBarTitle("", displayMode: .inline)
         .navigationBarBackButtonHidden(true)
         .onDisappear {
             if !showLinkStep && m.creatingChannelId == gInfo.id {
@@ -396,7 +396,7 @@ struct AddChannelView: View {
                 }
             }
         }
-        .navigationBarTitle("Channel link")
+        .navigationBarTitle("", displayMode: .inline)
     }
 
     private func cancelChannelCreation(_ gInfo: GroupInfo) {

@@ -74,7 +74,6 @@ fun ModalData.NewChatSheet(rh: RemoteHostInfo?, close: () -> Unit) {
       Column(Modifier.align(Alignment.BottomCenter)) {
         DefaultAppBar(
           navigationButton = { NavigationButtonBack(onButtonClicked = close) },
-          fixedTitleText = generalGetString(MR.strings.new_chat),
           onTop = false,
         )
       }
@@ -762,7 +761,6 @@ private fun ModalData.DeletedContactsView(rh: RemoteHostInfo?, closeDeletedChats
       Column(Modifier.align(Alignment.BottomCenter)) {
         DefaultAppBar(
           navigationButton = { NavigationButtonBack(onButtonClicked = closeDeletedChats) },
-          fixedTitleText = generalGetString(MR.strings.deleted_chats),
           onTop = false,
         )
       }

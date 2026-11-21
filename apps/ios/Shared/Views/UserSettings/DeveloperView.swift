@@ -51,8 +51,8 @@ struct DeveloperView: View {
                         }
                         NavigationLink {
                             StorageView()
-                                .navigationTitle("Storage")
-                                .navigationBarTitleDisplayMode(.large)
+                                .navigationBarTitle("", displayMode: .inline)
+                                .navigationBarTitleDisplayMode(.inline)
                         } label: {
                             settingsRow("internaldrive", color: theme.colors.secondary) { Text("Storage") }
                         }

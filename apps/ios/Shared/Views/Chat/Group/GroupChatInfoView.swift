@@ -664,8 +664,8 @@ struct GroupChatInfoView: View {
         let title: LocalizedStringKey = groupInfo.isChannel ? "Channel webpage" : "Group webpage"
         return NavigationLink {
             ChannelWebAccessView(groupInfo: $groupInfo)
-                .navigationBarTitle(title)
-                .navigationBarTitleDisplayMode(.large)
+                .navigationBarTitle("", displayMode: .inline)
+                .navigationBarTitleDisplayMode(.inline)
         } label: {
             Label(title, systemImage: "globe")
         }
@@ -698,7 +698,7 @@ struct GroupChatInfoView: View {
             if let d = groupInfo.groupProfile.publicGroup?.publicGroupAccess?.groupDomainClaim?.shortName {
                 Label("\(d)", systemImage: "number")
             } else {
-                Label("Get Zero name (BETA)", systemImage: "number")
+                Label("Zero Name (Coming Soon)", systemImage: "number")
             }
         }
     }
@@ -714,18 +714,18 @@ struct GroupChatInfoView: View {
             groupInfo: groupInfo,
             composeState: $composeState
         )
-        .navigationBarTitle(groupInfo.useRelays ? "Channel link" : "Group link")
+        .navigationBarTitle("", displayMode: .inline)
         .modifier(ThemedBackground(grouped: true))
-        .navigationBarTitleDisplayMode(.large)
+        .navigationBarTitleDisplayMode(.inline)
     }
 
     private func channelMembersButton() -> some View {
         let label: LocalizedStringKey = groupInfo.isOwner ? "Subscribers" : "Owners & contributors"
         return NavigationLink {
             ChannelMembersView(chat: chat, groupInfo: groupInfo)
-                .navigationTitle(label)
+                .navigationBarTitle("", displayMode: .inline)
                 .modifier(ThemedBackground(grouped: true))
-                .navigationBarTitleDisplayMode(.large)
+                .navigationBarTitleDisplayMode(.inline)
         } label: {
             Label(label, systemImage: "person.2")
         }
@@ -734,9 +734,9 @@ struct GroupChatInfoView: View {
     private func channelRelaysButton() -> some View {
         NavigationLink {
             ChannelRelaysView(chat: chat, groupInfo: groupInfo)
-                .navigationTitle("Chat relays")
+                .navigationBarTitle("", displayMode: .inline)
                 .modifier(ThemedBackground(grouped: true))
-                .navigationBarTitleDisplayMode(.large)
+                .navigationBarTitleDisplayMode(.inline)
         } label: {
             Label("Chat relays", systemImage: "externaldrive.connected.to.line.below")
         }
@@ -777,9 +777,9 @@ struct GroupChatInfoView: View {
     private func memberSupportButton() -> some View {
         NavigationLink {
             MemberSupportView(groupInfo: groupInfo, scrollToItemId: $scrollToItemId)
-                .navigationBarTitle("Chats with members")
+                .navigationBarTitle("", displayMode: .inline)
                 .modifier(ThemedBackground())
-                .navigationBarTitleDisplayMode(.large)
+                .navigationBarTitleDisplayMode(.inline)
         } label: {
             HStack {
                 Label(
@@ -847,9 +847,9 @@ struct GroupChatInfoView: View {
                 groupProfile: groupInfo.groupProfile,
                 welcomeText: groupInfo.groupProfile.description ?? ""
             )
-            .navigationTitle("Welcome message")
+            .navigationBarTitle("", displayMode: .inline)
             .modifier(ThemedBackground(grouped: true))
-            .navigationBarTitleDisplayMode(.large)
+            .navigationBarTitleDisplayMode(.inline)
         } label: {
             groupInfo.groupProfile.description == nil
                 ? Label("Add welcome message", systemImage: "plus.message")
@@ -1091,9 +1091,9 @@ struct GroupPreferencesButton: View {
                 creatingGroup: creatingGroup,
                 savePreferences: savePreferences
             )
-            .navigationBarTitle(label)
+            .navigationBarTitle("", displayMode: .inline)
             .modifier(ThemedBackground(grouped: true))
-            .navigationBarTitleDisplayMode(.large)
+            .navigationBarTitleDisplayMode(.inline)
             .onDisappear {
                 let saveText = NSLocalizedString(
                     creatingGroup ? "Save"

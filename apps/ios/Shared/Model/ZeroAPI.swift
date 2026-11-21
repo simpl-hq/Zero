@@ -2218,6 +2218,10 @@ private func chatInitialized(start: Bool, refreshInvitations: Bool) throws {
     }
 }
 
+func startZeroChat(refreshInvitations: Bool = true) throws {
+    try startChat(refreshInvitations: refreshInvitations)
+}
+
 func startChat(refreshInvitations: Bool = true, onboarding: Bool = false) throws {
     logger.debug("startChat")
     let m = ChatModel.shared

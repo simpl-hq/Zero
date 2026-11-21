@@ -182,9 +182,9 @@ struct MemberAdmissionButton: View {
                 creatingGroup: creatingGroup,
                 saveAdmission: saveAdmission
             )
-            .navigationBarTitle("Member admission")
+            .navigationBarTitle("", displayMode: .inline)
             .modifier(ThemedBackground(grouped: true))
-            .navigationBarTitleDisplayMode(.large)
+            .navigationBarTitleDisplayMode(.inline)
             .onDisappear {
                 let saveText = NSLocalizedString(
                     creatingGroup ? "Save" : "Save and notify group members",

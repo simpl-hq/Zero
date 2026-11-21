@@ -1,3 +1,5 @@
+# API Events
+# This file is generated automatically.
 from __future__ import annotations
 from collections.abc import Awaitable, Callable
 from typing import Literal, NotRequired, Protocol, TypedDict, overload
@@ -65,7 +67,7 @@ class GroupChatItemsDeleted(TypedDict):
     type: Literal["groupChatItemsDeleted"]
     user: "T.User"
     groupInfo: "T.GroupInfo"
-    chatItemIDs: list[int]
+    chatItemIDs: list[int]  # int64
     byUser: bool
     member_: NotRequired["T.GroupMember"]
 
@@ -376,6 +378,7 @@ ChatEvent = (
 )
 
 ChatEvent_Tag = Literal["contactConnected", "contactUpdated", "contactDeletedByContact", "receivedContactRequest", "newMemberContactReceivedInv", "contactSndReady", "newChatItems", "chatItemReaction", "chatItemsDeleted", "chatItemUpdated", "groupChatItemsDeleted", "chatItemsStatusesUpdated", "receivedGroupInvitation", "userJoinedGroup", "groupUpdated", "joinedGroupMember", "memberRole", "deletedMember", "leftMember", "deletedMemberUser", "groupDeleted", "connectedToGroupMember", "memberAcceptedByOther", "memberBlockedForAll", "groupMemberUpdated", "groupLinkDataUpdated", "groupRelayUpdated", "rcvFileDescrReady", "rcvFileComplete", "sndFileCompleteXFTP", "rcvFileStart", "rcvFileSndCancelled", "rcvFileAccepted", "rcvFileError", "rcvFileWarning", "sndFileError", "sndFileWarning", "acceptingContactRequest", "acceptingBusinessRequest", "contactConnecting", "businessLinkConnecting", "joinedGroupMemberConnecting", "sentGroupInvitation", "groupLinkConnecting", "hostConnected", "hostDisconnected", "subscriptionStatus", "messageError", "chatError", "chatErrors"]
+
 
 class OnEventDecorator(Protocol):
     """Per-tag narrowing protocol for ``Client.on_event``.

@@ -104,7 +104,7 @@ struct CreateProfile: View {
             }
             .compactSectionSpacing()
         }
-        .navigationTitle("Create your profile")
+        .navigationBarTitle("", displayMode: .inline)
         .modifier(ThemedBackground(grouped: true))
         .alert(item: $alert) { a in userProfileAlert(a, $displayName) }
         .confirmationDialog("Profile image", isPresented: $showChooseSource, titleVisibility: .visible) {
@@ -256,7 +256,7 @@ struct CreateFirstProfile: View {
             .sheet(isPresented: $showMigrateSheet, onDismiss: { m.migrationState = nil }) {
                 NavigationView {
                     MigrateToDevice(migrationState: $m.migrationState)
-                        .navigationTitle("Migrate here")
+                        .navigationBarTitle("", displayMode: .inline)
                         .modifier(ThemedBackground(grouped: true))
                 }
             }

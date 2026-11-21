@@ -6,12 +6,15 @@ private let ACCESS_GROUP: String = "5NN7GUYB6T.app.zero.chat"
 private let DATABASE_PASSWORD_ITEM: String = "databasePassword"
 private let APP_PASSWORD_ITEM: String = "appPassword"
 private let SELF_DESTRUCT_PASSWORD_ITEM: String = "selfDestructPassword"
+private let DISPOSABLE_PARENT_USER_ITEM: String = "disposableParentUserId"
 
 public let kcDatabasePassword = KeyChainItem(forKey: DATABASE_PASSWORD_ITEM)
 
 public let kcAppPassword = KeyChainItem(forKey: APP_PASSWORD_ITEM)
 
 public let kcSelfDestructPassword = KeyChainItem(forKey: SELF_DESTRUCT_PASSWORD_ITEM)
+
+public let kcDisposableParentUserId = KeyChainItem(forKey: DISPOSABLE_PARENT_USER_ITEM)
 
 public struct KeyChainItem {
     var forKey: String

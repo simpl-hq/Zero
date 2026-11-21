@@ -24,6 +24,7 @@ import androidx.compose.ui.text.style.TextAlign
 import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import app.zero.core.common.model.*
 import app.zero.core.common.ui.theme.*
 import app.zero.core.common.views.helpers.*
@@ -291,7 +292,7 @@ private fun UserAddressLayout(
     ) {
       if (userAddress == null) {
         if (!onboarding) {
-          SectionView(generalGetString(MR.strings.for_social_media)) {
+          SectionView {
             CreateAddressButton(createAddress)
           }
 
@@ -326,7 +327,7 @@ private fun UserAddressLayout(
           val savedAddressSettingsState = remember { mutableStateOf(addressSettingsState.value) }
 
           SectionViewWithButton(
-            stringResource(MR.strings.for_social_media),
+            "",
             titleButton = if (userAddress.connLinkContact.connShortLink != null) {{ ToggleShortLinkButton(showShortLink) }} else null
           ) {
             ZeroCreatedLinkQRCode(userAddress.connLinkContact, short = showShortLink.value)
@@ -348,11 +349,7 @@ private fun UserAddressLayout(
               }
               if (userAddress.shouldBeUpgraded) showAddShortLinkAlert { shareViaChat() } else shareViaChat()
             }
-            BusinessAddressToggle(addressSettingsState) { saveAddressSettings(addressSettingsState.value, savedAddressSettingsState) }
             AddressSettingsButton(user, userAddress, shareViaProfile, setProfileAddress, saveAddressSettings)
-          }
-          if (addressSettingsState.value.businessAddress) {
-            SectionTextFooter(stringResource(MR.strings.add_your_team_members_to_conversations))
           }
 
           SectionDividerSpaced()
@@ -369,7 +366,7 @@ private fun UserAddressLayout(
                     placeholder = "@yourname.testing",
                     zeroName = if (domain == null) "" else "@$domain",
                     registerBackgroundClose = true,
-                    broadcastWarning = generalGetString(MR.strings.profile_update_will_be_sent_to_contacts),
+                    broadcastWarning = null,
                     save = { zeroDomain ->
                       try {
                         val u = chatModel.controller.apiSetUserDomain(user?.remoteHostId, zeroDomain)
@@ -506,60 +503,51 @@ private fun ModalData.UserAddressSettings(
   saveAddressSettings: (AddressSettingsState, MutableState<AddressSettingsState>) -> Unit,
   close: () -> Unit
 ) {
-  val addressSettingsState = remember { stateGetOrPut("autoAcceptState") { (AddressSettingsState(userAddress.addressSettings)) } }
-  val savedAddressSettingsState = remember { stateGetOrPut("autoAcceptStateSaved") { (addressSettingsState.value) } }
+  val currentAddr = remember { chatModel.userAddress }.value
+  val rotating = remember { mutableStateOf(false) }
 
-  fun onClose(close: () -> Unit): Boolean = if (addressSettingsState.value == savedAddressSettingsState.value) {
-    chatModel.centerPanelBackgroundClickHandler = null
-    close()
-    false
-  } else {
-    showUnsavedChangesAlert(
-      save = {
-        saveAddressSettings(addressSettingsState.value, savedAddressSettingsState)
-        chatModel.centerPanelBackgroundClickHandler = null
-        close()
-      },
-      revert = {
-        chatModel.centerPanelBackgroundClickHandler = null
-        close()
-      }
-    )
-    true
-  }
-
-  LaunchedEffect(Unit) {
-    chatModel.centerPanelBackgroundClickHandler = {
-      onClose(close = { ModalManager.start.closeModals() })
-    }
-  }
-
-  ModalView(close = { onClose(close) }, cardScreen = true) {
+  ModalView(close = close, cardScreen = true) {
     ColumnWithScrollBar {
       AppBarTitle(stringResource(MR.strings.address_settings), hostDevice(user?.remoteHostId))
-      Column(
-        Modifier.fillMaxWidth().padding(bottom = DEFAULT_PADDING_HALF),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceEvenly
-      ) {
-        SectionView {
-          ShareWithContactsButton(shareViaProfile, setProfileAddress)
-          AutoAcceptToggle(addressSettingsState) { saveAddressSettings(addressSettingsState.value, savedAddressSettingsState) }
-          if (addressSettingsState.value.autoAccept && !chatModel.addressShortLinkDataSet() && !addressSettingsState.value.businessAddress) {
-            AcceptIncognitoToggle(addressSettingsState)
-          }
-        }
-        SectionDividerSpaced()
-
-        SectionView(stringResource(MR.strings.address_welcome_message)) {
-          AutoReplyEditor(addressSettingsState)
-        }
-        SectionDividerSpaced()
-
-        saveAddressSettingsButton(addressSettingsState.value == savedAddressSettingsState.value) {
-          saveAddressSettings(addressSettingsState.value, savedAddressSettingsState)
+      SectionView("Current address") {
+        Column(Modifier.fillMaxWidth().padding(horizontal = DEFAULT_PADDING, vertical = DEFAULT_PADDING_HALF)) {
+          Text(
+            currentAddr?.connLinkContact?.zeroChatUri(short = false) ?: "None",
+            fontSize = 13.sp,
+            color = MaterialTheme.colors.onSurface
+          )
         }
       }
+      SectionDividerSpaced()
+      SectionView {
+        SettingsActionItem(
+          painterResource(MR.images.ic_refresh),
+          if (rotating.value) "Generating..." else "New address",
+          {
+            if (rotating.value) return@SettingsActionItem
+            rotating.value = true
+            withBGApi {
+              val rhId = user?.remoteHostId
+              runCatching { chatModel.controller.apiDeleteUserAddress(rhId) }
+              val created = runCatching { chatModel.controller.apiCreateUserAddress(rhId) }.getOrNull()
+              if (created != null) {
+                val slDataSet = created.connShortLink != null
+                chatModel.userAddress.value = UserContactLinkRec(
+                  created,
+                  shortLinkDataSet = slDataSet,
+                  shortLinkLargeDataSet = slDataSet,
+                  addressSettings = AddressSettings(businessAddress = false, autoAccept = null, autoReply = null)
+                )
+              }
+              rotating.value = false
+            }
+          },
+          disabled = rotating.value,
+          textColor = MaterialTheme.colors.primary,
+          iconColor = MaterialTheme.colors.primary
+        )
+      }
+      SectionBottomSpacer()
     }
   }
 }

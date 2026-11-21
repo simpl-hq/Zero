@@ -104,8 +104,8 @@ struct OnboardingConditionsView: View {
                         .padding(.horizontal, 25)
                         .padding(.bottom, 20)
                 }
-                .navigationTitle("Conditions of use")
-                .navigationBarTitleDisplayMode(.large)
+                .navigationBarTitle("", displayMode: .inline)
+                .navigationBarTitleDisplayMode(.inline)
                 .toolbar { ToolbarItem(placement: .navigationBarTrailing, content: conditionsLinkButton) }
                 .modifier(ThemedBackground(grouped: true))
             }
@@ -362,8 +362,8 @@ struct ChooseServerOperatorsInfoView: View {
                         .foregroundColor(theme.colors.secondary)
                 }
             }
-            .navigationTitle("Server operators")
-            .navigationBarTitleDisplayMode(.large)
+            .navigationBarTitle("", displayMode: .inline)
+            .navigationBarTitleDisplayMode(.inline)
             .modifier(ThemedBackground(grouped: true))
         }
     }
@@ -371,9 +371,9 @@ struct ChooseServerOperatorsInfoView: View {
     private func operatorInfoNavLinkView(_ op: ServerOperator) -> some View {
         NavigationLink() {
             OperatorInfoView(serverOperator: op)
-                .navigationBarTitle("Network operator")
+                .navigationBarTitle("", displayMode: .inline)
                 .modifier(ThemedBackground(grouped: true))
-                .navigationBarTitleDisplayMode(.large)
+                .navigationBarTitleDisplayMode(.inline)
         } label: {
             HStack {
                 Image(op.logo(colorScheme))

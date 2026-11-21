@@ -49,7 +49,7 @@ struct AddGroupView: View {
                         }
                     }
                 }
-                .navigationBarTitle("Group link")
+                .navigationBarTitle("", displayMode: .inline)
             }
         } else {
             createGroupView()

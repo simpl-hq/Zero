@@ -653,26 +653,33 @@ getProtocolServers db p User {userId} =
 insertProtocolServer :: forall p. ProtocolTypeI p => DB.Connection -> SProtocolType p -> User -> UTCTime -> NewUserServer p -> IO (UserServer p)
 insertProtocolServer db p User {userId} ts srv@UserServer {server, preset, tested, enabled, roles} = do
   let (_, host, port, _, _) = serverColumns p server
+  DB.execute
+    db
+    [sql|
+      INSERT INTO protocol_servers
+        (protocol, host, port, key_hash, basic_auth, preset, tested, enabled,
+         role_storage, role_proxy, role_names, user_id, created_at, updated_at)
+      VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+      ON CONFLICT(user_id, host, port) DO UPDATE SET
+        protocol = excluded.protocol,
+        key_hash = excluded.key_hash,
+        basic_auth = excluded.basic_auth,
+        preset = excluded.preset,
+        tested = excluded.tested,
+        enabled = excluded.enabled,
+        role_storage = excluded.role_storage,
+        role_proxy = excluded.role_proxy,
+        role_names = excluded.role_names,
+        updated_at = excluded.updated_at
+    |]
+    (serverColumns p server :. (BI preset, BI <$> tested, BI enabled) :. roleColumns roles :. (userId, ts, ts))
   (existing :: Maybe Int64) <- maybeFirstRow fromOnly $ DB.query db
     "SELECT smp_server_id FROM protocol_servers WHERE user_id = ? AND host = ? AND port = ? LIMIT 1"
     (userId, host, port)
-  case existing of
-    Just sId -> do
-      let srv' = (srv :: NewUserServer p) {serverId = DBEntityId sId}
-      updateProtocolServer db p ts srv'
-      pure srv'
-    Nothing -> do
-      DB.execute
-        db
-        [sql|
-          INSERT INTO protocol_servers
-            (protocol, host, port, key_hash, basic_auth, preset, tested, enabled,
-             role_storage, role_proxy, role_names, user_id, created_at, updated_at)
-          VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)
-        |]
-        (serverColumns p server :. (BI preset, BI <$> tested, BI enabled) :. roleColumns roles :. (userId, ts, ts))
-      sId <- insertedRowId db
-      pure (srv :: NewUserServer p) {serverId = DBEntityId sId}
+  sId <- case existing of
+    Just sid -> pure sid
+    Nothing -> insertedRowId db
+  pure (srv :: NewUserServer p) {serverId = DBEntityId sId}
 
 updateProtocolServer :: ProtocolTypeI p => DB.Connection -> SProtocolType p -> UTCTime -> UserServer p -> IO ()
 updateProtocolServer db p ts UserServer {serverId, server, preset, tested, enabled, roles} =

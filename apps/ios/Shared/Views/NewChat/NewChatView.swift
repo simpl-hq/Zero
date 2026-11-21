@@ -375,10 +375,10 @@ private struct ActiveProfilePicker: View {
 
     var body: some View {
         viewBody()
-            .navigationTitle("Select chat profile")
+            .navigationBarTitle("", displayMode: .inline)
             .searchable(text: $searchTextOrPassword, placement: .navigationBarDrawer(displayMode: .always))
             .autocorrectionDisabled(true)
-            .navigationBarTitleDisplayMode(.large)
+            .navigationBarTitleDisplayMode(.inline)
             .onAppear {
                 profiles = chatModel.users
                     .map { $0.user }

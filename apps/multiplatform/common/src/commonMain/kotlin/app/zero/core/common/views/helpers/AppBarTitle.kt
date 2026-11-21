@@ -21,67 +21,16 @@ fun AppBarTitle(
   title: String,
   hostDevice: Pair<Long?, String>? = null,
   withPadding: Boolean = true,
-  bottomPadding: Dp = DEFAULT_PADDING * 1.5f + 8.dp,
+  bottomPadding: Dp = DEFAULT_PADDING_HALF,
   enableAlphaChanges: Boolean = true,
   overrideTitleColor: Color? = null,
-  textAlign: TextAlign = TextAlign.Start,
+  textAlign: TextAlign = TextAlign.Center,
   lineHeight: TextUnit = TextUnit.Unspecified
 ) {
   val handler = LocalAppBarHandler.current
-  val connection = if (enableAlphaChanges) handler?.connection else null
-  LaunchedEffect(title) {
-    if (enableAlphaChanges) {
-      handler?.title?.value = title.replace("\n", " ")
-    } else {
-      handler?.connection?.scrollTrackingEnabled = false
-    }
+  LaunchedEffect(Unit) {
+    handler?.title?.value = ""
+    handler?.connection?.scrollTrackingEnabled = false
   }
-  val theme = CurrentColors.collectAsState()
-  val titleColor = overrideTitleColor ?: MaterialTheme.appColors.title
-  val brush = if (overrideTitleColor != null)
-    Brush.linearGradient(listOf(titleColor, titleColor), Offset(0f, Float.POSITIVE_INFINITY), Offset(Float.POSITIVE_INFINITY, 0f))
-  else if (theme.value.base == DefaultTheme.ZERO)
-    Brush.linearGradient(listOf(titleColor.darker(0.2f), titleColor.lighter(0.35f)), Offset(0f, Float.POSITIVE_INFINITY), Offset(Float.POSITIVE_INFINITY, 0f))
-  else
-    Brush.linearGradient(listOf(titleColor, titleColor), Offset(0f, Float.POSITIVE_INFINITY), Offset(Float.POSITIVE_INFINITY, 0f))
-  Column {
-    Text(
-      title,
-      Modifier
-        .padding(start = if (withPadding) DEFAULT_PADDING else 0.dp, top = DEFAULT_PADDING_HALF, end = if (withPadding) DEFAULT_PADDING else 0.dp,)
-        .graphicsLayer {
-          alpha = bottomTitleAlpha(connection)
-        },
-      overflow = TextOverflow.Ellipsis,
-      style = MaterialTheme.typography.h1.copy(brush = brush, lineHeight = lineHeight),
-      color = MaterialTheme.colors.primaryVariant,
-      textAlign = textAlign
-    )
-    if (hostDevice != null) {
-      Box(Modifier.padding(start = if (withPadding) DEFAULT_PADDING else 0.dp, end = if (withPadding) DEFAULT_PADDING else 0.dp).graphicsLayer {
-        alpha = bottomTitleAlpha(connection)
-      }) {
-        HostDeviceTitle(hostDevice)
-      }
-    }
-    Spacer(Modifier.height(bottomPadding))
-  }
-}
-
-private fun bottomTitleAlpha(connection: CollapsingAppBarNestedScrollConnection?) =
-  if (connection?.scrollTrackingEnabled == false) 1f
-  else if ((connection?.appBarOffset ?: 0f).absoluteValue < AppBarHandler.appBarMaxHeightPx / 3) 1f
-  else ((AppBarHandler.appBarMaxHeightPx) + (connection?.appBarOffset ?: 0f) / 1.5f).coerceAtLeast(0f) / AppBarHandler.appBarMaxHeightPx
-
-@Composable
-private fun HostDeviceTitle(hostDevice: Pair<Long?, String>, extraPadding: Boolean = false) {
-  Row(Modifier.fillMaxWidth().padding(top = 5.dp, bottom = if (extraPadding) DEFAULT_PADDING * 2 else DEFAULT_PADDING_HALF), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start) {
-    DevicePill(
-      active = true,
-      onClick = {},
-      actionButtonVisible = false,
-      icon = painterResource(if (hostDevice.first == null) MR.images.ic_desktop else MR.images.ic_smartphone_300),
-      text = hostDevice.second
-    )
-  }
+  Spacer(Modifier.height(DEFAULT_PADDING_HALF))
 }

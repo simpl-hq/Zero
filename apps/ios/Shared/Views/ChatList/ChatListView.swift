@@ -4,7 +4,6 @@ import Zero
 enum UserPickerSheet: Identifiable {
     case address
     case chatPreferences
-    case chatProfiles
     case currentProfile
     case useFromDesktop
     case settings
@@ -13,12 +12,11 @@ enum UserPickerSheet: Identifiable {
 
     var navigationTitle: LocalizedStringKey {
         switch self {
-        case .address: "Zero address"
+        case .address: "My Address"
         case .chatPreferences: "Your preferences"
-        case .chatProfiles: "Your chat profiles"
-        case .currentProfile: "Your current profile"
+        case .currentProfile: "Edit profile"
         case .useFromDesktop: "Connect to desktop"
-        case .settings: "Your settings"
+        case .settings: "Settings"
         }
     }
 }
@@ -85,8 +83,6 @@ struct UserPickerSheetView: View {
                             preferences: currentUser.fullPreferences,
                             currentPreferences: currentUser.fullPreferences
                         )
-                    case .chatProfiles:
-                        UserProfilesView()
                     case .currentProfile:
                         UserProfile()
                     case .useFromDesktop:
@@ -97,8 +93,8 @@ struct UserPickerSheetView: View {
                 }
                 Color.clear
             }
-            .navigationTitle(sheet.navigationTitle)
-            .navigationBarTitleDisplayMode(.large)
+            .navigationBarTitle("", displayMode: .inline)
+            .navigationBarTitleDisplayMode(.inline)
             .modifier(ThemedBackground(grouped: true))
         }
         .overlay {
@@ -128,8 +124,8 @@ struct UserPickerSheetView: View {
             if let saveProfile = ss.profileSave {
                 showAlert(
                     title: NSLocalizedString("Save your profile?", comment: "alert title"),
-                    message: NSLocalizedString("Your profile was changed. If you save it, the updated profile will be sent to all your contacts.", comment: "alert message"),
-                    buttonTitle: NSLocalizedString("Save (and notify contacts)", comment: "alert button"),
+                    message: NSLocalizedString("Save changes to your profile?", comment: "alert message"),
+                    buttonTitle: NSLocalizedString("Save", comment: "alert button"),
                     buttonAction: saveProfile,
                     cancelButton: true
                 )

@@ -107,7 +107,7 @@ struct UserProfilesView: View {
                 EditButton()
             }
         }
-        .navigationTitle("Your chat profiles")
+        .navigationBarTitle("", displayMode: .inline)
         .modifier(ThemedBackground(grouped: true))
         .searchable(text: $searchTextOrPassword, placement: .navigationBarDrawer(displayMode: .always))
         .autocorrectionDisabled(true)

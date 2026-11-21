@@ -46,7 +46,6 @@ fun GroupReportsAppBar(
   BackHandler(onBack = onBackClicked)
   DefaultAppBar(
     navigationButton = { NavigationButtonBack(onBackClicked) },
-    fixedTitleText = stringResource(MR.strings.group_reports_member_reports),
     onTitleClick = null,
     onTop = !oneHandUI.value,
     showSearch = showSearch.value,

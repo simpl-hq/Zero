@@ -282,7 +282,7 @@ struct ConnectOnboardingView: View {
         .sheet(isPresented: $showAdvancedSettings) {
             NavigationView {
                 NetworkAndServers()
-                    .navigationTitle("Network & servers")
+                    .navigationBarTitle("", displayMode: .inline)
                     .modifier(ThemedBackground(grouped: true))
                     .environmentObject(ss)
             }

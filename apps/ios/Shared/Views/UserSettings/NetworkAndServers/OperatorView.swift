@@ -286,9 +286,9 @@ struct OperatorView: View {
     private func infoViewLink() -> some View {
         NavigationLink() {
             OperatorInfoView(serverOperator: userServers[operatorIndex].operator_)
-                .navigationBarTitle("Network operator")
+                .navigationBarTitle("", displayMode: .inline)
                 .modifier(ThemedBackground(grouped: true))
-                .navigationBarTitleDisplayMode(.large)
+                .navigationBarTitleDisplayMode(.inline)
         } label: {
             Image(userServers[operatorIndex].operator_.largeLogo(colorScheme))
                 .resizable()
@@ -578,8 +578,8 @@ struct SingleOperatorUsageConditionsView: View {
         NavigationLink("View conditions") {
             ConditionsTextView()
                 .padding()
-                .navigationTitle("Conditions of use")
-                .navigationBarTitleDisplayMode(.large)
+                .navigationBarTitle("", displayMode: .inline)
+                .navigationBarTitleDisplayMode(.inline)
                 .toolbar { ToolbarItem(placement: .navigationBarTrailing, content: conditionsLinkButton) }
                 .modifier(ThemedBackground(grouped: true))
         }

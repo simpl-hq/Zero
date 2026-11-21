@@ -70,7 +70,7 @@ struct DatabaseView: View {
             DatabaseEncryptionView(useKeychain: $useKeychain, migration: false, stopChatRunBlockStartChat: { progressIndicator, block in
                 stopChatRunBlockStartChat(false, progressIndicator, block)
             })
-                .navigationTitle("Database passphrase")
+                .navigationBarTitle("", displayMode: .inline)
                 .modifier(ThemedBackground(grouped: true))
         } label: {
             EmptyView()
@@ -190,7 +190,7 @@ struct DatabaseView: View {
                         DatabaseEncryptionView(useKeychain: $useKeychain, migration: false, stopChatRunBlockStartChat: { progressIndicator, block in
                             stopChatRunBlockStartChat(false, progressIndicator, block)
                         })
-                            .navigationTitle("Database passphrase")
+                            .navigationBarTitle("", displayMode: .inline)
                             .modifier(ThemedBackground(grouped: true))
                     } label: {
                         Text("Database passphrase")

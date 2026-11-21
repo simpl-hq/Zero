@@ -72,7 +72,7 @@ struct NetworkAndServers: View {
                                 serverWarnings: $ss.servers.serverWarnings,
                                 operatorIndex: idx
                             )
-                            .navigationTitle("Your servers")
+                            .navigationBarTitle("", displayMode: .inline)
                             .modifier(ThemedBackground(grouped: true))
                         } label: {
                             HStack {
@@ -88,7 +88,7 @@ struct NetworkAndServers: View {
 
                     NavigationLink {
                         AdvancedNetworkSettings()
-                            .navigationTitle("Advanced settings")
+                            .navigationBarTitle("", displayMode: .inline)
                             .modifier(ThemedBackground(grouped: true))
                     } label: {
                         Text("Advanced network settings")
@@ -179,9 +179,9 @@ struct NetworkAndServers: View {
                 operatorIndex: operatorIndex,
                 useOperator: serverOperator.enabled
             )
-            .navigationBarTitle("\(serverOperator.tradeName) servers")
+            .navigationBarTitle("", displayMode: .inline)
             .modifier(ThemedBackground(grouped: true))
-            .navigationBarTitleDisplayMode(.large)
+            .navigationBarTitleDisplayMode(.inline)
         } label: {
             HStack {
                 Image(serverOperator.logo(colorScheme))

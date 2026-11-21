@@ -136,7 +136,7 @@ struct AppearanceSettings: View {
                                 }
                         } else {
                             CustomizeThemeView(onChooseType: onChooseType)
-                                .navigationTitle("Customize theme")
+                                .navigationBarTitle("", displayMode: .inline)
                                 .modifier(ThemedBackground(grouped: true))
                                 .onAppear {
                                     customizeThemeIsOpen = true
@@ -696,7 +696,7 @@ struct UserWallpaperEditorSheet: View {
                 }
             }
         )
-        .navigationTitle("Profile theme")
+        .navigationBarTitle("", displayMode: .inline)
         .modifier(ThemedBackground(grouped: true))
         .onAppear {
             globalThemeUsed = preferred == nil

@@ -24,7 +24,7 @@ struct VersionView: View {
             Section {
                 NavigationLink {
                     DeveloperView()
-                        .navigationTitle("Developer")
+                        .navigationBarTitle("", displayMode: .inline)
                         .modifier(ThemedBackground(grouped: true))
                 } label: {
                     Text("Developer")

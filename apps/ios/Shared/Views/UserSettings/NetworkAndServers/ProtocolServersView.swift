@@ -150,8 +150,8 @@ struct YourServersView: View {
 
                     NavigationLink(isActive: $newChatRelayNavLinkActive) {
                         NewChatRelayView(userServers: $userServers, serverErrors: $serverErrors, serverWarnings: $serverWarnings)
-                            .navigationTitle("New chat relay")
-                            .navigationBarTitleDisplayMode(.large)
+                            .navigationBarTitle("", displayMode: .inline)
+                            .navigationBarTitleDisplayMode(.inline)
                             .modifier(ThemedBackground(grouped: true))
                     } label: {
                         EmptyView()
@@ -213,8 +213,8 @@ struct YourServersView: View {
             serverErrors: $serverErrors,
             serverWarnings: $serverWarnings
         )
-        .navigationTitle("New server")
-        .navigationBarTitleDisplayMode(.large)
+        .navigationBarTitle("", displayMode: .inline)
+        .navigationBarTitleDisplayMode(.inline)
         .modifier(ThemedBackground(grouped: true))
     }
 
@@ -253,9 +253,9 @@ struct ProtocolServerViewLink: View {
                 serverToEdit: server,
                 backLabel: backLabel
             )
-            .navigationBarTitle("\(proto) server")
+            .navigationBarTitle("", displayMode: .inline)
             .modifier(ThemedBackground(grouped: true))
-            .navigationBarTitleDisplayMode(.large)
+            .navigationBarTitleDisplayMode(.inline)
         } label: {
             let address = parseServerAddress(server.server)
             HStack {

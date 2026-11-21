@@ -775,7 +775,7 @@ struct ZeroInfo: View {
     @EnvironmentObject var theme: AppTheme
     @Environment(\.colorScheme) var colorScheme: ColorScheme
     @State private var isProvisioning = false
-    @State private var provisioningStatus = "Securing your Zero identity (Argon2id)..."
+    @State private var provisioningStatus = "Creating your private identity…"
     @State private var createdPhrase: String? = nil
     @State private var copiedCreatedPhrase = false
     @State private var showGuidedTutorial = false
@@ -806,13 +806,11 @@ struct ZeroInfo: View {
             Spacer()
 
             VStack(spacing: 12) {
-                Image(theme.colors.background.isLightSurface ? "logo" : "logo-light")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(height: 44)
-                    .accessibilityLabel("Zero")
+                Text("Zero")
+                    .font(.system(size: 42, weight: .black, design: .default))
+                    .foregroundColor(theme.colors.onBackground)
 
-                Text("Private messaging, made simple.\nNo phone number. No email. Nothing that identifies you.")
+                Text("Private by design.\nNo phone number. No email. Nothing that identifies you.")
                     .font(.subheadline)
                     .foregroundColor(theme.colors.secondary)
                     .multilineTextAlignment(.center)
@@ -867,7 +865,7 @@ struct ZeroInfo: View {
                     Button {
                         showGuidedTutorial = true
                     } label: {
-                        Text("Start Quick Setup Guide")
+                        Text("Setup Guide")
                             .font(.headline)
                             .foregroundColor(theme.colors.onPrimary)
                             .frame(maxWidth: .infinity)
@@ -897,7 +895,7 @@ struct ZeroInfo: View {
                     Button {
                         createZeroIdentity()
                     } label: {
-                        Text("Create Zero Identity")
+                        Text("Get Started")
                             .font(.headline)
                             .foregroundColor(theme.colors.onPrimary)
                             .frame(maxWidth: .infinity)
@@ -914,7 +912,7 @@ struct ZeroInfo: View {
                         errorMessage = nil
                         showExistingPhraseSheet = true
                     } label: {
-                        Text("I Already Have a Phrase")
+                        Text("Restore with Phrase")
                             .font(.headline)
                             .foregroundColor(theme.colors.onBackground)
                             .frame(maxWidth: .infinity)
@@ -961,7 +959,7 @@ struct ZeroInfo: View {
                 VStack(alignment: .leading) {
                     MigrateToDevice(migrationState: $m.migrationState)
                 }
-                .navigationTitle("Migrate here")
+                .navigationBarTitle("", displayMode: .inline)
                 .modifier(ThemedBackground(grouped: true))
             }
         }
@@ -1008,7 +1006,7 @@ struct ZeroInfo: View {
                             Text("Direct Network Connection")
                                 .font(.caption.weight(.semibold))
                                 .foregroundColor(theme.colors.onBackground)
-                            Text("Your IP address is visible to your ISP during discovery. To hide your IP, enable 2-hop Onion / SOCKS5 routing in Settings.")
+                            Text("Your IP address is visible to your ISP during discovery. To hide your IP, enable Tor routing in Settings.")
                                 .font(.caption2)
                                 .foregroundColor(theme.colors.secondary)
                         }
@@ -1025,7 +1023,7 @@ struct ZeroInfo: View {
                         Image(systemName: "checkmark.shield.fill")
                             .foregroundColor(.green)
                             .font(.caption)
-                        Text("Onion / SOCKS5 Proxy Active — IP Masked")
+                        Text("Tor Active — IP Masked")
                             .font(.caption2.weight(.medium))
                             .foregroundColor(theme.colors.secondary)
                     }
@@ -1271,7 +1269,7 @@ struct ZeroDiscoverySettingsView: View {
                     }
                 }
             }
-            .navigationTitle("Discovery Broker")
+            .navigationBarTitle("", displayMode: .inline)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {

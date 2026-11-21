@@ -50,7 +50,7 @@ struct AdvancedNetworkSettings: View {
                                     .foregroundColor(theme.colors.secondary)
                             }
                         }
-                        .navigationTitle("Private routing")
+                        .navigationBarTitle("", displayMode: .inline)
                         .modifier(ThemedBackground(grouped: true))
                         .navigationBarTitleDisplayMode(.inline)
                     } label: {
@@ -74,7 +74,7 @@ struct AdvancedNetworkSettings: View {
                                     .foregroundColor(theme.colors.secondary)
                             }
                         }
-                        .navigationTitle("Allow downgrade")
+                        .navigationBarTitle("", displayMode: .inline)
                         .modifier(ThemedBackground(grouped: true))
                         .navigationBarTitleDisplayMode(.inline)
                     } label: {
@@ -100,7 +100,7 @@ struct AdvancedNetworkSettings: View {
                 }
 
                 Section {
-                    Toggle("Use SOCKS proxy (Tor)", isOn: $useNetProxy)
+                    Toggle("Tor", isOn: $useNetProxy)
                         .onChange(of: useNetProxy) { on in
                             if !on && currentNetCfg.socksProxy != nil { showTorOffWarning = true }
                         }
@@ -139,7 +139,7 @@ struct AdvancedNetworkSettings: View {
                     .disabled(!useNetProxy)
                 } header: {
                     HStack {
-                        Text("SOCKS proxy").foregroundColor(theme.colors.secondary)
+                        Text("Tor settings").foregroundColor(theme.colors.secondary)
                         if useNetProxy && !netProxy.valid {
                             Spacer()
                             Image(systemName: "exclamationmark.circle.fill").foregroundColor(.red)
@@ -373,8 +373,8 @@ struct AdvancedNetworkSettings: View {
         let userMode = Text("A separate TCP connection will be used **for each chat profile you have in the app**.")
         return switch mode {
         case .user: userMode
-        case .session: userMode + textNewLine + Text("New SOCKS credentials will be used every time you start the app.")
-        case .server: userMode + textNewLine + Text("New SOCKS credentials will be used for each server.")
+        case .session: userMode + textNewLine + Text("New Tor circuit credentials will be used every time you start the app.")
+        case .server: userMode + textNewLine + Text("New Tor circuit credentials will be used for each server.")
         case .entity: Text("A separate TCP connection will be used **for each contact and group member**.\n**Please note**: if you have many connections, your battery and traffic consumption can be substantially higher and some connections may fail.")
         }
     }

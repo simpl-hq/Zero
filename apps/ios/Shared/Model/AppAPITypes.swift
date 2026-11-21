@@ -1632,23 +1632,20 @@ let operatorsInfo: Dictionary<OperatorTag, ServerOperatorInfo> = [
             "Zero develops the communication software for Zero network."
         ],
         website: URL(string: "https://simpl.global")!,
-        logo: "decentralized",
+        logo: "logo",
         largeLogo: "logo",
-        logoDarkMode: "decentralized-light",
+        logoDarkMode: "logo-light",
         largeLogoDarkMode: "logo-light"
     ),
     .flux: ServerOperatorInfo(
         description: [
-            "Flux is the largest decentralized cloud, based on a global network of user-operated nodes.",
-            "Flux offers a powerful, scalable, and affordable cutting edge technology platform for all.",
-            "Flux operates servers in Zero network to improve its privacy and decentralization."
+            "Zero EU operates European relay servers in the Zero network to improve privacy, latency, and decentralization."
         ],
-        website: URL(string: "https://runonflux.com")!,
-        selfhost: (text: "Self-host Zero servers on Flux", link: URL(string: "https://home.runonflux.io/apps/marketplace?q=zero")!),
-        logo: "flux_logo_symbol",
-        largeLogo: "flux_logo",
-        logoDarkMode: "flux_logo_symbol",
-        largeLogoDarkMode: "flux_logo-light"
+        website: URL(string: "https://simpl.global")!,
+        logo: "logo",
+        largeLogo: "logo",
+        logoDarkMode: "logo-light",
+        largeLogoDarkMode: "logo-light"
     ),
 ]
 

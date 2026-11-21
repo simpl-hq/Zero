@@ -80,6 +80,9 @@ else
     [ -e "$lib" ] || continue
     cp -P "$lib" "$DEST_DIR/"
   done
+  if [ "$OS_ARG" = "linux" ] && command -v strip >/dev/null 2>&1; then
+    strip --strip-unneeded "${DEST_DIR}/tor" "${DEST_DIR}"/*.so* 2>/dev/null || true
+  fi
 fi
 
 echo "[zero] Bundled Tor into ${DEST_DIR}:"

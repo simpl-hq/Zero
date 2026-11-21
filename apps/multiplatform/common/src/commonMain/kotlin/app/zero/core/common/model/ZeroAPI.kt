@@ -146,6 +146,8 @@ class AppPreferences {
   val terminalAlwaysVisible = mkBoolPreference(SHARED_PREFS_TERMINAL_ALWAYS_VISIBLE, false)
   val networkUseSocksProxy = mkBoolPreference(SHARED_PREFS_NETWORK_USE_SOCKS_PROXY, true)
   val networkShowSubscriptionPercentage = mkBoolPreference(SHARED_PREFS_NETWORK_SHOW_SUBSCRIPTION_PERCENTAGE, false)
+  val encryptedDisposableParentUserId = mkStrPreference(SHARED_PREFS_ENCRYPTED_DISPOSABLE_PARENT_USER_ID, null)
+  val initializationVectorDisposableParentUserId = mkStrPreference(SHARED_PREFS_IV_DISPOSABLE_PARENT_USER_ID, null)
   private val _networkProxy = mkStrPreference(SHARED_PREFS_NETWORK_PROXY_HOST_PORT, json.encodeToString(NetworkProxy()))
   val networkProxy: SharedPreference<NetworkProxy> = SharedPreference(
     get = fun(): NetworkProxy {
@@ -441,6 +443,8 @@ class AppPreferences {
     private const val SHARED_PREFS_TERMINAL_ALWAYS_VISIBLE = "TerminalAlwaysVisible"
     private const val SHARED_PREFS_NETWORK_USE_SOCKS_PROXY = "NetworkUseSocksProxy"
     private const val SHARED_PREFS_NETWORK_SHOW_SUBSCRIPTION_PERCENTAGE = "ShowSubscriptionPercentage"
+    private const val SHARED_PREFS_ENCRYPTED_DISPOSABLE_PARENT_USER_ID = "EncryptedDisposableParentUserId"
+    private const val SHARED_PREFS_IV_DISPOSABLE_PARENT_USER_ID = "IVDisposableParentUserId"
     private const val SHARED_PREFS_NETWORK_PROXY_HOST_PORT = "NetworkProxyHostPort"
     private const val SHARED_PREFS_NETWORK_SESSION_MODE = "NetworkSessionMode"
     private const val SHARED_PREFS_NETWORK_SMP_PROXY_MODE = "NetworkSMPProxyMode"
@@ -525,7 +529,9 @@ private const val MESSAGE_TIMEOUT: Int = 300_000_000
 
 object ChatController {
   private var chatCtrl: ChatCtrl? = -1
-  val appPrefs: AppPreferences by lazy { AppPreferences() }
+  private val appPrefsDelegate = lazy { AppPreferences() }
+  val appPrefs: AppPreferences by appPrefsDelegate
+  fun appPrefsOrNull(): AppPreferences? = if (appPrefsDelegate.isInitialized()) appPrefsDelegate.value else null
 
   val messagesChannel: Channel<API> = Channel()
 
@@ -4465,23 +4471,20 @@ val operatorsInfo: Map<OperatorTag, ServerOperatorInfo> = mapOf(
       "Zero develops the communication software for Zero network."
     ),
     website = "https://simpl.global",
-    logo = MR.images.decentralized,
+    logo = MR.images.logo,
     largeLogo = MR.images.logo,
-    logoDarkMode = MR.images.decentralized_light,
+    logoDarkMode = MR.images.logo_light,
     largeLogoDarkMode = MR.images.logo_light
   ),
   OperatorTag.Flux to ServerOperatorInfo(
     description = listOf(
-      "Flux is the largest decentralized cloud, based on a global network of user-operated nodes.",
-      "Flux offers a powerful, scalable, and affordable cutting edge technology platform for all.",
-      "Flux operates servers in Zero network to improve its privacy and decentralization."
+      "Zero EU operates European relay servers in the Zero network to improve privacy, latency, and decentralization."
     ),
-    website = "https://runonflux.com",
-    selfhost = "Self-host Zero servers on Flux" to "https://home.runonflux.io/apps/marketplace?q=zero",
-    logo = MR.images.flux_logo_symbol,
-    largeLogo = MR.images.flux_logo,
-    logoDarkMode = MR.images.flux_logo_symbol,
-    largeLogoDarkMode = MR.images.flux_logo_light
+    website = "https://simpl.global",
+    logo = MR.images.logo,
+    largeLogo = MR.images.logo,
+    logoDarkMode = MR.images.logo_light,
+    largeLogoDarkMode = MR.images.logo_light
   ),
 )
 
@@ -5354,7 +5357,7 @@ data class TimedMessagesPreference(
       get() = listOf(60, 300, 600, 1800, 3600, 12 * 3600, 86400, 7 * 86400, 30 * 86400, 3 * 30 * 86400, null)
 
     val profileLevelTTLValues: List<Int?>
-      get() = listOf(7 * 86400, 30 * 86400, 3 * 30 * 86400, null)
+      get() = listOf(60, 300, 1800, 3600, 86400, 7 * 86400, 30 * 86400, 3 * 30 * 86400, null)
   }
 }
 

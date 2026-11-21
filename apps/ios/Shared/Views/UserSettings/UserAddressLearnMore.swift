@@ -60,8 +60,8 @@ struct UserAddressLearnMore: View {
 
             NavigationLink(isActive: $createAddressLinkActive) {
                 UserAddressView(autoCreate: true)
-                    .navigationTitle("Zero address")
-                    .navigationBarTitleDisplayMode(.large)
+                    .navigationBarTitle("", displayMode: .inline)
+                    .navigationBarTitleDisplayMode(.inline)
             } label: {
                 EmptyView()
             }
@@ -81,8 +81,8 @@ struct UserAddressLearnMore: View {
 
             NavigationLink(isActive: $createOneTimeLinkActive) {
                 NewChatView(selection: .invite)
-                    .navigationTitle("New chat")
-                    .navigationBarTitleDisplayMode(.large)
+                    .navigationBarTitle("", displayMode: .inline)
+                    .navigationBarTitleDisplayMode(.inline)
                     .modifier(ThemedBackground(grouped: true))
             } label: {
                 EmptyView()

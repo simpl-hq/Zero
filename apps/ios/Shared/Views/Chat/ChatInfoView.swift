@@ -449,7 +449,7 @@ struct ChatInfoView: View {
                 }
             )
             .navigationBarTitleDisplayMode(.inline)
-            .navigationTitle("Security code")
+            .navigationBarTitle("", displayMode: .inline)
             .modifier(ThemedBackground(grouped: true))
         } label: {
             Label(
@@ -467,9 +467,9 @@ struct ChatInfoView: View {
                 currentFeaturesAllowed: $currentFeaturesAllowed,
                 savePreferences: savePreferences
             )
-            .navigationBarTitle("Contact preferences")
+            .navigationBarTitle("", displayMode: .inline)
             .modifier(ThemedBackground(grouped: true))
-            .navigationBarTitleDisplayMode(.large)
+            .navigationBarTitleDisplayMode(.inline)
         } label: {
             Label("Contact preferences", systemImage: "switch.2")
         }
@@ -934,7 +934,7 @@ struct ChatWallpaperEditorSheet: View {
                 await save(applyToMode, newTheme, $chat)
             }
         )
-        .navigationTitle("Chat theme")
+        .navigationBarTitle("", displayMode: .inline)
         .modifier(ThemedBackground(grouped: true))
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {

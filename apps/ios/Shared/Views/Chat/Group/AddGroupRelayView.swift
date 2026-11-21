@@ -34,7 +34,7 @@ struct AddGroupRelayView: View {
                 }
             }
             .modifier(ThemedBackground(grouped: true))
-            .navigationTitle("Add relays")
+            .navigationBarTitle("", displayMode: .inline)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
