@@ -145,7 +145,6 @@ fun HelpAndSupportView(
 
     SectionView(stringResource(MR.strings.settings_section_title_contact)) {
       if (!chatModel.desktopNoUserNoRemote) {
-        SettingsActionItem(painterResource(MR.images.ic_bigtop_updates), stringResource(MR.strings.follow_zero_network_news), { uriHandler.openExternalLink("https://simpl.global") }, textColor = MaterialTheme.colors.primary, disabled = stopped)
         SettingsActionItem(painterResource(MR.images.ic_tag), stringResource(MR.strings.chat_with_the_founder), { uriHandler.openExternalLink("https://github.com/simpl-hq/zero/issues") }, textColor = MaterialTheme.colors.primary, disabled = stopped)
       }
       SettingsActionItem(painterResource(MR.images.ic_mail), stringResource(MR.strings.send_us_an_email), { uriHandler.openUriCatching("mailto:support@simpl.global") }, textColor = MaterialTheme.colors.primary)
@@ -153,6 +152,7 @@ fun HelpAndSupportView(
     SectionDividerSpaced()
 
     SectionView(stringResource(MR.strings.settings_section_title_support_project)) {
+      SettingsActionItem(painterResource(MR.images.ic_heart), "Donate", showModal { DonateView() }, textColor = MaterialTheme.colors.primary)
       if (!platform.androidIsPlayStoreBuild) {
         ContributeItem(uriHandler)
       }
@@ -483,6 +483,89 @@ fun doWithAuth(title: String, desc: String, block: () -> Unit) {
             }
           )
         }
+      }
+    }
+  }
+}
+
+@Composable
+private fun DonateView() {
+  val uriHandler = LocalUriHandler.current
+  val clipboard = LocalClipboardManager.current
+  var copiedLabel by remember { mutableStateOf<String?>(null) }
+
+  ColumnWithScrollBar {
+    AppBarTitle("Donate")
+    Text(
+      "Zero is free, open-source, and independent. Every contribution helps keep relays and development running.",
+      modifier = Modifier.padding(horizontal = DEFAULT_PADDING, vertical = DEFAULT_PADDING_HALF),
+      color = MaterialTheme.colors.secondary,
+      fontSize = 14.sp,
+      lineHeight = 20.sp
+    )
+    SectionDividerSpaced()
+
+    SectionView("WEB") {
+      SettingsActionItem(
+        painterResource(MR.images.ic_heart),
+        "Open simpl.global/donate",
+        { uriHandler.openExternalLink("https://simpl.global/donate") },
+        textColor = MaterialTheme.colors.primary
+      )
+      SettingsActionItem(
+        painterResource(MR.images.ic_star_filled),
+        "Buy Me a Coffee",
+        { uriHandler.openExternalLink("https://buymeacoffee.com/supportsimpl") },
+        textColor = MaterialTheme.colors.primary
+      )
+    }
+    SectionDividerSpaced()
+
+    SectionView("CRYPTO (TAP TO COPY)") {
+      DonateAddressItem("Bitcoin (BTC)", "bc1qwdz5r5vagtqq8mmn0wch2y6q5adk4ms84xj3es", copiedLabel == "BTC") {
+        clipboard.setText(androidx.compose.ui.text.AnnotatedString("bc1qwdz5r5vagtqq8mmn0wch2y6q5adk4ms84xj3es"))
+        copiedLabel = "BTC"
+      }
+      DonateAddressItem("Monero (XMR)", "47hCGy2csT1fJXMbsVtstXDqudH2M6tyeVQed9ob4vjgawLMnRqA5sNESBrGsfoiEQNCFWbohXsTG9JDfVWCh5KgVhTcrrL", copiedLabel == "XMR") {
+        clipboard.setText(androidx.compose.ui.text.AnnotatedString("47hCGy2csT1fJXMbsVtstXDqudH2M6tyeVQed9ob4vjgawLMnRqA5sNESBrGsfoiEQNCFWbohXsTG9JDfVWCh5KgVhTcrrL"))
+        copiedLabel = "XMR"
+      }
+      DonateAddressItem("Ethereum / USDC (ETH)", "0x96A103A67cB65c33673275FEFA29C77807E52605", copiedLabel == "ETH") {
+        clipboard.setText(androidx.compose.ui.text.AnnotatedString("0x96A103A67cB65c33673275FEFA29C77807E52605"))
+        copiedLabel = "ETH"
+      }
+    }
+    SectionBottomSpacer()
+  }
+}
+
+@Composable
+private fun DonateAddressItem(label: String, address: String, copied: Boolean, onCopy: () -> Unit) {
+  SectionItemView(onCopy) {
+    Row(
+      Modifier.fillMaxWidth(),
+      verticalAlignment = Alignment.CenterVertically,
+      horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+      Column(Modifier.weight(1f).padding(end = 12.dp)) {
+        Text(label, fontWeight = FontWeight.Medium)
+        Text(
+          address,
+          color = MaterialTheme.colors.secondary,
+          fontSize = 12.sp,
+          maxLines = 1,
+          overflow = TextOverflow.Ellipsis
+        )
+      }
+      if (copied) {
+        Text("Copied", color = MaterialTheme.colors.primary, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+      } else {
+        Icon(
+          painterResource(MR.images.ic_content_copy),
+          contentDescription = "Copy",
+          tint = MaterialTheme.colors.secondary,
+          modifier = Modifier.size(18.dp)
+        )
       }
     }
   }

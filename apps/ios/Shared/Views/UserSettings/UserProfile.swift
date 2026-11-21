@@ -39,7 +39,7 @@ struct UserProfile: View {
                     TextField("Full name (optional)", text: $profile.fullName)
                 }
                 HStack {
-                    TextField("Bio", text: $shortDescr)
+                    TextField("About", text: $shortDescr)
                     if !bioFitsLimit() {
                         Button {
                             showAlert(NSLocalizedString("Bio too large", comment: "alert title"))
@@ -47,13 +47,6 @@ struct UserProfile: View {
                             Image(systemName: "exclamationmark.circle").foregroundColor(.red)
                         }
                     }
-                }
-                NavigationLink {
-                    ProfileDescriptionEditor(description: $description)
-                        .navigationTitle("Description")
-                        .modifier(ThemedBackground(grouped: true))
-                } label: {
-                    Text(description.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "Add description" : "Edit description")
                 }
             } footer: {
                 Text("Your profile is stored on your device and shared only with your contacts. Zero servers cannot see your profile.")
@@ -69,7 +62,7 @@ struct UserProfile: View {
                     (profile.description ?? "") == description.trimmingCharacters(in: .whitespacesAndNewlines)
                 )
                 Button(action: saveProfile) {
-                    Text("Save (and notify contacts)")
+                    Text("Save")
                 }
                 .disabled(!canSaveProfile)
             }

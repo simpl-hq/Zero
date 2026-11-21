@@ -3659,7 +3659,7 @@ sealed class CIStatus {
     paleMetaColor: Color = CurrentColors.value.colors.secondary
   ): Pair<ImageResource, Color>? =
     when (this) {
-      is SndNew -> null
+      is SndNew -> MR.images.ic_check_filled to metaColor
       is SndSent -> when (this.sndProgress) {
         SndCIStatusProgress.Complete -> MR.images.ic_check_filled to metaColor
         SndCIStatusProgress.Partial -> MR.images.ic_check_filled to paleMetaColor

@@ -12,14 +12,11 @@ struct PreferencesView: View {
         VStack {
             List {
                 timedMessagesFeatureSection($preferences.timedMessages.allow, $preferences.timedMessages.ttl)
-                featureSection(.fullDelete, $preferences.fullDelete.allow)
-                featureSection(.reactions, $preferences.reactions.allow)
-                featureSection(.voice, $preferences.voice.allow)
                 featureSection(.calls, $preferences.calls.allow)
 
                 Section {
                     Button("Reset") { preferences = currentPreferences }
-                    Button("Save (and notify contacts)") { savePreferences() }
+                    Button("Save") { savePreferences() }
                 }
                 .disabled(currentPreferences == preferences)
             }
@@ -88,7 +85,11 @@ struct PreferencesView: View {
         Task {
             do {
                 var p = fromLocalProfile(profile)
-                p.preferences = fullPreferencesToPreferences(preferences)
+                var updated = preferences
+                updated.fullDelete.allow = .yes
+                updated.reactions.allow = .yes
+                updated.voice.allow = .yes
+                p.preferences = fullPreferencesToPreferences(updated)
                 if let (newProfile, updatedContacts) = try await apiUpdateProfile(profile: p) {
                     await MainActor.run {
                         chatModel.updateCurrentUser(newProfile, preferences)

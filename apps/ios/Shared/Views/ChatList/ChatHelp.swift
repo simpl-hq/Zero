@@ -58,7 +58,7 @@ struct ChatHelp: View {
                 Text("**Your 4-Word Phrase**: Zero needs no email or phone number. Share your 4-word phrase or `simpl.global/add` link when someone wants to message you.")
                 Text("**6-Digit In-Person Code**: Mint a 5-minute code from the home card or `+` menu when connecting side by side or over a call.")
                 Text("**2-Hop Private Routing**: Turn on Private routing under Network & servers so your IP address stays hidden from a contact's relay.")
-                Text("**Local Device Security**: Messages live encrypted only on this device. Enable Face ID lock in Your privacy and back up your phrase.")
+                Text("**Local Device Security**: Messages live encrypted only on this device. Enable Face ID lock in Privacy and back up your phrase.")
             }
             .padding(.top, 8)
 

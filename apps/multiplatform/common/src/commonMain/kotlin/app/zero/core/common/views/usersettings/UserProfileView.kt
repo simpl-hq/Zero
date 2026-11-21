@@ -160,7 +160,6 @@ fun UserProfileLayout(
             .padding(horizontal = DEFAULT_PADDING),
         ) {
           AppBarTitle(stringResource(MR.strings.your_current_profile), withPadding = false)
-          ReadableText(generalGetString(MR.strings.your_profile_is_stored_on_device_and_shared_only_with_contacts_zero_cannot_see_it), TextAlign.Center)
           Column(
             Modifier
               .fillMaxWidth()
@@ -224,18 +223,11 @@ fun UserProfileLayout(
             ProfileNameField(shortDescr)
 
             Spacer(Modifier.height(DEFAULT_PADDING))
-            Text(
-              stringResource(if (description.value.isBlank()) MR.strings.add_description else MR.strings.edit_description),
-              color = MaterialTheme.colors.primary,
-              modifier = Modifier.clickable { editingDescription = true }
-            )
-
-            Spacer(Modifier.height(DEFAULT_PADDING))
             val enabled = !dataUnchanged() && canSaveProfile(displayName.value, shortDescr.value, profile)
             val saveModifier: Modifier = Modifier.clickable(enabled) { saveProfile(displayName.value, fullName.value, shortDescr.value, description.value, profileImage.value) }
             val saveColor: Color = if (enabled) MaterialTheme.colors.primary else MaterialTheme.colors.secondary
             Text(
-              stringResource(MR.strings.save_and_notify_contacts),
+              stringResource(MR.strings.save_verb),
               modifier = saveModifier,
               color = saveColor
             )
@@ -284,7 +276,7 @@ fun DeleteImageButton(click: () -> Unit) {
 private fun showUnsavedChangesAlert(save: () -> Unit, revert: () -> Unit) {
   AlertManager.shared.showAlertDialogStacked(
     title = generalGetString(MR.strings.save_preferences_question),
-    confirmText = generalGetString(MR.strings.save_and_notify_contacts),
+    confirmText = generalGetString(MR.strings.save_verb),
     dismissText = generalGetString(MR.strings.exit_without_saving),
     onConfirm = save,
     onDismiss = revert,

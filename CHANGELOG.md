@@ -15,20 +15,22 @@
 
 ---
 
-## [1.0.0] — 2026-11-18
+## [1.0.0] — 2026-11-20
 
 ### Added
-- Initial open-source **`v1.0.0`** launch release of **Zero** across desktop (`Windows`, `macOS`, `Linux`), CLI, signed Android APK (`arm64-v8a`, `armeabi-v7a`, `x86_64`), universal iOS sideload IPA (`iPhone & iPad`), and multi-language SDKs.
-- Monochrome black-and-white design system (`#000000` / `#FFFFFF`), adaptive monochrome app icons (`ic_zero_dark`, `ic_zero_light`, `AppIcon`, `DarkAppIcon`), luminance-aware bubble contrast, and an interactive 4-step Guided Setup Tutorial across SwiftUI and Compose Multiplatform.
-- Cross-platform native installers: Windows WPF Setup GUI (`ZeroSetup.exe`) with SHA-256 payload verification and Authenticode signing hooks, monochrome WiX `.msi` assets, macOS `.dmg` Finder canvas setup, and Linux `.deb` / `AppImage` / `install-linux.sh` packaging.
-- End-to-end test suites covering client `Argon2id` PoW vectors (`ZeroIdentityBridgeTest.kt`) and broker phrase/code provisioning, replay rejection, rate limits, and TURN credentials (`apps/zero-pin-broker/test_main.py`).
+- Initial open-source **`v1.0.0`** launch release of **Zero** across Windows (`zero-desktop-windows-x86_64-setup.exe`), macOS (`zero-desktop-macos-aarch64.dmg`), Linux (`zero-desktop-x86_64.AppImage`), Android (`zero-android-arm64-v8a.apk`), and iOS (`zero-ios-universal.ipa`).
+- Embedded **Tor** enabled by default across all 5 platforms (`Tor Expert Bundle 16.0.1` on Desktop, `tor-android` on Android, `iCepa/Tor.framework` on iOS) with SHA-256 verification and `--ClientOnly 1 --AvoidDiskWrites 1` loopback isolation.
+- **New identity** & **Burner identity** (with one-tap **Burn identity** teardown) backed by encrypted `KeyStore` / iOS `Keychain` storage.
+- Streamlined **My Address** & **Address settings** (live current address + one-tap **New address** rotation), expanded disappearing message timers (`1m`, `5m`, `30m`, `1h`, `1d`, `1w`, `1mo`), and **Donate** view (`simpl.global/donate`, Buy Me a Coffee, BTC, XMR, ETH).
+- Monochrome black-and-white design system (`#000000` / `#FFFFFF`), bold **Z** emblem, adaptive monochrome app icons, and pre-call **Encrypted P2P call** IP disclosure before making or answering calls.
 
 ### Changed
-- Standardized 10-bit RFC 9106 `Argon2id` proof-of-work (`m=8 MiB, t=1, p=1`), added TLS CA SPKI/DER certificate pinning on default `simpl.global` discovery endpoints (`zeroapi`, `zeroeu`, `zerona`), enforced fail-closed SOCKS5 proxy routing, and isolated custom/disabled broker settings (`ZeroDirectoryUrl = off` or custom HTTPS endpoint).
-- Unified monorepo release metadata to `1.0.0` across Haskell (`zero-runtime.cabal`, `vendor/zeroq`), SwiftUI (`Zero.xcodeproj`), Kotlin Multiplatform, Flatpak/AppStream, and `SECURITY.md` / `WHITEPAPER.md`.
+- Standardized 10-bit RFC 9106 `Argon2id` proof-of-work (`m=8 MiB, t=1, p=1`), added TLS CA SPKI/DER certificate pinning on default `simpl.global` discovery endpoints (`zeroapi`, `zeroeu`, `zerona`), and enforced SOCKS5h (`ATYP=0x03`) remote DNS resolution for broker calls.
+- Unified monorepo release metadata to `1.0.0` across Haskell (`zero-runtime.cabal`), SwiftUI (`Zero.xcodeproj`), Kotlin Multiplatform, and `SECURITY.md` / `WHITEPAPER.md`.
 
 ### Fixed
-- Tightened resolved contact discovery URIs to strictly require the `zero:/` scheme, bounded `WRITE_EXTERNAL_STORAGE` in `AndroidManifest.xml` to `maxSdkVersion="28"`, resolved Xcode framework target header/bridging settings in `Zero.xcodeproj`, and aligned CI artifact names and SHA-256 verification checklists.
+- Fixed startup `Log` / `appPrefs` initialization recursion (`appPrefsOrNull()`), atomic SQLite `protocol_servers` upserts (`ON CONFLICT DO UPDATE`), and `Zero (iOS)` module disambiguation (`PRODUCT_MODULE_NAME = ZeroApp`).
+- Tightened resolved contact discovery URIs to strictly require the `zero:/` scheme, bounded `WRITE_EXTERNAL_STORAGE` in `AndroidManifest.xml` to `maxSdkVersion="28"`, and aligned CI artifact names and SHA-256 verification checklists.
 
 ---
 

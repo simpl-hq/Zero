@@ -14,7 +14,7 @@ struct ZeroHybridConnectSheet: View {
     var body: some View {
         NavigationView {
             VStack(spacing: 20) {
-                Text("Connect Privately")
+                Text("New message")
                     .font(.title3)
                     .bold()
                     .padding(.top, 24)

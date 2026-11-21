@@ -1,3 +1,6 @@
+// API Types
+// This file is generated automatically.
+
 export interface ACIReaction {
   chatInfo: ChatInfo
   chatReaction: CIReaction
@@ -25,7 +28,7 @@ export interface AddressSettings {
   autoReply?: MsgContent
 }
 
-export type AgentCryptoError =
+export type AgentCryptoError = 
   | AgentCryptoError.DECRYPT_AES
   | AgentCryptoError.DECRYPT_CB
   | AgentCryptoError.RATCHET_HEADER
@@ -55,7 +58,7 @@ export namespace AgentCryptoError {
   }
 }
 
-export type AgentErrorType =
+export type AgentErrorType = 
   | AgentErrorType.CMD
   | AgentErrorType.CONN
   | AgentErrorType.NO_USER
@@ -74,7 +77,7 @@ export type AgentErrorType =
   | AgentErrorType.INACTIVE
 
 export namespace AgentErrorType {
-  export type Tag =
+  export type Tag = 
     | "CMD"
     | "CONN"
     | "NO_USER"
@@ -166,7 +169,7 @@ export namespace AgentErrorType {
     type: "NOTICE"
     server: string
     preset: boolean
-    expiresAt?: string
+    expiresAt?: string // ISO-8601 timestamp
   }
 
   export interface INTERNAL extends Interface {
@@ -191,12 +194,12 @@ export interface AutoAccept {
 
 export interface BadgeInfo {
   badgeType: BadgeType
-  badgeExpiry?: string
+  badgeExpiry?: string // ISO-8601 timestamp
   badgeExtra: string
 }
 
 export interface BadgeProof {
-  badgeKeyIdx: number
+  badgeKeyIdx: number // int
   presHeader: string
   proof: string
   badgeInfo: BadgeInfo
@@ -226,7 +229,7 @@ export enum BlockingReason {
   Content = "content",
 }
 
-export type BrokerErrorType =
+export type BrokerErrorType = 
   | BrokerErrorType.RESPONSE
   | BrokerErrorType.UNEXPECTED
   | BrokerErrorType.NETWORK
@@ -236,7 +239,7 @@ export type BrokerErrorType =
   | BrokerErrorType.TIMEOUT
 
 export namespace BrokerErrorType {
-  export type Tag =
+  export type Tag = 
     | "RESPONSE"
     | "UNEXPECTED"
     | "NETWORK"
@@ -305,7 +308,7 @@ export enum CICallStatus {
   Error = "error",
 }
 
-export type CIContent =
+export type CIContent = 
   | CIContent.SndMsgContent
   | CIContent.RcvMsgContent
   | CIContent.SndDeleted
@@ -340,7 +343,7 @@ export type CIContent =
   | CIContent.ChatBanner
 
 export namespace CIContent {
-  export type Tag =
+  export type Tag = 
     | "sndMsgContent"
     | "rcvMsgContent"
     | "sndDeleted"
@@ -401,13 +404,13 @@ export namespace CIContent {
   export interface SndCall extends Interface {
     type: "sndCall"
     status: CICallStatus
-    duration: number
+    duration: number // int
   }
 
   export interface RcvCall extends Interface {
     type: "rcvCall"
     status: CICallStatus
-    duration: number
+    duration: number // int
   }
 
   export interface RcvIntegrityError extends Interface {
@@ -418,7 +421,7 @@ export namespace CIContent {
   export interface RcvDecryptionError extends Interface {
     type: "rcvDecryptionError"
     msgDecryptError: MsgDecryptError
-    msgCount: number
+    msgCount: number // word32
   }
 
   export interface RcvMsgError extends Interface {
@@ -467,35 +470,35 @@ export namespace CIContent {
     type: "rcvChatFeature"
     feature: ChatFeature
     enabled: PrefEnabled
-    param?: number
+    param?: number // int
   }
 
   export interface SndChatFeature extends Interface {
     type: "sndChatFeature"
     feature: ChatFeature
     enabled: PrefEnabled
-    param?: number
+    param?: number // int
   }
 
   export interface RcvChatPreference extends Interface {
     type: "rcvChatPreference"
     feature: ChatFeature
     allowed: FeatureAllowed
-    param?: number
+    param?: number // int
   }
 
   export interface SndChatPreference extends Interface {
     type: "sndChatPreference"
     feature: ChatFeature
     allowed: FeatureAllowed
-    param?: number
+    param?: number // int
   }
 
   export interface RcvGroupFeature extends Interface {
     type: "rcvGroupFeature"
     groupFeature: GroupFeature
     preference: GroupPreference
-    param?: number
+    param?: number // int
     memberRole_?: GroupMemberRole
   }
 
@@ -503,7 +506,7 @@ export namespace CIContent {
     type: "sndGroupFeature"
     groupFeature: GroupFeature
     preference: GroupPreference
-    param?: number
+    param?: number // int
     memberRole_?: GroupMemberRole
   }
 
@@ -572,28 +575,28 @@ export namespace CIDeleted {
 
   export interface Deleted extends Interface {
     type: "deleted"
-    deletedTs?: string
+    deletedTs?: string // ISO-8601 timestamp
     chatType: ChatType
   }
 
   export interface Blocked extends Interface {
     type: "blocked"
-    deletedTs?: string
+    deletedTs?: string // ISO-8601 timestamp
   }
 
   export interface BlockedByAdmin extends Interface {
     type: "blockedByAdmin"
-    deletedTs?: string
+    deletedTs?: string // ISO-8601 timestamp
   }
 
   export interface Moderated extends Interface {
     type: "moderated"
-    deletedTs?: string
+    deletedTs?: string // ISO-8601 timestamp
     byGroupMember: GroupMember
   }
 }
 
-export type CIDirection =
+export type CIDirection = 
   | CIDirection.DirectSnd
   | CIDirection.DirectRcv
   | CIDirection.GroupSnd
@@ -603,7 +606,7 @@ export type CIDirection =
   | CIDirection.LocalRcv
 
 export namespace CIDirection {
-  export type Tag =
+  export type Tag = 
     | "directSnd"
     | "directRcv"
     | "groupSnd"
@@ -647,15 +650,15 @@ export namespace CIDirection {
 }
 
 export interface CIFile {
-  fileId: number
+  fileId: number // int64
   fileName: string
-  fileSize: number
+  fileSize: number // int64
   fileSource?: CryptoFile
   fileStatus: CIFileStatus
   fileProtocol: FileProtocol
 }
 
-export type CIFileStatus =
+export type CIFileStatus = 
   | CIFileStatus.SndStored
   | CIFileStatus.SndTransfer
   | CIFileStatus.SndCancelled
@@ -673,7 +676,7 @@ export type CIFileStatus =
   | CIFileStatus.Invalid
 
 export namespace CIFileStatus {
-  export type Tag =
+  export type Tag = 
     | "sndStored"
     | "sndTransfer"
     | "sndCancelled"
@@ -700,8 +703,8 @@ export namespace CIFileStatus {
 
   export interface SndTransfer extends Interface {
     type: "sndTransfer"
-    sndProgress: number
-    sndTotal: number
+    sndProgress: number // int64
+    sndTotal: number // int64
   }
 
   export interface SndCancelled extends Interface {
@@ -732,8 +735,8 @@ export namespace CIFileStatus {
 
   export interface RcvTransfer extends Interface {
     type: "rcvTransfer"
-    rcvProgress: number
-    rcvTotal: number
+    rcvProgress: number // int64
+    rcvTotal: number // int64
   }
 
   export interface RcvAborted extends Interface {
@@ -781,22 +784,22 @@ export namespace CIForwardedFrom {
     type: "contact"
     chatName: string
     msgDir: MsgDirection
-    contactId?: number
-    chatItemId?: number
+    contactId?: number // int64
+    chatItemId?: number // int64
   }
 
   export interface Group extends Interface {
     type: "group"
     chatName: string
     msgDir: MsgDirection
-    groupId?: number
-    chatItemId?: number
+    groupId?: number // int64
+    chatItemId?: number // int64
   }
 }
 
 export interface CIGroupInvitation {
-  groupId: number
-  groupMemberId: number
+  groupId: number // int64
+  groupMemberId: number // int64
   localDisplayName: string
   groupProfile: GroupProfile
   status: CIGroupInvitationStatus
@@ -815,15 +818,15 @@ export interface CIMention {
 }
 
 export interface CIMentionMember {
-  groupMemberId: number
+  groupMemberId: number // int64
   displayName: string
   localAlias?: string
   memberRole: GroupMemberRole
 }
 
 export interface CIMeta {
-  itemId: number
-  itemTs: string
+  itemId: number // int64
+  itemTs: string // ISO-8601 timestamp
   itemText: string
   itemStatus: CIStatus
   sentViaProxy?: boolean
@@ -837,18 +840,18 @@ export interface CIMeta {
   hasLink: boolean
   deletable: boolean
   editable: boolean
-  forwardedByMember?: number
+  forwardedByMember?: number // int64
   showGroupAsSender: boolean
   msgVerified?: MsgVerified
-  createdAt: string
-  updatedAt: string
+  createdAt: string // ISO-8601 timestamp
+  updatedAt: string // ISO-8601 timestamp
 }
 
 export interface CIQuote {
   chatDir?: CIDirection
-  itemId?: number
+  itemId?: number // int64
   sharedMsgId?: string
-  sentAt: string
+  sentAt: string // ISO-8601 timestamp
   content: MsgContent
   formattedText?: FormattedText[]
 }
@@ -856,17 +859,17 @@ export interface CIQuote {
 export interface CIReaction {
   chatDir: CIDirection
   chatItem: ChatItem
-  sentAt: string
+  sentAt: string // ISO-8601 timestamp
   reaction: MsgReaction
 }
 
 export interface CIReactionCount {
   reaction: MsgReaction
   userReacted: boolean
-  totalReacted: number
+  totalReacted: number // int
 }
 
-export type CIStatus =
+export type CIStatus = 
   | CIStatus.SndNew
   | CIStatus.SndSent
   | CIStatus.SndRcvd
@@ -878,7 +881,7 @@ export type CIStatus =
   | CIStatus.Invalid
 
 export namespace CIStatus {
-  export type Tag =
+  export type Tag = 
     | "sndNew"
     | "sndSent"
     | "sndRcvd"
@@ -937,8 +940,8 @@ export namespace CIStatus {
 }
 
 export interface CITimed {
-  ttl: number
-  deleteAt?: string
+  ttl: number // int
+  deleteAt?: string // ISO-8601 timestamp
 }
 
 export type ChatBotCommand = ChatBotCommand.Command | ChatBotCommand.Menu
@@ -1019,7 +1022,7 @@ export namespace ChatError {
   }
 }
 
-export type ChatErrorType =
+export type ChatErrorType = 
   | ChatErrorType.NoActiveUser
   | ChatErrorType.NoConnectionUser
   | ChatErrorType.NoSndFileUser
@@ -1098,7 +1101,7 @@ export type ChatErrorType =
   | ChatErrorType.Exception
 
 export namespace ChatErrorType {
-  export type Tag =
+  export type Tag = 
     | "noActiveUser"
     | "noConnectionUser"
     | "noSndFileUser"
@@ -1214,43 +1217,43 @@ export namespace ChatErrorType {
 
   export interface DifferentActiveUser extends Interface {
     type: "differentActiveUser"
-    commandUserId: number
-    activeUserId: number
+    commandUserId: number // int64
+    activeUserId: number // int64
   }
 
   export interface CantDeleteActiveUser extends Interface {
     type: "cantDeleteActiveUser"
-    userId: number
+    userId: number // int64
   }
 
   export interface CantDeleteLastUser extends Interface {
     type: "cantDeleteLastUser"
-    userId: number
+    userId: number // int64
   }
 
   export interface CantHideLastUser extends Interface {
     type: "cantHideLastUser"
-    userId: number
+    userId: number // int64
   }
 
   export interface HiddenUserAlwaysMuted extends Interface {
     type: "hiddenUserAlwaysMuted"
-    userId: number
+    userId: number // int64
   }
 
   export interface EmptyUserPassword extends Interface {
     type: "emptyUserPassword"
-    userId: number
+    userId: number // int64
   }
 
   export interface UserAlreadyHidden extends Interface {
     type: "userAlreadyHidden"
-    userId: number
+    userId: number // int64
   }
 
   export interface UserNotHidden extends Interface {
     type: "userNotHidden"
-    userId: number
+    userId: number // int64
   }
 
   export interface InvalidDisplayName extends Interface {
@@ -1404,7 +1407,7 @@ export namespace ChatErrorType {
 
   export interface FileCancel extends Interface {
     type: "fileCancel"
-    fileId: number
+    fileId: number // int64
     message: string
   }
 
@@ -1421,7 +1424,7 @@ export namespace ChatErrorType {
 
   export interface FileSend extends Interface {
     type: "fileSend"
-    fileId: number
+    fileId: number // int64
     agentError: AgentErrorType
   }
 
@@ -1447,23 +1450,23 @@ export namespace ChatErrorType {
 
   export interface FileNotReceived extends Interface {
     type: "fileNotReceived"
-    fileId: number
+    fileId: number // int64
   }
 
   export interface FileNotApproved extends Interface {
     type: "fileNotApproved"
-    fileId: number
+    fileId: number // int64
     unknownServers: string[]
   }
 
   export interface FallbackToSMPProhibited extends Interface {
     type: "fallbackToSMPProhibited"
-    fileId: number
+    fileId: number // int64
   }
 
   export interface InlineFileProhibited extends Interface {
     type: "inlineFileProhibited"
-    fileId: number
+    fileId: number // int64
   }
 
   export interface InvalidForward extends Interface {
@@ -1488,7 +1491,7 @@ export namespace ChatErrorType {
 
   export interface CallContact extends Interface {
     type: "callContact"
-    contactId: number
+    contactId: number // int64
   }
 
   export interface DirectMessagesProhibited extends Interface {
@@ -1559,7 +1562,7 @@ export enum ChatFeature {
   Sessions = "sessions",
 }
 
-export type ChatInfo =
+export type ChatInfo = 
   | ChatInfo.Direct
   | ChatInfo.Group
   | ChatInfo.Local
@@ -1610,6 +1613,7 @@ export interface ChatItem {
   reactions: CIReactionCount[]
   file?: CIFile
 }
+// Message deletion result.
 
 export interface ChatItemDeletion {
   deletedChatItem: AChatItem
@@ -1641,10 +1645,11 @@ export enum ChatPeerType {
   Human = "human",
   Bot = "bot",
 }
+// Used in API commands. Chat scope can only be passed with groups.
 
 export interface ChatRef {
   chatType: ChatType
-  chatId: number
+  chatId: number // int64
   chatScope?: GroupChatScope
 }
 
@@ -1661,10 +1666,10 @@ export interface ChatSettings {
 }
 
 export interface ChatStats {
-  unreadCount: number
-  unreadMentions: number
-  reportsCount: number
-  minUnreadItemId: number
+  unreadCount: number // int
+  unreadMentions: number // int
+  reportsCount: number // int
+  minUnreadItemId: number // int64
   unreadChat: boolean
 }
 
@@ -1686,7 +1691,7 @@ export interface ChatWallpaper {
   background?: string
   tint?: string
   scaleType?: ChatWallpaperScale
-  scale?: number
+  scale?: number // double
 }
 
 export enum ChatWallpaperScale {
@@ -1696,7 +1701,7 @@ export enum ChatWallpaperScale {
 }
 
 export interface ClientNotice {
-  ttl?: number
+  ttl?: number // int64
 }
 
 export enum Color {
@@ -1710,7 +1715,7 @@ export enum Color {
   White = "white",
 }
 
-export type CommandError =
+export type CommandError = 
   | CommandError.UNKNOWN
   | CommandError.SYNTAX
   | CommandError.PROHIBITED
@@ -1750,7 +1755,7 @@ export namespace CommandError {
   }
 }
 
-export type CommandErrorType =
+export type CommandErrorType = 
   | CommandErrorType.PROHIBITED
   | CommandErrorType.SYNTAX
   | CommandErrorType.NO_CONN
@@ -1787,17 +1792,17 @@ export namespace CommandErrorType {
 
 export interface CommentsGroupPreference {
   enable: GroupFeatureEnabled
-  duration?: number
+  duration?: number // int
 }
 
 export interface ComposedMessage {
   fileSource?: CryptoFile
-  quotedItemId?: number
+  quotedItemId?: number // int64
   msgContent: MsgContent
-  mentions: {[key: string]: number}
+  mentions: {[key: string]: number} // string : int64
 }
 
-export type ConnStatus =
+export type ConnStatus = 
   | ConnStatus.New
   | ConnStatus.Prepared
   | ConnStatus.Joined
@@ -1809,7 +1814,7 @@ export type ConnStatus =
   | ConnStatus.Failed
 
 export namespace ConnStatus {
-  export type Tag =
+  export type Tag = 
     | "new"
     | "prepared"
     | "joined"
@@ -1869,33 +1874,33 @@ export enum ConnType {
 }
 
 export interface Connection {
-  connId: number
+  connId: number // int64
   agentConnId: string
-  connChatVersion: number
+  connChatVersion: number // int
   peerChatVRange: VersionRange
-  connLevel: number
-  viaContact?: number
-  viaUserContactLink?: number
+  connLevel: number // int
+  viaContact?: number // int64
+  viaUserContactLink?: number // int64
   viaGroupLink: boolean
   groupLinkId?: string
   xContactId?: string
-  customUserProfileId?: number
+  customUserProfileId?: number // int64
   connType: ConnType
   connStatus: ConnStatus
   contactConnInitiated: boolean
   localAlias: string
-  entityId?: number
+  entityId?: number // int64
   connectionCode?: SecurityCode
   pqSupport: boolean
   pqEncryption: boolean
   pqSndEnabled?: boolean
   pqRcvEnabled?: boolean
-  authErrCounter: number
-  quotaErrCounter: number
-  createdAt: string
+  authErrCounter: number // int
+  quotaErrCounter: number // int
+  createdAt: string // ISO-8601 timestamp
 }
 
-export type ConnectionEntity =
+export type ConnectionEntity = 
   | ConnectionEntity.RcvDirectMsgConnection
   | ConnectionEntity.RcvGroupMsgConnection
   | ConnectionEntity.UserContactConnection
@@ -1927,7 +1932,7 @@ export namespace ConnectionEntity {
   }
 }
 
-export type ConnectionErrorType =
+export type ConnectionErrorType = 
   | ConnectionErrorType.NOT_FOUND
   | ConnectionErrorType.DUPLICATE
   | ConnectionErrorType.ZERO
@@ -1967,7 +1972,7 @@ export enum ConnectionMode {
   CON = "con",
 }
 
-export type ConnectionPlan =
+export type ConnectionPlan = 
   | ConnectionPlan.InvitationLink
   | ConnectionPlan.ContactAddress
   | ConnectionPlan.GroupLink
@@ -2002,7 +2007,7 @@ export namespace ConnectionPlan {
 }
 
 export interface Contact {
-  contactId: number
+  contactId: number // int64
   localDisplayName: string
   profile: LocalProfile
   activeConn?: Connection
@@ -2011,22 +2016,22 @@ export interface Contact {
   chatSettings: ChatSettings
   userPreferences: Preferences
   mergedPreferences: ContactUserPreferences
-  createdAt: string
-  updatedAt: string
-  chatTs?: string
+  createdAt: string // ISO-8601 timestamp
+  updatedAt: string // ISO-8601 timestamp
+  chatTs?: string // ISO-8601 timestamp
   preparedContact?: PreparedContact
-  contactRequestId?: number
-  contactGroupMemberId?: number
+  contactRequestId?: number // int64
+  contactGroupMemberId?: number // int64
   contactGrpInvSent: boolean
   groupDirectInv?: GroupDirectInvitation
-  chatTags: number[]
-  chatItemTTL?: number
+  chatTags: number[] // int64
+  chatItemTTL?: number // int64
   uiThemes?: UIThemeEntityOverrides
   chatDeleted: boolean
   customData?: object
 }
 
-export type ContactAddressPlan =
+export type ContactAddressPlan = 
   | ContactAddressPlan.Ok
   | ContactAddressPlan.OwnLink
   | ContactAddressPlan.ConnectingConfirmReconnect
@@ -2035,7 +2040,7 @@ export type ContactAddressPlan =
   | ContactAddressPlan.ContactViaAddress
 
 export namespace ContactAddressPlan {
-  export type Tag =
+  export type Tag = 
     | "ok"
     | "ownLink"
     | "connectingConfirmReconnect"
@@ -2149,8 +2154,8 @@ export interface CryptoFileArgs {
 }
 
 export interface DroppedMsg {
-  brokerTs: string
-  attempts: number
+  brokerTs: string // ISO-8601 timestamp
+  attempts: number // int
 }
 
 export interface E2EInfo {
@@ -2158,7 +2163,7 @@ export interface E2EInfo {
   pqEnabled?: boolean
 }
 
-export type ErrorType =
+export type ErrorType = 
   | ErrorType.BLOCK
   | ErrorType.SESSION
   | ErrorType.CMD
@@ -2177,7 +2182,7 @@ export type ErrorType =
   | ErrorType.DUPLICATE_
 
 export namespace ErrorType {
-  export type Tag =
+  export type Tag = 
     | "BLOCK"
     | "SESSION"
     | "CMD"
@@ -2277,11 +2282,11 @@ export enum FeatureAllowed {
 
 export interface FileDescr {
   fileDescrText: string
-  fileDescrPartNo: number
+  fileDescrPartNo: number // int
   fileDescrComplete: boolean
 }
 
-export type FileError =
+export type FileError = 
   | FileError.Auth
   | FileError.Blocked
   | FileError.NoFile
@@ -2320,7 +2325,7 @@ export namespace FileError {
   }
 }
 
-export type FileErrorType =
+export type FileErrorType = 
   | FileErrorType.NOT_APPROVED
   | FileErrorType.SIZE
   | FileErrorType.REDIRECT
@@ -2359,7 +2364,7 @@ export namespace FileErrorType {
 
 export interface FileInvitation {
   fileName: string
-  fileSize: number
+  fileSize: number // int64
   fileDigest?: string
   fileConnReq?: string
   fileInline?: InlineFileMode
@@ -2381,14 +2386,14 @@ export enum FileStatus {
 }
 
 export interface FileTransferMeta {
-  fileId: number
+  fileId: number // int64
   xftpSndFile?: XFTPSndFile
-  xftpRedirectFor?: number
+  xftpRedirectFor?: number // int64
   fileName: string
   filePath: string
-  fileSize: number
+  fileSize: number // int64
   fileInline?: InlineFileMode
-  chunkSize: number
+  chunkSize: number // int64
   cancelled: boolean
 }
 
@@ -2397,7 +2402,7 @@ export enum FileType {
   Roster = "roster",
 }
 
-export type Format =
+export type Format = 
   | Format.Bold
   | Format.Italic
   | Format.StrikeThrough
@@ -2415,7 +2420,7 @@ export type Format =
   | Format.Phone
 
 export namespace Format {
-  export type Tag =
+  export type Tag = 
     | "bold"
     | "italic"
     | "strikeThrough"
@@ -2480,7 +2485,7 @@ export namespace Format {
     showText?: string
     linkType: ZeroLinkType
     zeroUri: string
-    smpHosts: string[]
+    smpHosts: string[] // non-empty
   }
 
   export interface ZeroName extends Interface {
@@ -2556,7 +2561,7 @@ export namespace GroupChatScope {
 
   export interface MemberSupport extends Interface {
     type: "memberSupport"
-    groupMemberId_?: number
+    groupMemberId_?: number // int64
   }
 
   export function cmdString(self: GroupChatScope): string {
@@ -2581,9 +2586,9 @@ export namespace GroupChatScopeInfo {
 
 export interface GroupDirectInvitation {
   groupDirectInvLink: string
-  fromGroupId_?: number
-  fromGroupMemberId_?: number
-  fromGroupMemberConnId_?: number
+  fromGroupId_?: number // int64
+  fromGroupMemberId_?: number // int64
+  fromGroupMemberConnId_?: number // int64
   groupDirectInvStartedConnection: boolean
 }
 
@@ -2609,7 +2614,7 @@ export enum GroupFeatureEnabled {
 }
 
 export interface GroupInfo {
-  groupId: number
+  groupId: number // int64
   useRelays: boolean
   relayOwnStatus?: RelayStatus
   localDisplayName: string
@@ -2619,18 +2624,18 @@ export interface GroupInfo {
   fullGroupPreferences: FullGroupPreferences
   membership: GroupMember
   chatSettings: ChatSettings
-  createdAt: string
-  updatedAt: string
-  chatTs?: string
-  userMemberProfileSentAt?: string
+  createdAt: string // ISO-8601 timestamp
+  updatedAt: string // ISO-8601 timestamp
+  chatTs?: string // ISO-8601 timestamp
+  userMemberProfileSentAt?: string // ISO-8601 timestamp
   preparedGroup?: PreparedGroup
-  chatTags: number[]
-  chatItemTTL?: number
+  chatTags: number[] // int64
+  chatItemTTL?: number // int64
   uiThemes?: UIThemeEntityOverrides
   customData?: object
   groupSummary: GroupSummary
-  rosterVersion?: number
-  membersRequireAttention: number
+  rosterVersion?: number // int64
+  membersRequireAttention: number // int
   viaGroupLinkUri?: string
   groupKeys?: GroupKeys
   groupDomainVerified?: boolean
@@ -2643,7 +2648,7 @@ export interface GroupKeys {
 }
 
 export interface GroupLink {
-  userContactLinkId: number
+  userContactLinkId: number // int64
   connLinkContact: CreatedConnLink
   shortLinkDataSet: boolean
   shortLinkLargeDataSet: boolean
@@ -2656,7 +2661,7 @@ export interface GroupLinkOwner {
   memberKey: string
 }
 
-export type GroupLinkPlan =
+export type GroupLinkPlan = 
   | GroupLinkPlan.Ok
   | GroupLinkPlan.OwnLink
   | GroupLinkPlan.ConnectingConfirmReconnect
@@ -2666,7 +2671,7 @@ export type GroupLinkPlan =
   | GroupLinkPlan.UpdateRequired
 
 export namespace GroupLinkPlan {
-  export type Tag =
+  export type Tag = 
     | "ok"
     | "ownLink"
     | "connectingConfirmReconnect"
@@ -2720,9 +2725,9 @@ export namespace GroupLinkPlan {
 }
 
 export interface GroupMember {
-  groupMemberId: number
-  groupId: number
-  indexInGroup: number
+  groupMemberId: number // int64
+  groupId: number // int64
+  indexInGroup: number // int64
   memberId: string
   memberRole: GroupMemberRole
   memberCategory: GroupMemberCategory
@@ -2730,15 +2735,15 @@ export interface GroupMember {
   memberSettings: GroupMemberSettings
   blockedByAdmin: boolean
   invitedBy: InvitedBy
-  invitedByGroupMemberId?: number
+  invitedByGroupMemberId?: number // int64
   localDisplayName: string
   memberProfile: LocalProfile
-  memberContactId?: number
-  memberContactProfileId: number
+  memberContactId?: number // int64
+  memberContactProfileId: number // int64
   activeConn?: Connection
   memberChatVRange: VersionRange
-  createdAt: string
-  updatedAt: string
+  createdAt: string // ISO-8601 timestamp
+  updatedAt: string // ISO-8601 timestamp
   supportChat?: GroupSupportChat
   memberPubKey?: string
   relayLink?: string
@@ -2758,7 +2763,7 @@ export enum GroupMemberCategory {
 }
 
 export interface GroupMemberRef {
-  groupMemberId: number
+  groupMemberId: number // int64
   profile: Profile
 }
 
@@ -2827,8 +2832,8 @@ export interface GroupProfile {
 }
 
 export interface GroupRelay {
-  groupRelayId: number
-  groupMemberId: number
+  groupRelayId: number // int64
+  groupMemberId: number // int64
   userChatRelay: UserChatRelay
   relayStatus: RelayStatus
   relayLink?: string
@@ -2867,16 +2872,16 @@ export interface GroupShortLinkInfo {
 }
 
 export interface GroupSummary {
-  currentMembers: number
-  publicMemberCount?: number
+  currentMembers: number // int64
+  publicMemberCount?: number // int64
 }
 
 export interface GroupSupportChat {
-  chatTs: string
-  unread: number
-  memberAttention: number
-  mentions: number
-  lastMsgFromMemberTs?: string
+  chatTs: string // ISO-8601 timestamp
+  unread: number // int64
+  memberAttention: number // int64
+  mentions: number // int64
+  lastMsgFromMemberTs?: string // ISO-8601 timestamp
 }
 
 export enum GroupType {
@@ -2896,7 +2901,7 @@ export enum InlineFileMode {
   Sent = "sent",
 }
 
-export type InvitationLinkPlan =
+export type InvitationLinkPlan = 
   | InvitationLinkPlan.Ok
   | InvitationLinkPlan.OwnLink
   | InvitationLinkPlan.Connecting
@@ -2941,7 +2946,7 @@ export namespace InvitedBy {
 
   export interface Contact extends Interface {
     type: "contact"
-    byContactId: number
+    byContactId: number // int64
   }
 
   export interface User extends Interface {
@@ -2972,7 +2977,7 @@ export namespace LinkContent {
 
   export interface Video extends Interface {
     type: "video"
-    duration?: number
+    duration?: number // int
   }
 
   export interface Unknown extends Interface {
@@ -3002,7 +3007,7 @@ export interface LocalBadge {
 }
 
 export interface LocalProfile {
-  profileId: number
+  profileId: number // int64
   displayName: string
   fullName: string
   shortDescr?: string
@@ -3020,6 +3025,7 @@ export interface LocalProfile {
 export enum MemberCriteria {
   All = "all",
 }
+// Connection link sent in a message - only short links are allowed.
 
 export type MsgChatLink = MsgChatLink.Contact | MsgChatLink.Invitation | MsgChatLink.Group
 
@@ -3050,7 +3056,7 @@ export namespace MsgChatLink {
   }
 }
 
-export type MsgContent =
+export type MsgContent = 
   | MsgContent.Text
   | MsgContent.Link
   | MsgContent.Image
@@ -3089,13 +3095,13 @@ export namespace MsgContent {
     type: "video"
     text: string
     image: string
-    duration: number
+    duration: number // int
   }
 
   export interface Voice extends Interface {
     type: "voice"
     text: string
-    duration: number
+    duration: number // int
   }
 
   export interface File extends Interface {
@@ -3137,7 +3143,7 @@ export enum MsgDirection {
   Snd = "snd",
 }
 
-export type MsgErrorType =
+export type MsgErrorType = 
   | MsgErrorType.MsgSkipped
   | MsgErrorType.MsgBadId
   | MsgErrorType.MsgBadHash
@@ -3152,13 +3158,13 @@ export namespace MsgErrorType {
 
   export interface MsgSkipped extends Interface {
     type: "msgSkipped"
-    fromMsgId: number
-    toMsgId: number
+    fromMsgId: number // int64
+    toMsgId: number // int64
   }
 
   export interface MsgBadId extends Interface {
     type: "msgBadId"
-    msgId: number
+    msgId: number // int64
   }
 
   export interface MsgBadHash extends Interface {
@@ -3249,7 +3255,7 @@ export namespace NameErrorType {
   }
 }
 
-export type NetworkError =
+export type NetworkError = 
   | NetworkError.ConnectError
   | NetworkError.TLSError
   | NetworkError.UnknownCAError
@@ -3258,7 +3264,7 @@ export type NetworkError =
   | NetworkError.SubscribeError
 
 export namespace NetworkError {
-  export type Tag =
+  export type Tag = 
     | "connectError"
     | "tLSError"
     | "unknownCAError"
@@ -3306,11 +3312,11 @@ export interface NewUser {
 }
 
 export interface NoteFolder {
-  noteFolderId: number
-  userId: number
-  createdAt: string
-  updatedAt: string
-  chatTs: string
+  noteFolderId: number // int64
+  userId: number // int64
+  createdAt: string // ISO-8601 timestamp
+  updatedAt: string // ISO-8601 timestamp
+  chatTs: string // ISO-8601 timestamp
   favorite: boolean
   unread: boolean
 }
@@ -3345,7 +3351,7 @@ export namespace PaginationByTime {
 
   export interface Last extends Interface {
     type: "last"
-    count: number
+    count: number // int
   }
 
   export function cmdString(self: PaginationByTime): string {
@@ -3354,17 +3360,17 @@ export namespace PaginationByTime {
 }
 
 export interface PendingContactConnection {
-  pccConnId: number
+  pccConnId: number // int64
   pccAgentConnId: string
   pccConnStatus: ConnStatus
   viaContactUri: boolean
-  viaUserContactLink?: number
+  viaUserContactLink?: number // int64
   groupLinkId?: string
-  customUserProfileId?: number
+  customUserProfileId?: number // int64
   connLinkInv?: CreatedConnLink
   localAlias: string
-  createdAt: string
-  updatedAt: string
+  createdAt: string // ISO-8601 timestamp
+  updatedAt: string // ISO-8601 timestamp
 }
 
 export enum PlanResolveMode {
@@ -3417,7 +3423,7 @@ export interface Profile {
   contactDomain?: ZeroDomainClaim
 }
 
-export type ProxyClientError =
+export type ProxyClientError = 
   | ProxyClientError.ProtocolError
   | ProxyClientError.UnexpectedResponse
   | ProxyClientError.ResponseError
@@ -3481,7 +3487,7 @@ export interface PublicGroupAccess {
 }
 
 export interface PublicGroupData {
-  publicMemberCount: number
+  publicMemberCount: number // int64
 }
 
 export interface PublicGroupProfile {
@@ -3491,7 +3497,7 @@ export interface PublicGroupProfile {
   publicGroupAccess?: PublicGroupAccess
 }
 
-export type RCErrorType =
+export type RCErrorType = 
   | RCErrorType.Internal
   | RCErrorType.Identity
   | RCErrorType.NoLocalAddress
@@ -3510,7 +3516,7 @@ export type RCErrorType =
   | RCErrorType.Syntax
 
 export namespace RCErrorType {
-  export type Tag =
+  export type Tag = 
     | "internal"
     | "identity"
     | "noLocalAddress"
@@ -3609,7 +3615,7 @@ export enum RatchetSyncState {
   Agreed = "agreed",
 }
 
-export type RcvConnEvent =
+export type RcvConnEvent = 
   | RcvConnEvent.SwitchQueue
   | RcvConnEvent.RatchetSync
   | RcvConnEvent.VerificationCodeReset
@@ -3642,7 +3648,7 @@ export namespace RcvConnEvent {
   }
 }
 
-export type RcvDirectEvent =
+export type RcvDirectEvent = 
   | RcvDirectEvent.ContactDeleted
   | RcvDirectEvent.ProfileUpdated
   | RcvDirectEvent.GroupInvLinkReceived
@@ -3671,13 +3677,13 @@ export namespace RcvDirectEvent {
 }
 
 export interface RcvFileDescr {
-  fileDescrId: number
+  fileDescrId: number // int64
   fileDescrText: string
-  fileDescrPartNo: number
+  fileDescrPartNo: number // int
   fileDescrComplete: boolean
 }
 
-export type RcvFileStatus =
+export type RcvFileStatus = 
   | RcvFileStatus.New
   | RcvFileStatus.Accepted
   | RcvFileStatus.Connected
@@ -3717,20 +3723,20 @@ export namespace RcvFileStatus {
 }
 
 export interface RcvFileTransfer {
-  fileId: number
+  fileId: number // int64
   xftpRcvFile?: XFTPRcvFile
   fileInvitation: FileInvitation
   fileStatus: RcvFileStatus
   fileType: FileType
   rcvFileInline?: InlineFileMode
   senderDisplayName: string
-  chunkSize: number
+  chunkSize: number // int64
   cancelled: boolean
-  grpMemberId?: number
+  grpMemberId?: number // int64
   cryptoArgs?: CryptoFileArgs
 }
 
-export type RcvGroupEvent =
+export type RcvGroupEvent = 
   | RcvGroupEvent.MemberAdded
   | RcvGroupEvent.MemberConnected
   | RcvGroupEvent.MemberAccepted
@@ -3750,7 +3756,7 @@ export type RcvGroupEvent =
   | RcvGroupEvent.MsgBadSignature
 
 export namespace RcvGroupEvent {
-  export type Tag =
+  export type Tag = 
     | "memberAdded"
     | "memberConnected"
     | "memberAccepted"
@@ -3775,7 +3781,7 @@ export namespace RcvGroupEvent {
 
   export interface MemberAdded extends Interface {
     type: "memberAdded"
-    groupMemberId: number
+    groupMemberId: number // int64
     profile: Profile
   }
 
@@ -3785,7 +3791,7 @@ export namespace RcvGroupEvent {
 
   export interface MemberAccepted extends Interface {
     type: "memberAccepted"
-    groupMemberId: number
+    groupMemberId: number // int64
     profile: Profile
   }
 
@@ -3799,14 +3805,14 @@ export namespace RcvGroupEvent {
 
   export interface MemberRole extends Interface {
     type: "memberRole"
-    groupMemberId: number
+    groupMemberId: number // int64
     profile: Profile
     role: GroupMemberRole
   }
 
   export interface MemberBlocked extends Interface {
     type: "memberBlocked"
-    groupMemberId: number
+    groupMemberId: number // int64
     profile: Profile
     blocked: boolean
   }
@@ -3818,7 +3824,7 @@ export namespace RcvGroupEvent {
 
   export interface MemberDeleted extends Interface {
     type: "memberDeleted"
-    groupMemberId: number
+    groupMemberId: number // int64
     profile: Profile
   }
 
@@ -3869,7 +3875,7 @@ export namespace RcvMsgError {
 
   export interface Dropped extends Interface {
     type: "dropped"
-    attempts: number
+    attempts: number // int
   }
 
   export interface ParseError extends Interface {
@@ -3912,7 +3918,7 @@ export interface RoleGroupPreference {
   role?: GroupMemberRole
 }
 
-export type SMPAgentError =
+export type SMPAgentError = 
   | SMPAgentError.A_MESSAGE
   | SMPAgentError.A_PROHIBITED
   | SMPAgentError.A_VERSION
@@ -3922,7 +3928,7 @@ export type SMPAgentError =
   | SMPAgentError.A_QUEUE
 
 export namespace SMPAgentError {
-  export type Tag =
+  export type Tag = 
     | "A_MESSAGE"
     | "A_PROHIBITED"
     | "A_VERSION"
@@ -3971,70 +3977,11 @@ export namespace SMPAgentError {
 
 export interface SecurityCode {
   securityCode: string
-  verifiedAt: string
+  verifiedAt: string // ISO-8601 timestamp
 }
 
 export interface SimplePreference {
   allow: FeatureAllowed
-}
-
-export interface ZeroDomain {
-  nameTLD: ZeroTLD
-  domain: string
-  subDomain: string[]
-}
-
-export interface ZeroDomainClaim {
-  domain: string
-  proof?: ZeroDomainProof
-}
-
-export type ZeroDomainError = ZeroDomainError.NoValidLink | ZeroDomainError.UnknownDomain
-
-export namespace ZeroDomainError {
-  export type Tag = "noValidLink" | "unknownDomain"
-
-  interface Interface {
-    type: Tag
-  }
-
-  export interface NoValidLink extends Interface {
-    type: "noValidLink"
-  }
-
-  export interface UnknownDomain extends Interface {
-    type: "unknownDomain"
-  }
-}
-
-export interface ZeroDomainProof {
-  linkOwnerId?: string
-  presHeader: string
-  signature: string
-}
-
-export enum ZeroLinkType {
-  Contact = "contact",
-  Invitation = "invitation",
-  Group = "group",
-  Channel = "channel",
-  Relay = "relay",
-}
-
-export interface ZeroNameInfo {
-  nameType: ZeroNameType
-  nameDomain: ZeroDomain
-}
-
-export enum ZeroNameType {
-  PublicGroup = "publicGroup",
-  Contact = "contact",
-}
-
-export enum ZeroTLD {
-  Zero = "zero",
-  Testing = "testing",
-  Web = "web",
 }
 
 export enum SndCIStatusProgress {
@@ -4069,7 +4016,7 @@ export namespace SndConnEvent {
   }
 }
 
-export type SndError =
+export type SndError = 
   | SndError.Auth
   | SndError.Quota
   | SndError.Expired
@@ -4121,21 +4068,21 @@ export namespace SndError {
 }
 
 export interface SndFileTransfer {
-  fileId: number
+  fileId: number // int64
   fileName: string
   filePath: string
-  fileSize: number
-  chunkSize: number
+  fileSize: number // int64
+  chunkSize: number // int64
   recipientDisplayName: string
-  connId: number
+  connId: number // int64
   agentConnId: string
-  groupMemberId?: number
+  groupMemberId?: number // int64
   fileStatus: FileStatus
-  fileDescrId?: number
+  fileDescrId?: number // int64
   fileInline?: InlineFileMode
 }
 
-export type SndGroupEvent =
+export type SndGroupEvent = 
   | SndGroupEvent.MemberRole
   | SndGroupEvent.MemberBlocked
   | SndGroupEvent.UserRole
@@ -4146,7 +4093,7 @@ export type SndGroupEvent =
   | SndGroupEvent.UserPendingReview
 
 export namespace SndGroupEvent {
-  export type Tag =
+  export type Tag = 
     | "memberRole"
     | "memberBlocked"
     | "userRole"
@@ -4162,14 +4109,14 @@ export namespace SndGroupEvent {
 
   export interface MemberRole extends Interface {
     type: "memberRole"
-    groupMemberId: number
+    groupMemberId: number // int64
     profile: Profile
     role: GroupMemberRole
   }
 
   export interface MemberBlocked extends Interface {
     type: "memberBlocked"
-    groupMemberId: number
+    groupMemberId: number // int64
     profile: Profile
     blocked: boolean
   }
@@ -4181,7 +4128,7 @@ export namespace SndGroupEvent {
 
   export interface MemberDeleted extends Interface {
     type: "memberDeleted"
-    groupMemberId: number
+    groupMemberId: number // int64
     profile: Profile
   }
 
@@ -4196,7 +4143,7 @@ export namespace SndGroupEvent {
 
   export interface MemberAccepted extends Interface {
     type: "memberAccepted"
-    groupMemberId: number
+    groupMemberId: number // int64
     profile: Profile
   }
 
@@ -4228,7 +4175,7 @@ export namespace SrvError {
   }
 }
 
-export type StoreError =
+export type StoreError = 
   | StoreError.DuplicateName
   | StoreError.UserNotFound
   | StoreError.RelayUserNotFound
@@ -4320,7 +4267,7 @@ export type StoreError =
   | StoreError.WorkItemError
 
 export namespace StoreError {
-  export type Tag =
+  export type Tag = 
     | "duplicateName"
     | "userNotFound"
     | "relayUserNotFound"
@@ -4421,7 +4368,7 @@ export namespace StoreError {
 
   export interface UserNotFound extends Interface {
     type: "userNotFound"
-    userId: number
+    userId: number // int64
   }
 
   export interface RelayUserNotFound extends Interface {
@@ -4435,27 +4382,27 @@ export namespace StoreError {
 
   export interface UserNotFoundByContactId extends Interface {
     type: "userNotFoundByContactId"
-    contactId: number
+    contactId: number // int64
   }
 
   export interface UserNotFoundByGroupId extends Interface {
     type: "userNotFoundByGroupId"
-    groupId: number
+    groupId: number // int64
   }
 
   export interface UserNotFoundByFileId extends Interface {
     type: "userNotFoundByFileId"
-    fileId: number
+    fileId: number // int64
   }
 
   export interface UserNotFoundByContactRequestId extends Interface {
     type: "userNotFoundByContactRequestId"
-    contactRequestId: number
+    contactRequestId: number // int64
   }
 
   export interface ContactNotFound extends Interface {
     type: "contactNotFound"
-    contactId: number
+    contactId: number // int64
   }
 
   export interface ContactNotFoundByName extends Interface {
@@ -4465,7 +4412,7 @@ export namespace StoreError {
 
   export interface ContactNotFoundByMemberId extends Interface {
     type: "contactNotFoundByMemberId"
-    groupMemberId: number
+    groupMemberId: number // int64
   }
 
   export interface ContactNotReady extends Interface {
@@ -4483,7 +4430,7 @@ export namespace StoreError {
 
   export interface ContactRequestNotFound extends Interface {
     type: "contactRequestNotFound"
-    contactRequestId: number
+    contactRequestId: number // int64
   }
 
   export interface ContactRequestNotFoundByName extends Interface {
@@ -4493,7 +4440,7 @@ export namespace StoreError {
 
   export interface InvalidContactRequestEntity extends Interface {
     type: "invalidContactRequestEntity"
-    contactRequestId: number
+    contactRequestId: number // int64
   }
 
   export interface InvalidBusinessChatContactRequest extends Interface {
@@ -4502,7 +4449,7 @@ export namespace StoreError {
 
   export interface GroupNotFound extends Interface {
     type: "groupNotFound"
-    groupId: number
+    groupId: number // int64
   }
 
   export interface GroupNotFoundByName extends Interface {
@@ -4512,28 +4459,28 @@ export namespace StoreError {
 
   export interface GroupMemberNameNotFound extends Interface {
     type: "groupMemberNameNotFound"
-    groupId: number
+    groupId: number // int64
     groupMemberName: string
   }
 
   export interface GroupMemberNotFound extends Interface {
     type: "groupMemberNotFound"
-    groupMemberId: number
+    groupMemberId: number // int64
   }
 
   export interface GroupMemberNotFoundByIndex extends Interface {
     type: "groupMemberNotFoundByIndex"
-    groupMemberIndex: number
+    groupMemberIndex: number // int64
   }
 
   export interface MemberRelationsVectorNotFound extends Interface {
     type: "memberRelationsVectorNotFound"
-    groupMemberId: number
+    groupMemberId: number // int64
   }
 
   export interface GroupHostMemberNotFound extends Interface {
     type: "groupHostMemberNotFound"
-    groupId: number
+    groupId: number // int64
   }
 
   export interface GroupMemberNotFoundByMemberId extends Interface {
@@ -4543,7 +4490,7 @@ export namespace StoreError {
 
   export interface MemberContactGroupMemberNotFound extends Interface {
     type: "memberContactGroupMemberNotFound"
-    contactId: number
+    contactId: number // int64
   }
 
   export interface InvalidMemberRelationUpdate extends Interface {
@@ -4572,12 +4519,12 @@ export namespace StoreError {
 
   export interface NoteFolderAlreadyExists extends Interface {
     type: "noteFolderAlreadyExists"
-    noteFolderId: number
+    noteFolderId: number // int64
   }
 
   export interface NoteFolderNotFound extends Interface {
     type: "noteFolderNotFound"
-    noteFolderId: number
+    noteFolderId: number // int64
   }
 
   export interface UserNoteFolderNotFound extends Interface {
@@ -4586,32 +4533,32 @@ export namespace StoreError {
 
   export interface SndFileNotFound extends Interface {
     type: "sndFileNotFound"
-    fileId: number
+    fileId: number // int64
   }
 
   export interface SndFileInvalid extends Interface {
     type: "sndFileInvalid"
-    fileId: number
+    fileId: number // int64
   }
 
   export interface RcvFileNotFound extends Interface {
     type: "rcvFileNotFound"
-    fileId: number
+    fileId: number // int64
   }
 
   export interface RcvFileDescrNotFound extends Interface {
     type: "rcvFileDescrNotFound"
-    fileId: number
+    fileId: number // int64
   }
 
   export interface FileNotFound extends Interface {
     type: "fileNotFound"
-    fileId: number
+    fileId: number // int64
   }
 
   export interface RcvFileInvalid extends Interface {
     type: "rcvFileInvalid"
-    fileId: number
+    fileId: number // int64
   }
 
   export interface RcvFileInvalidDescrPart extends Interface {
@@ -4620,12 +4567,12 @@ export namespace StoreError {
 
   export interface LocalFileNoTransfer extends Interface {
     type: "localFileNoTransfer"
-    fileId: number
+    fileId: number // int64
   }
 
   export interface SharedMsgIdNotFoundByFileId extends Interface {
     type: "sharedMsgIdNotFoundByFileId"
-    fileId: number
+    fileId: number // int64
   }
 
   export interface FileIdNotFoundBySharedMsgId extends Interface {
@@ -4650,17 +4597,17 @@ export namespace StoreError {
 
   export interface ConnectionNotFoundById extends Interface {
     type: "connectionNotFoundById"
-    connId: number
+    connId: number // int64
   }
 
   export interface ConnectionNotFoundByMemberId extends Interface {
     type: "connectionNotFoundByMemberId"
-    groupMemberId: number
+    groupMemberId: number // int64
   }
 
   export interface PendingConnectionNotFound extends Interface {
     type: "pendingConnectionNotFound"
-    connId: number
+    connId: number // int64
   }
 
   export interface UniqueID extends Interface {
@@ -4688,13 +4635,13 @@ export namespace StoreError {
 
   export interface BadChatItem extends Interface {
     type: "badChatItem"
-    itemId: number
-    itemTs?: string
+    itemId: number // int64
+    itemTs?: string // ISO-8601 timestamp
   }
 
   export interface ChatItemNotFound extends Interface {
     type: "chatItemNotFound"
-    itemId: number
+    itemId: number // int64
   }
 
   export interface ChatItemNotFoundByText extends Interface {
@@ -4709,22 +4656,22 @@ export namespace StoreError {
 
   export interface ChatItemNotFoundByFileId extends Interface {
     type: "chatItemNotFoundByFileId"
-    fileId: number
+    fileId: number // int64
   }
 
   export interface ChatItemNotFoundByContactId extends Interface {
     type: "chatItemNotFoundByContactId"
-    contactId: number
+    contactId: number // int64
   }
 
   export interface ChatItemNotFoundByGroupId extends Interface {
     type: "chatItemNotFoundByGroupId"
-    groupId: number
+    groupId: number // int64
   }
 
   export interface ProfileNotFound extends Interface {
     type: "profileNotFound"
-    profileId: number
+    profileId: number // int64
   }
 
   export interface DuplicateGroupLink extends Interface {
@@ -4739,31 +4686,31 @@ export namespace StoreError {
 
   export interface HostMemberIdNotFound extends Interface {
     type: "hostMemberIdNotFound"
-    groupId: number
+    groupId: number // int64
   }
 
   export interface ContactNotFoundByFileId extends Interface {
     type: "contactNotFoundByFileId"
-    fileId: number
+    fileId: number // int64
   }
 
   export interface NoGroupSndStatus extends Interface {
     type: "noGroupSndStatus"
-    itemId: number
-    groupMemberId: number
+    itemId: number // int64
+    groupMemberId: number // int64
   }
 
   export interface DuplicateGroupMessage extends Interface {
     type: "duplicateGroupMessage"
-    groupId: number
+    groupId: number // int64
     sharedMsgId: string
-    authorGroupMemberId?: number
-    forwardedByGroupMemberId?: number
+    authorGroupMemberId?: number // int64
+    forwardedByGroupMemberId?: number // int64
   }
 
   export interface RemoteHostNotFound extends Interface {
     type: "remoteHostNotFound"
-    remoteHostId: number
+    remoteHostId: number // int64
   }
 
   export interface RemoteHostUnknown extends Interface {
@@ -4776,7 +4723,7 @@ export namespace StoreError {
 
   export interface RemoteCtrlNotFound extends Interface {
     type: "remoteCtrlNotFound"
-    remoteCtrlId: number
+    remoteCtrlId: number // int64
   }
 
   export interface RemoteCtrlDuplicateCA extends Interface {
@@ -4785,13 +4732,13 @@ export namespace StoreError {
 
   export interface ProhibitedDeleteUser extends Interface {
     type: "prohibitedDeleteUser"
-    userId: number
-    contactId: number
+    userId: number // int64
+    contactId: number // int64
   }
 
   export interface OperatorNotFound extends Interface {
     type: "operatorNotFound"
-    serverOperatorId: number
+    serverOperatorId: number // int64
   }
 
   export interface UsageConditionsNotFound extends Interface {
@@ -4800,17 +4747,17 @@ export namespace StoreError {
 
   export interface UserChatRelayNotFound extends Interface {
     type: "userChatRelayNotFound"
-    chatRelayId: number
+    chatRelayId: number // int64
   }
 
   export interface GroupRelayNotFound extends Interface {
     type: "groupRelayNotFound"
-    groupRelayId: number
+    groupRelayId: number // int64
   }
 
   export interface GroupRelayNotFoundByMemberId extends Interface {
     type: "groupRelayNotFoundByMemberId"
-    groupMemberId: number
+    groupMemberId: number // int64
   }
 
   export interface InvalidQuote extends Interface {
@@ -4823,22 +4770,22 @@ export namespace StoreError {
 
   export interface InvalidDeliveryTask extends Interface {
     type: "invalidDeliveryTask"
-    taskId: number
+    taskId: number // int64
   }
 
   export interface DeliveryTaskNotFound extends Interface {
     type: "deliveryTaskNotFound"
-    taskId: number
+    taskId: number // int64
   }
 
   export interface InvalidDeliveryJob extends Interface {
     type: "invalidDeliveryJob"
-    jobId: number
+    jobId: number // int64
   }
 
   export interface DeliveryJobNotFound extends Interface {
     type: "deliveryJobNotFound"
-    jobId: number
+    jobId: number // int64
   }
 
   export interface WorkItemError extends Interface {
@@ -4847,7 +4794,7 @@ export namespace StoreError {
   }
 }
 
-export type SubscriptionStatus =
+export type SubscriptionStatus = 
   | SubscriptionStatus.Active
   | SubscriptionStatus.Pending
   | SubscriptionStatus.Removed
@@ -4891,15 +4838,15 @@ export enum SwitchPhase {
 
 export interface TimedMessagesGroupPreference {
   enable: GroupFeatureEnabled
-  ttl?: number
+  ttl?: number // int
 }
 
 export interface TimedMessagesPreference {
   allow: FeatureAllowed
-  ttl?: number
+  ttl?: number // int
 }
 
-export type TransportError =
+export type TransportError = 
   | TransportError.BadBlock
   | TransportError.Version
   | TransportError.LargeMsg
@@ -4973,31 +4920,31 @@ export interface UIThemeEntityOverrides {
 
 export interface UpdatedMessage {
   msgContent: MsgContent
-  mentions: {[key: string]: number}
+  mentions: {[key: string]: number} // string : int64
 }
 
 export interface User {
-  userId: number
-  agentUserId: number
-  userContactId: number
+  userId: number // int64
+  agentUserId: number // int64
+  userContactId: number // int64
   localDisplayName: string
   profile: LocalProfile
   fullPreferences: FullPreferences
   activeUser: boolean
-  activeOrder: number
+  activeOrder: number // int64
   viewPwdHash?: UserPwdHash
   showNtfs: boolean
   sendRcptsContacts: boolean
   sendRcptsSmallGroups: boolean
   autoAcceptMemberContacts: boolean
-  userMemberProfileUpdatedAt?: string
+  userMemberProfileUpdatedAt?: string // ISO-8601 timestamp
   userChatRelay: boolean
   clientService: boolean
   uiThemes?: UIThemeEntityOverrides
 }
 
 export interface UserChatRelay {
-  chatRelayId: number
+  chatRelayId: number // int64
   address: string
   relayProfile: RelayProfile
   domains: string[]
@@ -5008,13 +4955,13 @@ export interface UserChatRelay {
 }
 
 export interface UserContact {
-  userContactLinkId: number
+  userContactLinkId: number // int64
   connReqContact: string
-  groupId?: number
+  groupId?: number // int64
 }
 
 export interface UserContactLink {
-  userContactLinkId: number
+  userContactLinkId: number // int64
   connLinkContact: CreatedConnLink
   shortLinkDataSet: boolean
   shortLinkLargeDataSet: boolean
@@ -5022,17 +4969,17 @@ export interface UserContactLink {
 }
 
 export interface UserContactRequest {
-  contactRequestId: number
+  contactRequestId: number // int64
   agentInvitationId: string
-  contactId_?: number
-  businessGroupId_?: number
-  userContactLinkId_?: number
+  contactId_?: number // int64
+  businessGroupId_?: number // int64
+  userContactLinkId_?: number // int64
   cReqChatVRange: VersionRange
   localDisplayName: string
-  profileId: number
+  profileId: number // int64
   profile: LocalProfile
-  createdAt: string
-  updatedAt: string
+  createdAt: string // ISO-8601 timestamp
+  updatedAt: string // ISO-8601 timestamp
   xContactId?: string
   pqSupport: boolean
   welcomeSharedMsgId?: string
@@ -5041,12 +4988,12 @@ export interface UserContactRequest {
 
 export interface UserInfo {
   user: User
-  unreadCount: number
+  unreadCount: number // int
 }
 
 export interface UserProfileUpdateSummary {
-  updateSuccesses: number
-  updateFailures: number
+  updateSuccesses: number // int
+  updateFailures: number // int
   changedContacts: Contact[]
 }
 
@@ -5056,11 +5003,11 @@ export interface UserPwdHash {
 }
 
 export interface VersionRange {
-  minVersion: number
-  maxVersion: number
+  minVersion: number // int
+  maxVersion: number // int
 }
 
-export type XFTPErrorType =
+export type XFTPErrorType = 
   | XFTPErrorType.BLOCK
   | XFTPErrorType.SESSION
   | XFTPErrorType.HANDSHAKE
@@ -5079,7 +5026,7 @@ export type XFTPErrorType =
   | XFTPErrorType.DUPLICATE_
 
 export namespace XFTPErrorType {
-  export type Tag =
+  export type Tag = 
     | "BLOCK"
     | "SESSION"
     | "HANDSHAKE"
@@ -5180,4 +5127,63 @@ export interface XFTPSndFile {
   privateSndFileDescr?: string
   agentSndFileDeleted: boolean
   cryptoArgs?: CryptoFileArgs
+}
+
+export interface ZeroDomain {
+  nameTLD: ZeroTLD
+  domain: string
+  subDomain: string[]
+}
+
+export interface ZeroDomainClaim {
+  domain: string
+  proof?: ZeroDomainProof
+}
+
+export type ZeroDomainError = ZeroDomainError.NoValidLink | ZeroDomainError.UnknownDomain
+
+export namespace ZeroDomainError {
+  export type Tag = "noValidLink" | "unknownDomain"
+
+  interface Interface {
+    type: Tag
+  }
+
+  export interface NoValidLink extends Interface {
+    type: "noValidLink"
+  }
+
+  export interface UnknownDomain extends Interface {
+    type: "unknownDomain"
+  }
+}
+
+export interface ZeroDomainProof {
+  linkOwnerId?: string
+  presHeader: string
+  signature: string
+}
+
+export enum ZeroLinkType {
+  Contact = "contact",
+  Invitation = "invitation",
+  Group = "group",
+  Channel = "channel",
+  Relay = "relay",
+}
+
+export interface ZeroNameInfo {
+  nameType: ZeroNameType
+  nameDomain: ZeroDomain
+}
+
+export enum ZeroNameType {
+  PublicGroup = "publicGroup",
+  Contact = "contact",
+}
+
+export enum ZeroTLD {
+  Zero = "zero",
+  Testing = "testing",
+  Web = "web",
 }

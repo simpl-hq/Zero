@@ -698,7 +698,7 @@ struct GroupChatInfoView: View {
             if let d = groupInfo.groupProfile.publicGroup?.publicGroupAccess?.groupDomainClaim?.shortName {
                 Label("\(d)", systemImage: "number")
             } else {
-                Label("Get Zero name (BETA)", systemImage: "number")
+                Label("Zero Name (Coming Soon)", systemImage: "number")
             }
         }
     }

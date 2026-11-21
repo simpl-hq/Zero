@@ -64,9 +64,9 @@ object TorAndroid {
     if (!serviceStarted) {
       startAsync(context)
     }
-    repeat(60) {
+    repeat(200) {
       if (TorRuntime.isProxyUp()) return true
-      delay(500)
+      delay(150)
     }
     return TorRuntime.isProxyUp()
   }

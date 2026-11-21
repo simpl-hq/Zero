@@ -126,8 +126,8 @@ struct GroupProfileView: View {
                         ? NSLocalizedString("Save channel profile?", comment: "alert title")
                         : NSLocalizedString("Save group profile?", comment: "alert title"),
                     message: groupInfo.useRelays
-                        ? NSLocalizedString("Channel profile was changed. If you save it, the updated profile will be sent to channel subscribers.", comment: "alert message")
-                        : NSLocalizedString("Group profile was changed. If you save it, the updated profile will be sent to group members.", comment: "alert message"),
+                        ? NSLocalizedString("Save changes to this channel?", comment: "alert message")
+                        : NSLocalizedString("Save changes to this group?", comment: "alert message"),
                     buttonTitle: groupInfo.useRelays
                         ? NSLocalizedString("Save (and notify subscribers)", comment: "alert button")
                         : NSLocalizedString("Save (and notify members)", comment: "alert button"),

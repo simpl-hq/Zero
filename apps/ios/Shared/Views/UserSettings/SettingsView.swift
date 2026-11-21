@@ -301,17 +301,17 @@ struct SettingsView: View {
 
                 NavigationLink {
                     PrivacySettings()
-                        .navigationTitle("Your privacy")
+                        .navigationTitle("Privacy")
                         .modifier(ThemedBackground(grouped: true))
                 } label: {
-                    settingsRow("lock", color: theme.colors.secondary) { Text("Your privacy") }
+                    settingsRow("lock", color: theme.colors.secondary) { Text("Privacy") }
                 }
                 .disabled(chatModel.chatRunning != true)
 
                 NavigationLink {
                     helpAndSupportView
                 } label: {
-                    settingsRow("questionmark", color: theme.colors.secondary) { Text("Help & support") }
+                    settingsRow("questionmark", color: theme.colors.secondary) { Text("Help") }
                 }
 
                 chatDatabaseRow()
@@ -320,13 +320,13 @@ struct SettingsView: View {
                     MigrateFromDevice(showProgressOnSettings: $showProgress)
                         .toolbar {
                             ToolbarItem(placement: .principal) {
-                                Text("Migrate device").font(.headline)
+                                Text("Transfer device").font(.headline)
                             }
                         }
                         .modifier(ThemedBackground(grouped: true))
                         .navigationBarTitleDisplayMode(.large)
                 } label: {
-                    settingsRow("tray.and.arrow.up", color: theme.colors.secondary) { Text("Migrate to another device") }
+                    settingsRow("tray.and.arrow.up", color: theme.colors.secondary) { Text("Transfer to a new device") }
                 }
             }
 
@@ -381,7 +381,7 @@ struct SettingsView: View {
                 }
             }
         }
-        .navigationTitle("Your settings")
+        .navigationTitle("Settings")
         .modifier(ThemedBackground(grouped: true))
         .onDisappear {
             chatModel.showingTerminal = false
@@ -401,7 +401,7 @@ struct SettingsView: View {
                             .modifier(ThemedBackground())
                             .frame(maxHeight: .infinity, alignment: .top)
                     } label: {
-                        settingsRow("questionmark", color: theme.colors.secondary) { Text("How to use it") }
+                        settingsRow("questionmark", color: theme.colors.secondary) { Text("How to use") }
                     }
                 }
                 NavigationLink {
@@ -423,16 +423,19 @@ struct SettingsView: View {
             }
 
             Section(header: Text("Contact").foregroundColor(theme.colors.secondary)) {
-                settingsRow("antenna.radiowaves.left.and.right", color: theme.colors.secondary) {
-                    ExternalLink("Follow Zero Updates", destination: URL(string: "https://simpl.global")!)
-                }
                 settingsRow("number", color: theme.colors.secondary) {
-                    ExternalLink("Send questions and ideas", destination: URL(string: "https://github.com/simpl-hq/zero/issues")!)
+                    ExternalLink("Share feedback", destination: URL(string: "https://github.com/simpl-hq/zero/issues")!)
                 }
-                settingsRow("envelope", color: theme.colors.secondary) { Text("[Send us email](mailto:support@simpl.global)") }
+                settingsRow("envelope", color: theme.colors.secondary) { Text("[Email us at: support@simpl.global](mailto:support@simpl.global)") }
             }
 
             Section(header: Text("Support the project").foregroundColor(theme.colors.secondary)) {
+                NavigationLink {
+                    DonateView()
+                        .modifier(ThemedBackground(grouped: true))
+                } label: {
+                    settingsRow("heart.fill", color: .red) { Text("Donate") }
+                }
                 settingsRow("keyboard", color: theme.colors.secondary) {
                     ExternalLink("Contribute", destination: URL(string: "https://github.com/simpl-hq/zero#contributing")!)
                 }
@@ -456,20 +459,77 @@ struct SettingsView: View {
                 }
             }
         }
-        .navigationTitle("Help & support")
+        .navigationTitle("Help")
         .modifier(ThemedBackground(grouped: true))
+    }
+
+    private struct DonateView: View {
+        @EnvironmentObject var theme: AppTheme
+        @State private var copiedId: String?
+
+        private let btcAddress = "bc1qwdz5r5vagtqq8mmn0wch2y6q5adk4ms84xj3es"
+        private let xmrAddress = "47hCGy2csT1fJXMbsVtstXDqudH2M6tyeVQed9ob4vjgawLMnRqA5sNESBrGsfoiEQNCFWbohXsTG9JDfVWCh5KgVhTcrrL"
+        private let ethAddress = "0x96A103A67cB65c33673275FEFA29C77807E52605"
+
+        var body: some View {
+            List {
+                Section {
+                    ExternalLink("Open simpl.global/donate", destination: URL(string: "https://simpl.global/donate")!)
+                    ExternalLink("Buy Me a Coffee", destination: URL(string: "https://buymeacoffee.com/supportsimpl")!)
+                } header: {
+                    Text("Web")
+                } footer: {
+                    Text("Zero is free, open-source, and independent. Every contribution helps keep relays and development running.")
+                }
+
+                Section(header: Text("Crypto (tap to copy)")) {
+                    copyRow(id: "BTC", title: "Bitcoin (BTC)", address: btcAddress)
+                    copyRow(id: "XMR", title: "Monero (XMR)", address: xmrAddress)
+                    copyRow(id: "ETH", title: "Ethereum / USDC (ETH)", address: ethAddress)
+                }
+            }
+            .navigationTitle("Donate")
+        }
+
+        private func copyRow(id: String, title: String, address: String) -> some View {
+            Button {
+                UIPasteboard.general.string = address
+                copiedId = id
+            } label: {
+                HStack {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(title)
+                            .foregroundColor(theme.colors.onBackground)
+                        Text(address)
+                            .font(.caption)
+                            .foregroundColor(theme.colors.secondary)
+                            .lineLimit(1)
+                            .truncationMode(.middle)
+                    }
+                    Spacer()
+                    if copiedId == id {
+                        Text("Copied")
+                            .font(.caption.weight(.semibold))
+                            .foregroundColor(theme.colors.primary)
+                    } else {
+                        Image(systemName: "doc.on.doc")
+                            .foregroundColor(theme.colors.secondary)
+                    }
+                }
+            }
+        }
     }
 
     private func chatDatabaseRow() -> some View {
         NavigationLink {
             DatabaseView(dismissSettingsSheet: dismiss, chatItemTTL: chatModel.chatItemTTL)
-                .navigationTitle("Chat data")
+                .navigationTitle("Chat settings")
                 .modifier(ThemedBackground(grouped: true))
         } label: {
             let color: Color = chatModel.chatDbEncrypted == false ? .orange : theme.colors.secondary
             settingsRow("internaldrive", color: color) {
                 HStack {
-                    Text("Chat data")
+                    Text("Chat settings")
                     Spacer()
                     if chatModel.chatRunning == false {
                         Image(systemName: "exclamationmark.octagon.fill").foregroundColor(.red)

@@ -96,7 +96,7 @@ private fun CIMetaText(
     val statusIcon = meta.statusIcon(statusPrimaryColor, color, paleColor)
     if (statusIcon != null) {
       val (icon, statusColor) = statusIcon
-      if (meta.itemStatus is CIStatus.SndSent || meta.itemStatus is CIStatus.SndRcvd) {
+      if (meta.itemStatus is CIStatus.SndNew || meta.itemStatus is CIStatus.SndSent || meta.itemStatus is CIStatus.SndRcvd) {
         Icon(painterResource(icon), null, Modifier.height(17.dp), tint = statusColor)
       } else {
         StatusIconText(painterResource(icon), statusColor)

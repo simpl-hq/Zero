@@ -1,6 +1,9 @@
+// API Responses
+// This file is generated automatically.
+
 import * as T from "./types"
 
-export type ChatResponse =
+export type ChatResponse = 
   | CR.AcceptingContactRequest
   | CR.ActiveUser
   | CR.ChatItemNotChanged
@@ -58,7 +61,7 @@ export type ChatResponse =
   | CR.ApiChats
 
 export namespace CR {
-  export type Tag =
+  export type Tag = 
     | "acceptingContactRequest"
     | "activeUser"
     | "chatItemNotChanged"

@@ -183,16 +183,26 @@ namespace ZeroSetup
             left.VerticalAlignment = VerticalAlignment.Center;
             left.Margin = new Thickness(22, 0, 0, 0);
 
-            Image miniLogo = CreateWordmarkImage(16);
-            miniLogo.Margin = new Thickness(0, 0, 10, 0);
+            UIElement miniLogo = CreateZeroLogo(20);
+            ((FrameworkElement)miniLogo).Margin = new Thickness(0, 0, 8, 0);
             left.Children.Add(miniLogo);
 
+            TextBlock brandName = new TextBlock();
+            brandName.Text = "Zero";
+            brandName.FontFamily = new FontFamily("Segoe UI Black, Segoe UI");
+            brandName.FontSize = 14;
+            brandName.FontWeight = FontWeights.Black;
+            brandName.Foreground = Brushes.White;
+            brandName.VerticalAlignment = VerticalAlignment.Center;
+            brandName.Margin = new Thickness(0, 0, 8, 0);
+            left.Children.Add(brandName);
+
             Border versionPill = new Border();
-            versionPill.CornerRadius = new CornerRadius(99);
-            versionPill.Background = BrushFromHex("#121214");
+            versionPill.CornerRadius = new CornerRadius(6);
+            versionPill.Background = BrushFromHex("#141416");
             versionPill.BorderBrush = BrushFromHex("#262629");
             versionPill.BorderThickness = new Thickness(1);
-            versionPill.Padding = new Thickness(8, 2, 8, 2);
+            versionPill.Padding = new Thickness(7, 2, 7, 2);
             versionPill.VerticalAlignment = VerticalAlignment.Center;
 
             TextBlock verTxt = new TextBlock();
@@ -251,40 +261,41 @@ namespace ZeroSetup
             hero.VerticalAlignment = VerticalAlignment.Center;
             hero.HorizontalAlignment = HorizontalAlignment.Center;
 
-            Image wordmark = CreateWordmarkImage(40);
-            wordmark.HorizontalAlignment = HorizontalAlignment.Center;
-            wordmark.Margin = new Thickness(0, 0, 0, 16);
-            hero.Children.Add(wordmark);
+            UIElement heroLogo = CreateZeroLogo(52);
+            ((FrameworkElement)heroLogo).HorizontalAlignment = HorizontalAlignment.Center;
+            ((FrameworkElement)heroLogo).Margin = new Thickness(0, 0, 0, 12);
+            hero.Children.Add(heroLogo);
+
+            TextBlock wordmarkText = new TextBlock();
+            wordmarkText.Text = "Zero";
+            wordmarkText.FontFamily = new FontFamily("Segoe UI Black, Segoe UI");
+            wordmarkText.FontSize = 36;
+            wordmarkText.FontWeight = FontWeights.Black;
+            wordmarkText.Foreground = Brushes.White;
+            wordmarkText.HorizontalAlignment = HorizontalAlignment.Center;
+            wordmarkText.Margin = new Thickness(0, 0, 0, 4);
+            hero.Children.Add(wordmarkText);
 
             TextBlock title = new TextBlock();
-            title.Text = "Privacy Should Be Effortless.";
+            title.Text = "Private by design.";
             title.FontFamily = new FontFamily("Segoe UI");
-            title.FontSize = 20;
+            title.FontSize = 18;
             title.FontWeight = FontWeights.SemiBold;
-            title.Foreground = Brushes.White;
+            title.Foreground = BrushFromHex("#F5F5F7");
             title.HorizontalAlignment = HorizontalAlignment.Center;
-            title.Margin = new Thickness(0, 0, 0, 8);
+            title.Margin = new Thickness(0, 0, 0, 6);
             hero.Children.Add(title);
 
             TextBlock sub = new TextBlock();
-            sub.Text = "Post-quantum encrypted messaging with zero phone numbers, zero emails, and zero persistent identifiers.";
+            sub.Text = "No phone numbers. No accounts. Just encrypted messaging.";
             sub.FontFamily = new FontFamily("Segoe UI");
-            sub.FontSize = 12.5;
+            sub.FontSize = 13;
             sub.Foreground = BrushFromHex("#8E8E93");
             sub.TextWrapping = TextWrapping.Wrap;
             sub.TextAlignment = TextAlignment.Center;
-            sub.MaxWidth = 430;
-            sub.Margin = new Thickness(0, 0, 0, 18);
+            sub.MaxWidth = 400;
+            sub.Margin = new Thickness(0, 0, 0, 16);
             hero.Children.Add(sub);
-
-            StackPanel pills = new StackPanel();
-            pills.Orientation = Orientation.Horizontal;
-            pills.HorizontalAlignment = HorizontalAlignment.Center;
-            pills.Margin = new Thickness(0, 0, 0, 12);
-            pills.Children.Add(CreateSpecPill("Curve448 + sntrup761"));
-            pills.Children.Add(CreateSpecPill("16 KB Padded"));
-            pills.Children.Add(CreateSpecPill("2-Hop Onion"));
-            hero.Children.Add(pills);
 
             // Collapsible customize panel
             _customPanel = new Border();
@@ -362,17 +373,17 @@ namespace ZeroSetup
             footer.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
 
             Button customToggle = new Button();
-            customToggle.Content = "Install options";
+            customToggle.Content = "Options";
             customToggle.FontFamily = new FontFamily("Segoe UI");
-            customToggle.FontSize = 12;
-            customToggle.Padding = new Thickness(14, 9, 14, 9);
+            customToggle.FontSize = 12.5;
+            customToggle.Padding = new Thickness(16, 9, 16, 9);
             customToggle.Cursor = Cursors.Hand;
-            customToggle.Style = CreateFlatButtonStyle("#0A0A0C", "#161618", "#8E8E93", "#FFFFFF", 99);
+            customToggle.Style = CreateFlatButtonStyle("#141416", "#1F1F23", "#A1A1A6", "#FFFFFF", 10);
             customToggle.Click += delegate
             {
                 bool show = _customPanel.Visibility != Visibility.Visible;
                 _customPanel.Visibility = show ? Visibility.Visible : Visibility.Collapsed;
-                customToggle.Content = show ? "Hide options" : "Install options";
+                customToggle.Content = show ? "Hide options" : "Options";
             };
             Grid.SetColumn(customToggle, 0);
             footer.Children.Add(customToggle);
@@ -384,7 +395,7 @@ namespace ZeroSetup
             installBtn.FontWeight = FontWeights.SemiBold;
             installBtn.Padding = new Thickness(28, 11, 28, 11);
             installBtn.Cursor = Cursors.Hand;
-            installBtn.Style = CreateFlatButtonStyle("#FFFFFF", "#E5E5EA", "#000000", "#000000", 99);
+            installBtn.Style = CreateFlatButtonStyle("#FFFFFF", "#E5E5EA", "#000000", "#000000", 10);
             installBtn.Click += delegate { StartInstall(); };
             Grid.SetColumn(installBtn, 2);
             footer.Children.Add(installBtn);
@@ -403,9 +414,9 @@ namespace ZeroSetup
             stack.HorizontalAlignment = HorizontalAlignment.Center;
             stack.Width = 420;
 
-            Image wordmark = CreateWordmarkImage(34);
-            wordmark.HorizontalAlignment = HorizontalAlignment.Center;
-            wordmark.Margin = new Thickness(0, 0, 0, 26);
+            UIElement wordmark = CreateZeroLogo(44);
+            ((FrameworkElement)wordmark).HorizontalAlignment = HorizontalAlignment.Center;
+            ((FrameworkElement)wordmark).Margin = new Thickness(0, 0, 0, 26);
             stack.Children.Add(wordmark);
 
             Grid labelRow = new Grid();
@@ -445,10 +456,10 @@ namespace ZeroSetup
             stack.Children.Add(track);
 
             TextBlock note = new TextBlock();
-            note.Text = "Verifying cryptographic runtime and creating local encrypted environment";
+            note.Text = "Setting up your private workspace.";
             note.FontFamily = new FontFamily("Segoe UI");
-            note.FontSize = 11.5;
-            note.Foreground = BrushFromHex("#636366");
+            note.FontSize = 12;
+            note.Foreground = BrushFromHex("#8E8E93");
             note.HorizontalAlignment = HorizontalAlignment.Center;
             note.Margin = new Thickness(0, 14, 0, 0);
             stack.Children.Add(note);
@@ -522,7 +533,7 @@ namespace ZeroSetup
             closeBtn.Padding = new Thickness(20, 10, 20, 10);
             closeBtn.Margin = new Thickness(0, 0, 10, 0);
             closeBtn.Cursor = Cursors.Hand;
-            closeBtn.Style = CreateFlatButtonStyle("#121214", "#1F1F23", "#D1D1D6", "#FFFFFF", 99);
+            closeBtn.Style = CreateFlatButtonStyle("#141416", "#1F1F23", "#D1D1D6", "#FFFFFF", 10);
             closeBtn.Click += delegate { _window.Close(); };
 
             Button launchBtn = new Button();
@@ -532,7 +543,7 @@ namespace ZeroSetup
             launchBtn.FontWeight = FontWeights.SemiBold;
             launchBtn.Padding = new Thickness(28, 10, 28, 10);
             launchBtn.Cursor = Cursors.Hand;
-            launchBtn.Style = CreateFlatButtonStyle("#FFFFFF", "#E5E5EA", "#000000", "#000000", 99);
+            launchBtn.Style = CreateFlatButtonStyle("#FFFFFF", "#E5E5EA", "#000000", "#000000", 10);
             launchBtn.Click += delegate
             {
                 LaunchInstalledApp();
@@ -592,7 +603,7 @@ namespace ZeroSetup
             closeBtn.Padding = new Thickness(20, 10, 20, 10);
             closeBtn.Margin = new Thickness(0, 0, 10, 0);
             closeBtn.Cursor = Cursors.Hand;
-            closeBtn.Style = CreateFlatButtonStyle("#121214", "#1F1F23", "#D1D1D6", "#FFFFFF", 99);
+            closeBtn.Style = CreateFlatButtonStyle("#141416", "#1F1F23", "#D1D1D6", "#FFFFFF", 10);
             closeBtn.Click += delegate { _window.Close(); };
 
             Button retryBtn = new Button();
@@ -602,7 +613,7 @@ namespace ZeroSetup
             retryBtn.FontWeight = FontWeights.SemiBold;
             retryBtn.Padding = new Thickness(24, 10, 24, 10);
             retryBtn.Cursor = Cursors.Hand;
-            retryBtn.Style = CreateFlatButtonStyle("#FFFFFF", "#E5E5EA", "#000000", "#000000", 99);
+            retryBtn.Style = CreateFlatButtonStyle("#FFFFFF", "#E5E5EA", "#000000", "#000000", 10);
             retryBtn.Click += delegate { SwitchPane(_welcomePane); };
 
             footer.Children.Add(closeBtn);
@@ -657,24 +668,24 @@ namespace ZeroSetup
                 try
                 {
                     Directory.CreateDirectory(tempDir);
-                    SetProgress(24, "Verifying Zero installer SHA-256 checksum…");
+                    SetProgress(24, "Verifying installer…");
                     string msiPath = ExtractAndVerifyMsi(tempDir);
 
-                    SetProgress(36, "Deploying Zero Core & Post-Quantum Runtime…");
+                    SetProgress(36, "Preparing Zero…");
                     string args = "/i \"" + msiPath + "\" /qn /norestart INSTALLDIR=\"" + _installDir + "\"";
                     ProcessStartInfo psi = new ProcessStartInfo("msiexec.exe", args);
                     psi.UseShellExecute = true;
                     psi.Verb = "runas";
                     psi.WindowStyle = ProcessWindowStyle.Hidden;
 
-                    SetProgress(62, "Installing application files and shortcuts…");
+                    SetProgress(62, "Installing Zero…");
                     using (Process proc = Process.Start(psi))
                     {
                         while (!proc.WaitForExit(350))
                         {
                             if (_targetProgress < 92)
                             {
-                                SetProgress(_targetProgress + 2.5, "Installing Zero to " + _installDir + "…");
+                                SetProgress(_targetProgress + 2.5, "Installing Zero…");
                             }
                         }
 
@@ -840,50 +851,33 @@ namespace ZeroSetup
             return outMsi;
         }
 
-        private static Image CreateWordmarkImage(double height)
+        private static UIElement CreateZeroLogo(double size)
         {
-            Image img = new Image();
-            img.Height = height;
-            img.Stretch = Stretch.Uniform;
-            RenderOptions.SetBitmapScalingMode(img, BitmapScalingMode.HighQuality);
-            try
-            {
-                Assembly asm = Assembly.GetExecutingAssembly();
-                using (Stream s = asm.GetManifestResourceStream("ZeroWordmark.png"))
-                {
-                    if (s != null)
-                    {
-                        BitmapImage bmp = new BitmapImage();
-                        bmp.BeginInit();
-                        bmp.CacheOption = BitmapCacheOption.OnLoad;
-                        bmp.StreamSource = s;
-                        bmp.EndInit();
-                        bmp.Freeze();
-                        img.Source = bmp;
-                    }
-                }
-            }
-            catch { }
-            return img;
-        }
+            Border badge = new Border();
+            badge.Width = size;
+            badge.Height = size;
+            badge.CornerRadius = new CornerRadius(Math.Round(size * 0.24));
+            badge.Background = BrushFromHex("#141416");
+            badge.BorderBrush = BrushFromHex("#2C2C2E");
+            badge.BorderThickness = new Thickness(1);
 
-        private static Border CreateSpecPill(string text)
-        {
-            Border b = new Border();
-            b.CornerRadius = new CornerRadius(99);
-            b.Background = BrushFromHex("#0A0A0C");
-            b.BorderBrush = BrushFromHex("#222226");
-            b.BorderThickness = new Thickness(1);
-            b.Padding = new Thickness(10, 4, 10, 4);
-            b.Margin = new Thickness(4, 0, 4, 0);
+            Viewbox vb = new Viewbox();
+            vb.Margin = new Thickness(Math.Round(size * 0.24));
+            vb.Stretch = Stretch.Uniform;
 
-            TextBlock t = new TextBlock();
-            t.Text = text;
-            t.FontFamily = new FontFamily("Segoe UI");
-            t.FontSize = 10.5;
-            t.Foreground = BrushFromHex("#A1A1A6");
-            b.Child = t;
-            return b;
+            System.Windows.Shapes.Path zPath = new System.Windows.Shapes.Path();
+            zPath.Stroke = Brushes.White;
+            zPath.StrokeThickness = 4.8;
+            zPath.StrokeStartLineCap = PenLineCap.Round;
+            zPath.StrokeEndLineCap = PenLineCap.Round;
+            zPath.StrokeLineJoin = PenLineJoin.Round;
+            zPath.Data = Geometry.Parse("M 4,5 L 20,5 L 4,19 L 20,19");
+            zPath.Width = 24;
+            zPath.Height = 24;
+
+            vb.Child = zPath;
+            badge.Child = vb;
+            return badge;
         }
 
         private static CheckBox CreateMonochromeCheck(string label, bool isChecked)

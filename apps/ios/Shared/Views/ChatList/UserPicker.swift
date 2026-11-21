@@ -13,6 +13,10 @@ struct UserPicker: View {
     @State private var switchingProfile = false
     @State private var frameWidth: CGFloat = 0
     @State private var resetScroll = ResetScrollAction()
+    @State private var showNewIdentityDialog = false
+    @State private var showBurnDisposableDialog = false
+    @State private var identityActionInProgress = false
+    @State private var disposableParentUserId: Int64 = Int64(kcDisposableParentUserId.get() ?? "") ?? 0
 
     private let imageSize: CGFloat = 44
     private let rowPadding: CGFloat = 16
@@ -22,12 +26,11 @@ struct UserPicker: View {
     private let sectionShape = RoundedRectangle(cornerRadius: 10, style: .continuous)
 
     var body: some View {
-        let otherUsers: [UserInfo] = m.users
-            .filter { u in !u.user.hidden && u.user.userId != m.currentUser?.userId }
-            .sorted(using: KeyPathComparator<UserInfo>(\.user.activeOrder, order: .reverse))
         let sectionWidth = max(frameWidth - sectionHorizontalPadding * 2, 0)
-        let currentUserWidth = max(frameWidth - sectionHorizontalPadding - rowPadding * 2 - 14 - imageSize, 0)
-        let stopped = m.chatRunning != true
+        let stopped = m.chatRunning != true || identityActionInProgress
+        let hasDisposableParent = disposableParentUserId > 0
+            && m.currentUser?.userId != Int64(disposableParentUserId)
+            && m.users.contains(where: { $0.user.userId == Int64(disposableParentUserId) })
         VStack(spacing: sectionSpacing) {
             if let user = m.currentUser {
                 StickyScrollView(resetScroll: $resetScroll) {
@@ -38,18 +41,11 @@ struct UserPicker: View {
                             profileName(user).lineLimit(1)
                         }
                         .padding(rowPadding)
-                        .frame(width: otherUsers.isEmpty ? sectionWidth : currentUserWidth, alignment: .leading)
+                        .frame(width: sectionWidth, alignment: .leading)
                         .modifier(ListRow { activeSheet = .currentProfile })
                         .clipShape(sectionShape)
                         .disabled(stopped)
                         .opacity(stopped ? 0.4 : 1)
-                        ForEach(otherUsers) { u in
-                            userView(u, size: imageSize)
-                                .frame(maxWidth: sectionWidth * 0.618)
-                                .fixedSize()
-                                .disabled(stopped)
-                                .opacity(stopped ? 0.4 : 1)
-                        }
                     }
                     .padding(.horizontal, sectionHorizontalPadding)
                 }
@@ -59,9 +55,16 @@ struct UserPicker: View {
                 .onPreferenceChange(DetermineWidth.Key.self) { frameWidth = $0 }
             }
             VStack(spacing: 0) {
-                openSheetOnTap("qrcode", title: m.userAddress == nil ? "Create Zero address" : "Your Zero address", sheet: .address, disabled: stopped)
+                openSheetOnTap("qrcode", title: m.userAddress == nil ? "Create my address" : "My Address", sheet: .address, disabled: stopped)
                 openSheetOnTap("switch.2", title: "Chat preferences", sheet: .chatPreferences, disabled: stopped)
-                openSheetOnTap("person.crop.rectangle.stack", title: "Your chat profiles", sheet: .chatProfiles, disabled: stopped)
+                if hasDisposableParent {
+                    actionRow("flame", title: "Burn identity", tint: .red, disabled: stopped) {
+                        showBurnDisposableDialog = true
+                    }
+                }
+                actionRow("arrow.triangle.2.circlepath", title: "New identity", disabled: stopped) {
+                    showNewIdentityDialog = true
+                }
                 openSheetOnTap("desktopcomputer", title: "Use from desktop", sheet: .useFromDesktop, disabled: stopped)
                 ZStack(alignment: .trailing) {
                     openSheetOnTap("gearshape", title: "Settings", sheet: .settings, showDivider: false)
@@ -88,6 +91,33 @@ struct UserPicker: View {
             .clipShape(sectionShape)
             .padding(.horizontal, sectionHorizontalPadding)
             .padding(.bottom, sectionSpacing)
+        }
+        .confirmationDialog(
+            "New identity",
+            isPresented: $showNewIdentityDialog,
+            titleVisibility: .visible
+        ) {
+            Button("Burner identity") {
+                rotateIdentity(disposable: true)
+            }
+            Button("New identity", role: .destructive) {
+                rotateIdentity(disposable: false)
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("Start a temporary burner session you can destroy anytime, or permanently replace your current identity.")
+        }
+        .confirmationDialog(
+            "Burn identity?",
+            isPresented: $showBurnDisposableDialog,
+            titleVisibility: .visible
+        ) {
+            Button("Burn", role: .destructive) {
+                burnDisposableIdentity()
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("This burner identity, its chats, and its address will be permanently deleted, and you will return to your main identity.")
         }
         .onAppear {
             if case .active = scenePhase, hasChatCtrl() {
@@ -146,6 +176,104 @@ struct UserPicker: View {
             }
         })
         .clipShape(sectionShape)
+    }
+
+    private func actionRow(_ icon: String, title: LocalizedStringKey, tint: Color? = nil, showDivider: Bool = true, disabled: Bool = false, action: @escaping () -> Void) -> some View {
+        ZStack(alignment: .bottom) {
+            settingsRow(icon, color: tint ?? theme.colors.secondary) {
+                Text(title)
+                    .foregroundColor(tint ?? .primary)
+                    .opacity(disabled ? 0.4 : 1)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, rowPadding)
+            .padding(.vertical, rowVerticalPadding)
+            .modifier(ListRow(action: action))
+            .disabled(disabled)
+            if showDivider {
+                Divider().padding(.leading, 52)
+            }
+        }
+    }
+
+    private func rotateIdentity(disposable: Bool) {
+        guard !identityActionInProgress else { return }
+        identityActionInProgress = true
+        let prevUser = m.currentUser
+        let existingParentId = disposableParentUserId > 0 ? Int64(disposableParentUserId) : nil
+        Task {
+            do {
+                let suffix = String(format: "%06x", UInt32.random(in: 0..<0x1000000))
+                let prefix = disposable ? "anon" : "zero"
+                let newUser = try apiCreateActiveUser(Profile(displayName: "\(prefix)_\(suffix)", fullName: ""))
+                _ = try? await apiCreateUserAddress()
+                try await changeActiveUserAsync_(newUser.userId, viewPwd: nil)
+                if disposable {
+                    if existingParentId == nil, let prev = prevUser {
+                        await MainActor.run { setDisposableParentUserId(prev.userId) }
+                    } else if let parentId = existingParentId, let prev = prevUser, prev.userId != parentId {
+                        try? await apiDeleteUser(prev.userId, true, viewPwd: nil)
+                    }
+                } else {
+                    await MainActor.run { setDisposableParentUserId(0) }
+                    if let prev = prevUser, prev.userId != newUser.userId {
+                        try? await apiDeleteUser(prev.userId, true, viewPwd: nil)
+                    }
+                    if let parentId = existingParentId, parentId != prevUser?.userId, parentId != newUser.userId {
+                        try? await apiDeleteUser(parentId, true, viewPwd: nil)
+                    }
+                }
+                await MainActor.run {
+                    identityActionInProgress = false
+                    userPickerShown = false
+                }
+            } catch {
+                await MainActor.run {
+                    identityActionInProgress = false
+                    showAlert(
+                        NSLocalizedString("Error creating identity", comment: "alertTitle"),
+                        message: responseError(error)
+                    )
+                }
+            }
+        }
+    }
+
+    private func burnDisposableIdentity() {
+        let parentId = Int64(disposableParentUserId)
+        guard parentId > 0, !identityActionInProgress else { return }
+        identityActionInProgress = true
+        let disposableUser = m.currentUser
+        Task {
+            do {
+                try await changeActiveUserAsync_(parentId, viewPwd: nil)
+                await MainActor.run { setDisposableParentUserId(0) }
+                if let disp = disposableUser, disp.userId != parentId {
+                    try? await apiDeleteUser(disp.userId, true, viewPwd: nil)
+                }
+                await MainActor.run {
+                    identityActionInProgress = false
+                    userPickerShown = false
+                }
+            } catch {
+                await MainActor.run {
+                    identityActionInProgress = false
+                    showAlert(
+                        NSLocalizedString("Error switching identity", comment: "alertTitle"),
+                        message: responseError(error)
+                    )
+                }
+            }
+        }
+    }
+
+    private func setDisposableParentUserId(_ id: Int64) {
+        disposableParentUserId = id
+        if id > 0 {
+            _ = kcDisposableParentUserId.set(String(id))
+        } else {
+            _ = kcDisposableParentUserId.remove()
+        }
     }
 
     private func openSheetOnTap(_ icon: String, title: LocalizedStringKey, sheet: UserPickerSheet, showDivider: Bool = true, disabled: Bool = false) -> some View {

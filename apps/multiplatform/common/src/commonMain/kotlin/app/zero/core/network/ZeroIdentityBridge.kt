@@ -14,16 +14,22 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
+import java.io.ByteArrayOutputStream
+import java.io.EOFException
+import java.io.InputStream
 import java.io.OutputStreamWriter
 import java.net.HttpURLConnection
 import java.net.InetSocketAddress
-import java.net.Proxy
+import java.net.Socket
 import java.net.URL
 import java.security.MessageDigest
+import java.security.cert.Certificate
 import java.security.cert.X509Certificate
 import java.util.Base64
 import javax.net.ssl.HttpsURLConnection
 import javax.net.ssl.SSLPeerUnverifiedException
+import javax.net.ssl.SSLSocket
+import javax.net.ssl.SSLSocketFactory
 import kotlin.coroutines.coroutineContext
 
 data class ZeroPhraseIdentity(
@@ -404,12 +410,19 @@ class ZeroIdentityBridge(
     if (!url.protocol.equals("https", ignoreCase = true)) {
       throw SSLPeerUnverifiedException("Plaintext HTTP rejected for broker host ${url.host}")
     }
+    val httpsConn = conn as? HttpsURLConnection
+      ?: throw SSLPeerUnverifiedException("Expected HTTPS connection for ${url.host}")
+    verifyBrokerTlsCertificates(httpsConn.serverCertificates, url)
+  }
+
+  private fun verifyBrokerTlsCertificates(certs: Array<out Certificate>, url: URL) {
+    if (!url.protocol.equals("https", ignoreCase = true)) {
+      throw SSLPeerUnverifiedException("Plaintext HTTP rejected for broker host ${url.host}")
+    }
     val host = url.host.lowercase()
     if (host !in SIMPL_BROKER_HOSTS) return
-    val httpsConn = conn as? HttpsURLConnection
-      ?: throw SSLPeerUnverifiedException("Expected HTTPS connection for $host")
     val sha256 = MessageDigest.getInstance("SHA-256")
-    val matched = httpsConn.serverCertificates.any { cert ->
+    val matched = certs.any { cert ->
       val x509 = cert as? X509Certificate ?: return@any false
       val spkiPin = Base64.getEncoder().encodeToString(sha256.digest(x509.publicKey.encoded))
       spkiPin in SIMPL_BROKER_SPKI_PINS
@@ -421,8 +434,11 @@ class ZeroIdentityBridge(
 
   private fun executeHttpRequest(url: String, method: String, body: String?): String {
     val parsedUrl = URL(url)
-    val proxy = resolveActiveSocksProxy()
-    val conn = (if (proxy != null) parsedUrl.openConnection(proxy) else parsedUrl.openConnection()) as HttpURLConnection
+    val proxyConfig = resolveActiveSocksProxy()
+    if (proxyConfig != null) {
+      return executeHttpOverSocks5h(parsedUrl, method, body, proxyConfig.first, proxyConfig.second)
+    }
+    val conn = parsedUrl.openConnection() as HttpURLConnection
     conn.instanceFollowRedirects = false
     conn.connectTimeout = CONNECT_TIMEOUT_MS
     conn.readTimeout = READ_TIMEOUT_MS
@@ -456,22 +472,189 @@ class ZeroIdentityBridge(
     }
   }
 
+  private fun executeHttpOverSocks5h(
+    url: URL,
+    method: String,
+    body: String?,
+    proxyHost: String,
+    proxyPort: Int
+  ): String {
+    if (!url.protocol.equals("https", ignoreCase = true)) {
+      throw SSLPeerUnverifiedException("Plaintext HTTP rejected for broker host ${url.host}")
+    }
+    val targetHost = url.host
+    val targetPort = if (url.port > 0) url.port else 443
+    val hostBytes = targetHost.toByteArray(Charsets.UTF_8)
+    require(hostBytes.size in 1..255) { "Invalid host length for SOCKS5h: $targetHost" }
+
+    val tunnel = Socket()
+    try {
+      tunnel.connect(InetSocketAddress(proxyHost, proxyPort), CONNECT_TIMEOUT_MS)
+      tunnel.soTimeout = READ_TIMEOUT_MS
+      val rawOut = tunnel.getOutputStream()
+      val rawIn = tunnel.getInputStream()
+
+      // SOCKS5 greeting: version 5, 1 auth method (no auth = 0x00)
+      rawOut.write(byteArrayOf(0x05, 0x01, 0x00))
+      rawOut.flush()
+      val greet = readExactBytes(rawIn, 2)
+      if (greet[0].toInt() != 0x05 || greet[1].toInt() != 0x00) {
+        throw IllegalStateException("SOCKS5 handshake rejected (${greet[1].toInt() and 0xFF})")
+      }
+
+      // SOCKS5h CONNECT with ATYP=0x03 (domain name) so DNS resolves remotely inside Tor
+      val req = ByteArrayOutputStream(7 + hostBytes.size)
+      req.write(0x05)
+      req.write(0x01) // CONNECT
+      req.write(0x00) // RSV
+      req.write(0x03) // DOMAINNAME
+      req.write(hostBytes.size)
+      req.write(hostBytes)
+      req.write((targetPort ushr 8) and 0xFF)
+      req.write(targetPort and 0xFF)
+      rawOut.write(req.toByteArray())
+      rawOut.flush()
+
+      val respHead = readExactBytes(rawIn, 4)
+      if (respHead[0].toInt() != 0x05 || respHead[1].toInt() != 0x00) {
+        throw IllegalStateException("SOCKS5h connect failed with code ${respHead[1].toInt() and 0xFF}")
+      }
+      when (respHead[3].toInt() and 0xFF) {
+        0x01 -> readExactBytes(rawIn, 4 + 2)
+        0x03 -> {
+          val len = rawIn.read()
+          if (len < 0) throw EOFException("Unexpected EOF reading SOCKS5h bound domain")
+          readExactBytes(rawIn, len + 2)
+        }
+        0x04 -> readExactBytes(rawIn, 16 + 2)
+        else -> throw IllegalStateException("Unknown SOCKS5h address type: ${respHead[3].toInt() and 0xFF}")
+      }
+
+      val sslSocket = (SSLSocketFactory.getDefault() as SSLSocketFactory)
+        .createSocket(tunnel, targetHost, targetPort, true) as SSLSocket
+      sslSocket.soTimeout = READ_TIMEOUT_MS
+      sslSocket.sslParameters = sslSocket.sslParameters.apply {
+        endpointIdentificationAlgorithm = "HTTPS"
+      }
+      sslSocket.startHandshake()
+      verifyBrokerTlsCertificates(sslSocket.session.peerCertificates, url)
+
+      val pathWithQuery = buildString {
+        append(url.path.ifEmpty { "/" })
+        if (!url.query.isNullOrEmpty()) {
+          append('?')
+          append(url.query)
+        }
+      }
+      val bodyBytes = body?.toByteArray(Charsets.UTF_8)
+      val headerText = buildString {
+        append("$method $pathWithQuery HTTP/1.1\r\n")
+        append("Host: $targetHost\r\n")
+        append("User-Agent: $MASKED_USER_AGENT\r\n")
+        append("Accept: application/json\r\n")
+        append("Cache-Control: no-store\r\n")
+        append("Connection: close\r\n")
+        if (bodyBytes != null) {
+          append("Content-Type: application/json; charset=utf-8\r\n")
+          append("Content-Length: ${bodyBytes.size}\r\n")
+        }
+        append("\r\n")
+      }
+      val tlsOut = sslSocket.outputStream
+      tlsOut.write(headerText.toByteArray(Charsets.US_ASCII))
+      if (bodyBytes != null) {
+        tlsOut.write(bodyBytes)
+      }
+      tlsOut.flush()
+
+      val tlsIn = sslSocket.inputStream
+      val statusLine = readAsciiLine(tlsIn)
+      val statusCode = statusLine.split(' ').getOrNull(1)?.toIntOrNull()
+        ?: throw IllegalStateException("Malformed HTTP status line: $statusLine")
+      val headers = mutableMapOf<String, String>()
+      while (true) {
+        val line = readAsciiLine(tlsIn)
+        if (line.isEmpty()) break
+        val idx = line.indexOf(':')
+        if (idx > 0) {
+          headers[line.substring(0, idx).trim().lowercase()] = line.substring(idx + 1).trim()
+        }
+      }
+
+      val isChunked = headers["transfer-encoding"]?.lowercase()?.contains("chunked") == true
+      val contentLength = headers["content-length"]?.toIntOrNull()
+      val responseBytes = when {
+        isChunked -> readChunkedBody(tlsIn)
+        contentLength != null -> readExactBytes(tlsIn, contentLength)
+        else -> tlsIn.readBytes()
+      }
+      val text = responseBytes.toString(Charsets.UTF_8)
+      if (statusCode !in 200..299) {
+        throw IllegalStateException("Directory HTTP $statusCode: $text")
+      }
+      return text
+    } finally {
+      runCatching { tunnel.close() }
+    }
+  }
+
+  private fun readExactBytes(input: InputStream, count: Int): ByteArray {
+    val buf = ByteArray(count)
+    var offset = 0
+    while (offset < count) {
+      val n = input.read(buf, offset, count - offset)
+      if (n < 0) throw EOFException("Unexpected EOF after $offset of $count bytes")
+      offset += n
+    }
+    return buf
+  }
+
+  private fun readAsciiLine(input: InputStream): String {
+    val out = ByteArrayOutputStream(64)
+    while (true) {
+      val b = input.read()
+      if (b < 0) {
+        if (out.size() == 0) throw EOFException("Unexpected EOF reading HTTP line")
+        break
+      }
+      if (b == '\n'.code) break
+      if (b != '\r'.code) out.write(b)
+    }
+    return out.toString(Charsets.US_ASCII.name())
+  }
+
+  private fun readChunkedBody(input: InputStream): ByteArray {
+    val out = ByteArrayOutputStream()
+    while (true) {
+      val sizeLine = readAsciiLine(input).substringBefore(';').trim()
+      val chunkSize = sizeLine.toIntOrNull(16)
+        ?: throw IllegalStateException("Invalid HTTP chunk size: $sizeLine")
+      if (chunkSize == 0) {
+        while (readAsciiLine(input).isNotEmpty()) {}
+        break
+      }
+      out.write(readExactBytes(input, chunkSize))
+      readAsciiLine(input)
+    }
+    return out.toByteArray()
+  }
+
   fun hasActiveProxy(): Boolean = resolveActiveSocksProxy() != null
 
-  private fun resolveActiveSocksProxy(): Proxy? {
+  private fun resolveActiveSocksProxy(): Pair<String, Int>? {
     val useSocks = runCatching { appPrefs.networkUseSocksProxy.get() }.getOrDefault(false)
     if (!useSocks) return null
     val netProxy = try {
       appPrefs.networkProxy.get()
     } catch (t: Throwable) {
-      throw IllegalStateException("SOCKS5 proxy enabled but configuration could not be read", t)
+      throw IllegalStateException("Tor enabled but configuration could not be read", t)
     }
-    val host = netProxy.host.trim().ifBlank { "localhost" }
+    val host = netProxy.host.trim().ifBlank { "127.0.0.1" }
     val port = netProxy.port
     if (port !in 1..65535) {
-      throw IllegalStateException("SOCKS5 proxy enabled with invalid port: $port")
+      throw IllegalStateException("Tor enabled with invalid port: $port")
     }
-    return Proxy(Proxy.Type.SOCKS, InetSocketAddress(host, port))
+    return host to port
   }
 
   suspend fun relaySupportMessage(message: String, senderPin: String? = null): Boolean = withContext(Dispatchers.IO) {

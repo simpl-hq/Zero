@@ -1,3 +1,5 @@
+# API Types
+# This file is generated automatically.
 from __future__ import annotations
 from typing import Literal, NotRequired, TypedDict
 
@@ -102,7 +104,7 @@ class AgentErrorType_NOTICE(TypedDict):
     type: Literal["NOTICE"]
     server: str
     preset: bool
-    expiresAt: NotRequired[str]
+    expiresAt: NotRequired[str]  # ISO-8601 timestamp
 
 class AgentErrorType_INTERNAL(TypedDict):
     type: Literal["INTERNAL"]
@@ -142,11 +144,11 @@ class AutoAccept(TypedDict):
 
 class BadgeInfo(TypedDict):
     badgeType: "BadgeType"
-    badgeExpiry: NotRequired[str]
+    badgeExpiry: NotRequired[str]  # ISO-8601 timestamp
     badgeExtra: str
 
 class BadgeProof(TypedDict):
-    badgeKeyIdx: int
+    badgeKeyIdx: int  # int
     presHeader: str
     proof: str
     badgeInfo: "BadgeInfo"
@@ -227,12 +229,12 @@ class CIContent_rcvDeleted(TypedDict):
 class CIContent_sndCall(TypedDict):
     type: Literal["sndCall"]
     status: "CICallStatus"
-    duration: int
+    duration: int  # int
 
 class CIContent_rcvCall(TypedDict):
     type: Literal["rcvCall"]
     status: "CICallStatus"
-    duration: int
+    duration: int  # int
 
 class CIContent_rcvIntegrityError(TypedDict):
     type: Literal["rcvIntegrityError"]
@@ -241,7 +243,7 @@ class CIContent_rcvIntegrityError(TypedDict):
 class CIContent_rcvDecryptionError(TypedDict):
     type: Literal["rcvDecryptionError"]
     msgDecryptError: "MsgDecryptError"
-    msgCount: int
+    msgCount: int  # word32
 
 class CIContent_rcvMsgError(TypedDict):
     type: Literal["rcvMsgError"]
@@ -281,38 +283,38 @@ class CIContent_rcvChatFeature(TypedDict):
     type: Literal["rcvChatFeature"]
     feature: "ChatFeature"
     enabled: "PrefEnabled"
-    param: NotRequired[int]
+    param: NotRequired[int]  # int
 
 class CIContent_sndChatFeature(TypedDict):
     type: Literal["sndChatFeature"]
     feature: "ChatFeature"
     enabled: "PrefEnabled"
-    param: NotRequired[int]
+    param: NotRequired[int]  # int
 
 class CIContent_rcvChatPreference(TypedDict):
     type: Literal["rcvChatPreference"]
     feature: "ChatFeature"
     allowed: "FeatureAllowed"
-    param: NotRequired[int]
+    param: NotRequired[int]  # int
 
 class CIContent_sndChatPreference(TypedDict):
     type: Literal["sndChatPreference"]
     feature: "ChatFeature"
     allowed: "FeatureAllowed"
-    param: NotRequired[int]
+    param: NotRequired[int]  # int
 
 class CIContent_rcvGroupFeature(TypedDict):
     type: Literal["rcvGroupFeature"]
     groupFeature: "GroupFeature"
     preference: "GroupPreference"
-    param: NotRequired[int]
+    param: NotRequired[int]  # int
     memberRole_: NotRequired["GroupMemberRole"]
 
 class CIContent_sndGroupFeature(TypedDict):
     type: Literal["sndGroupFeature"]
     groupFeature: "GroupFeature"
     preference: "GroupPreference"
-    param: NotRequired[int]
+    param: NotRequired[int]  # int
     memberRole_: NotRequired["GroupMemberRole"]
 
 class CIContent_rcvChatFeatureRejected(TypedDict):
@@ -392,20 +394,20 @@ CIDeleteMode = Literal["broadcast", "internal", "internalMark", "history"]
 
 class CIDeleted_deleted(TypedDict):
     type: Literal["deleted"]
-    deletedTs: NotRequired[str]
+    deletedTs: NotRequired[str]  # ISO-8601 timestamp
     chatType: "ChatType"
 
 class CIDeleted_blocked(TypedDict):
     type: Literal["blocked"]
-    deletedTs: NotRequired[str]
+    deletedTs: NotRequired[str]  # ISO-8601 timestamp
 
 class CIDeleted_blockedByAdmin(TypedDict):
     type: Literal["blockedByAdmin"]
-    deletedTs: NotRequired[str]
+    deletedTs: NotRequired[str]  # ISO-8601 timestamp
 
 class CIDeleted_moderated(TypedDict):
     type: Literal["moderated"]
-    deletedTs: NotRequired[str]
+    deletedTs: NotRequired[str]  # ISO-8601 timestamp
     byGroupMember: "GroupMember"
 
 CIDeleted = CIDeleted_deleted | CIDeleted_blocked | CIDeleted_blockedByAdmin | CIDeleted_moderated
@@ -447,9 +449,9 @@ CIDirection = (
 CIDirection_Tag = Literal["directSnd", "directRcv", "groupSnd", "groupRcv", "channelRcv", "localSnd", "localRcv"]
 
 class CIFile(TypedDict):
-    fileId: int
+    fileId: int  # int64
     fileName: str
-    fileSize: int
+    fileSize: int  # int64
     fileSource: NotRequired["CryptoFile"]
     fileStatus: "CIFileStatus"
     fileProtocol: "FileProtocol"
@@ -459,8 +461,8 @@ class CIFileStatus_sndStored(TypedDict):
 
 class CIFileStatus_sndTransfer(TypedDict):
     type: Literal["sndTransfer"]
-    sndProgress: int
-    sndTotal: int
+    sndProgress: int  # int64
+    sndTotal: int  # int64
 
 class CIFileStatus_sndCancelled(TypedDict):
     type: Literal["sndCancelled"]
@@ -484,8 +486,8 @@ class CIFileStatus_rcvAccepted(TypedDict):
 
 class CIFileStatus_rcvTransfer(TypedDict):
     type: Literal["rcvTransfer"]
-    rcvProgress: int
-    rcvTotal: int
+    rcvProgress: int  # int64
+    rcvTotal: int  # int64
 
 class CIFileStatus_rcvAborted(TypedDict):
     type: Literal["rcvAborted"]
@@ -535,23 +537,23 @@ class CIForwardedFrom_contact(TypedDict):
     type: Literal["contact"]
     chatName: str
     msgDir: "MsgDirection"
-    contactId: NotRequired[int]
-    chatItemId: NotRequired[int]
+    contactId: NotRequired[int]  # int64
+    chatItemId: NotRequired[int]  # int64
 
 class CIForwardedFrom_group(TypedDict):
     type: Literal["group"]
     chatName: str
     msgDir: "MsgDirection"
-    groupId: NotRequired[int]
-    chatItemId: NotRequired[int]
+    groupId: NotRequired[int]  # int64
+    chatItemId: NotRequired[int]  # int64
 
 CIForwardedFrom = CIForwardedFrom_unknown | CIForwardedFrom_contact | CIForwardedFrom_group
 
 CIForwardedFrom_Tag = Literal["unknown", "contact", "group"]
 
 class CIGroupInvitation(TypedDict):
-    groupId: int
-    groupMemberId: int
+    groupId: int  # int64
+    groupMemberId: int  # int64
     localDisplayName: str
     groupProfile: "GroupProfile"
     status: "CIGroupInvitationStatus"
@@ -563,14 +565,14 @@ class CIMention(TypedDict):
     memberRef: NotRequired["CIMentionMember"]
 
 class CIMentionMember(TypedDict):
-    groupMemberId: int
+    groupMemberId: int  # int64
     displayName: str
     localAlias: NotRequired[str]
     memberRole: "GroupMemberRole"
 
 class CIMeta(TypedDict):
-    itemId: int
-    itemTs: str
+    itemId: int  # int64
+    itemTs: str  # ISO-8601 timestamp
     itemText: str
     itemStatus: "CIStatus"
     sentViaProxy: NotRequired[bool]
@@ -584,30 +586,30 @@ class CIMeta(TypedDict):
     hasLink: bool
     deletable: bool
     editable: bool
-    forwardedByMember: NotRequired[int]
+    forwardedByMember: NotRequired[int]  # int64
     showGroupAsSender: bool
     msgVerified: NotRequired["MsgVerified"]
-    createdAt: str
-    updatedAt: str
+    createdAt: str  # ISO-8601 timestamp
+    updatedAt: str  # ISO-8601 timestamp
 
 class CIQuote(TypedDict):
     chatDir: NotRequired["CIDirection"]
-    itemId: NotRequired[int]
+    itemId: NotRequired[int]  # int64
     sharedMsgId: NotRequired[str]
-    sentAt: str
+    sentAt: str  # ISO-8601 timestamp
     content: "MsgContent"
     formattedText: NotRequired[list["FormattedText"]]
 
 class CIReaction(TypedDict):
     chatDir: "CIDirection"
     chatItem: "ChatItem"
-    sentAt: str
+    sentAt: str  # ISO-8601 timestamp
     reaction: "MsgReaction"
 
 class CIReactionCount(TypedDict):
     reaction: "MsgReaction"
     userReacted: bool
-    totalReacted: int
+    totalReacted: int  # int
 
 class CIStatus_sndNew(TypedDict):
     type: Literal["sndNew"]
@@ -657,8 +659,8 @@ CIStatus = (
 CIStatus_Tag = Literal["sndNew", "sndSent", "sndRcvd", "sndErrorAuth", "sndError", "sndWarning", "rcvNew", "rcvRead", "invalid"]
 
 class CITimed(TypedDict):
-    ttl: int
-    deleteAt: NotRequired[str]
+    ttl: int  # int
+    deleteAt: NotRequired[str]  # ISO-8601 timestamp
 
 class ChatBotCommand_command(TypedDict):
     type: Literal["command"]
@@ -690,8 +692,9 @@ ChatDeleteMode = ChatDeleteMode_full | ChatDeleteMode_entity | ChatDeleteMode_me
 
 ChatDeleteMode_Tag = Literal["full", "entity", "messages"]
 
+
 def ChatDeleteMode_cmd_string(self: ChatDeleteMode) -> str:
-    return str(self['type']) + ('' if str(self['type']) == 'messages' else (' notify=off' if not self['notify'] else ''))
+    return str(self['type']) + ('' if str(self['type']) == 'messages' else (' notify=off' if not self['notify'] else ''))  # type: ignore[typeddict-item]
 
 class ChatError_error(TypedDict):
     type: Literal["error"]
@@ -738,36 +741,36 @@ class ChatErrorType_chatRelayExists(TypedDict):
 
 class ChatErrorType_differentActiveUser(TypedDict):
     type: Literal["differentActiveUser"]
-    commandUserId: int
-    activeUserId: int
+    commandUserId: int  # int64
+    activeUserId: int  # int64
 
 class ChatErrorType_cantDeleteActiveUser(TypedDict):
     type: Literal["cantDeleteActiveUser"]
-    userId: int
+    userId: int  # int64
 
 class ChatErrorType_cantDeleteLastUser(TypedDict):
     type: Literal["cantDeleteLastUser"]
-    userId: int
+    userId: int  # int64
 
 class ChatErrorType_cantHideLastUser(TypedDict):
     type: Literal["cantHideLastUser"]
-    userId: int
+    userId: int  # int64
 
 class ChatErrorType_hiddenUserAlwaysMuted(TypedDict):
     type: Literal["hiddenUserAlwaysMuted"]
-    userId: int
+    userId: int  # int64
 
 class ChatErrorType_emptyUserPassword(TypedDict):
     type: Literal["emptyUserPassword"]
-    userId: int
+    userId: int  # int64
 
 class ChatErrorType_userAlreadyHidden(TypedDict):
     type: Literal["userAlreadyHidden"]
-    userId: int
+    userId: int  # int64
 
 class ChatErrorType_userNotHidden(TypedDict):
     type: Literal["userNotHidden"]
-    userId: int
+    userId: int  # int64
 
 class ChatErrorType_invalidDisplayName(TypedDict):
     type: Literal["invalidDisplayName"]
@@ -889,7 +892,7 @@ class ChatErrorType_fileCancelled(TypedDict):
 
 class ChatErrorType_fileCancel(TypedDict):
     type: Literal["fileCancel"]
-    fileId: int
+    fileId: int  # int64
     message: str
 
 class ChatErrorType_fileAlreadyExists(TypedDict):
@@ -903,7 +906,7 @@ class ChatErrorType_fileWrite(TypedDict):
 
 class ChatErrorType_fileSend(TypedDict):
     type: Literal["fileSend"]
-    fileId: int
+    fileId: int  # int64
     agentError: "AgentErrorType"
 
 class ChatErrorType_fileRcvChunk(TypedDict):
@@ -924,20 +927,20 @@ class ChatErrorType_fileImageSize(TypedDict):
 
 class ChatErrorType_fileNotReceived(TypedDict):
     type: Literal["fileNotReceived"]
-    fileId: int
+    fileId: int  # int64
 
 class ChatErrorType_fileNotApproved(TypedDict):
     type: Literal["fileNotApproved"]
-    fileId: int
+    fileId: int  # int64
     unknownServers: list[str]
 
 class ChatErrorType_fallbackToSMPProhibited(TypedDict):
     type: Literal["fallbackToSMPProhibited"]
-    fileId: int
+    fileId: int  # int64
 
 class ChatErrorType_inlineFileProhibited(TypedDict):
     type: Literal["inlineFileProhibited"]
-    fileId: int
+    fileId: int  # int64
 
 class ChatErrorType_invalidForward(TypedDict):
     type: Literal["invalidForward"]
@@ -956,7 +959,7 @@ class ChatErrorType_noCurrentCall(TypedDict):
 
 class ChatErrorType_callContact(TypedDict):
     type: Literal["callContact"]
-    contactId: int
+    contactId: int  # int64
 
 class ChatErrorType_directMessagesProhibited(TypedDict):
     type: Literal["directMessagesProhibited"]
@@ -1127,6 +1130,8 @@ class ChatItem(TypedDict):
     reactions: list["CIReactionCount"]
     file: NotRequired["CIFile"]
 
+# Message deletion result.
+
 class ChatItemDeletion(TypedDict):
     deletedChatItem: "AChatItem"
     toChatItem: NotRequired["AChatItem"]
@@ -1146,10 +1151,13 @@ ChatListQuery_Tag = Literal["filters", "search"]
 
 ChatPeerType = Literal["human", "bot"]
 
+# Used in API commands. Chat scope can only be passed with groups.
+
 class ChatRef(TypedDict):
     chatType: "ChatType"
-    chatId: int
+    chatId: int  # int64
     chatScope: NotRequired["GroupChatScope"]
+
 
 def ChatRef_cmd_string(self: ChatRef) -> str:
     return ChatType_cmd_string(self['chatType']) + str(self['chatId']) + ((GroupChatScope_cmd_string(self.get('chatScope'))) if self.get('chatScope') is not None else '')
@@ -1160,13 +1168,14 @@ class ChatSettings(TypedDict):
     favorite: bool
 
 class ChatStats(TypedDict):
-    unreadCount: int
-    unreadMentions: int
-    reportsCount: int
-    minUnreadItemId: int
+    unreadCount: int  # int
+    unreadMentions: int  # int
+    reportsCount: int  # int
+    minUnreadItemId: int  # int64
     unreadChat: bool
 
 ChatType = Literal["direct", "group", "local"]
+
 
 def ChatType_cmd_string(self: ChatType) -> str:
     return '@' if str(self) == 'direct' else '#' if str(self) == 'group' else '*' if str(self) == 'local' else ''
@@ -1177,12 +1186,12 @@ class ChatWallpaper(TypedDict):
     background: NotRequired[str]
     tint: NotRequired[str]
     scaleType: NotRequired["ChatWallpaperScale"]
-    scale: NotRequired[float]
+    scale: NotRequired[float]  # double
 
 ChatWallpaperScale = Literal["fill", "fit", "repeat"]
 
 class ClientNotice(TypedDict):
-    ttl: NotRequired[int]
+    ttl: NotRequired[int]  # int64
 
 Color = Literal["black", "red", "green", "yellow", "blue", "magenta", "cyan", "white"]
 
@@ -1242,13 +1251,13 @@ CommandErrorType_Tag = Literal["PROHIBITED", "SYNTAX", "NO_CONN", "SIZE", "LARGE
 
 class CommentsGroupPreference(TypedDict):
     enable: "GroupFeatureEnabled"
-    duration: NotRequired[int]
+    duration: NotRequired[int]  # int
 
 class ComposedMessage(TypedDict):
     fileSource: NotRequired["CryptoFile"]
-    quotedItemId: NotRequired[int]
+    quotedItemId: NotRequired[int]  # int64
     msgContent: "MsgContent"
-    mentions: dict[str, int]
+    mentions: dict[str, int]  # str : int64
 
 class ConnStatus_new(TypedDict):
     type: Literal["new"]
@@ -1295,30 +1304,30 @@ ConnStatus_Tag = Literal["new", "prepared", "joined", "requested", "accepted", "
 ConnType = Literal["contact", "member", "user_contact"]
 
 class Connection(TypedDict):
-    connId: int
+    connId: int  # int64
     agentConnId: str
-    connChatVersion: int
+    connChatVersion: int  # int
     peerChatVRange: "VersionRange"
-    connLevel: int
-    viaContact: NotRequired[int]
-    viaUserContactLink: NotRequired[int]
+    connLevel: int  # int
+    viaContact: NotRequired[int]  # int64
+    viaUserContactLink: NotRequired[int]  # int64
     viaGroupLink: bool
     groupLinkId: NotRequired[str]
     xContactId: NotRequired[str]
-    customUserProfileId: NotRequired[int]
+    customUserProfileId: NotRequired[int]  # int64
     connType: "ConnType"
     connStatus: "ConnStatus"
     contactConnInitiated: bool
     localAlias: str
-    entityId: NotRequired[int]
+    entityId: NotRequired[int]  # int64
     connectionCode: NotRequired["SecurityCode"]
     pqSupport: bool
     pqEncryption: bool
     pqSndEnabled: NotRequired[bool]
     pqRcvEnabled: NotRequired[bool]
-    authErrCounter: int
-    quotaErrCounter: int
-    createdAt: str
+    authErrCounter: int  # int
+    quotaErrCounter: int  # int
+    createdAt: str  # ISO-8601 timestamp
 
 class ConnectionEntity_rcvDirectMsgConnection(TypedDict):
     type: Literal["rcvDirectMsgConnection"]
@@ -1397,7 +1406,7 @@ ConnectionPlan = (
 ConnectionPlan_Tag = Literal["invitationLink", "contactAddress", "groupLink", "error"]
 
 class Contact(TypedDict):
-    contactId: int
+    contactId: int  # int64
     localDisplayName: str
     profile: "LocalProfile"
     activeConn: NotRequired["Connection"]
@@ -1406,16 +1415,16 @@ class Contact(TypedDict):
     chatSettings: "ChatSettings"
     userPreferences: "Preferences"
     mergedPreferences: "ContactUserPreferences"
-    createdAt: str
-    updatedAt: str
-    chatTs: NotRequired[str]
+    createdAt: str  # ISO-8601 timestamp
+    updatedAt: str  # ISO-8601 timestamp
+    chatTs: NotRequired[str]  # ISO-8601 timestamp
     preparedContact: NotRequired["PreparedContact"]
-    contactRequestId: NotRequired[int]
-    contactGroupMemberId: NotRequired[int]
+    contactRequestId: NotRequired[int]  # int64
+    contactGroupMemberId: NotRequired[int]  # int64
     contactGrpInvSent: bool
     groupDirectInv: NotRequired["GroupDirectInvitation"]
-    chatTags: list[int]
-    chatItemTTL: NotRequired[int]
+    chatTags: list[int]  # int64
+    chatItemTTL: NotRequired[int]  # int64
     uiThemes: NotRequired["UIThemeEntityOverrides"]
     chatDeleted: bool
     customData: NotRequired[dict[str, object]]
@@ -1493,6 +1502,7 @@ class CreatedConnLink(TypedDict):
     connFullLink: str
     connShortLink: NotRequired[str]
 
+
 def CreatedConnLink_cmd_string(self: CreatedConnLink) -> str:
     return self['connFullLink'] + ((' ' + self.get('connShortLink')) if self.get('connShortLink') is not None else '')
 
@@ -1505,8 +1515,8 @@ class CryptoFileArgs(TypedDict):
     fileNonce: str
 
 class DroppedMsg(TypedDict):
-    brokerTs: str
-    attempts: int
+    brokerTs: str  # ISO-8601 timestamp
+    attempts: int  # int
 
 class E2EInfo(TypedDict):
     public: NotRequired[bool]
@@ -1590,7 +1600,7 @@ FeatureAllowed = Literal["always", "yes", "no"]
 
 class FileDescr(TypedDict):
     fileDescrText: str
-    fileDescrPartNo: int
+    fileDescrPartNo: int  # int
     fileDescrComplete: bool
 
 class FileError_auth(TypedDict):
@@ -1651,7 +1661,7 @@ FileErrorType_Tag = Literal["NOT_APPROVED", "SIZE", "REDIRECT", "FILE_IO", "NO_F
 
 class FileInvitation(TypedDict):
     fileName: str
-    fileSize: int
+    fileSize: int  # int64
     fileDigest: NotRequired[str]
     fileConnReq: NotRequired[str]
     fileInline: NotRequired["InlineFileMode"]
@@ -1662,14 +1672,14 @@ FileProtocol = Literal["SMP", "XFTP", "LOCAL"]
 FileStatus = Literal["new", "accepted", "connected", "complete", "cancelled"]
 
 class FileTransferMeta(TypedDict):
-    fileId: int
+    fileId: int  # int64
     xftpSndFile: NotRequired["XFTPSndFile"]
-    xftpRedirectFor: NotRequired[int]
+    xftpRedirectFor: NotRequired[int]  # int64
     fileName: str
     filePath: str
-    fileSize: int
+    fileSize: int  # int64
     fileInline: NotRequired["InlineFileMode"]
-    chunkSize: int
+    chunkSize: int  # int64
     cancelled: bool
 
 FileType = Literal["normal", "roster"]
@@ -1709,7 +1719,7 @@ class Format_zeroLink(TypedDict):
     showText: NotRequired[str]
     linkType: "ZeroLinkType"
     zeroUri: str
-    smpHosts: list[str]
+    smpHosts: list[str]  # non-empty
 
 class Format_zeroName(TypedDict):
     type: Literal["zeroName"]
@@ -1785,14 +1795,15 @@ class Group(TypedDict):
 
 class GroupChatScope_memberSupport(TypedDict):
     type: Literal["memberSupport"]
-    groupMemberId_: NotRequired[int]
+    groupMemberId_: NotRequired[int]  # int64
 
 GroupChatScope = GroupChatScope_memberSupport
 
 GroupChatScope_Tag = Literal["memberSupport"]
 
+
 def GroupChatScope_cmd_string(self: GroupChatScope) -> str:
-    return '(_support' + ((':' + str(self.get('groupMemberId_'))) if self.get('groupMemberId_') is not None else '') + ')'
+    return '(_support' + ((':' + str(self.get('groupMemberId_'))) if self.get('groupMemberId_') is not None else '') + ')'  # type: ignore[typeddict-item]
 
 class GroupChatScopeInfo_memberSupport(TypedDict):
     type: Literal["memberSupport"]
@@ -1804,9 +1815,9 @@ GroupChatScopeInfo_Tag = Literal["memberSupport"]
 
 class GroupDirectInvitation(TypedDict):
     groupDirectInvLink: str
-    fromGroupId_: NotRequired[int]
-    fromGroupMemberId_: NotRequired[int]
-    fromGroupMemberConnId_: NotRequired[int]
+    fromGroupId_: NotRequired[int]  # int64
+    fromGroupMemberId_: NotRequired[int]  # int64
+    fromGroupMemberConnId_: NotRequired[int]  # int64
     groupDirectInvStartedConnection: bool
 
 GroupFeature = Literal["timedMessages", "directMessages", "fullDelete", "reactions", "voice", "files", "zeroLinks", "reports", "history", "support", "sessions", "comments", "signMessages"]
@@ -1814,7 +1825,7 @@ GroupFeature = Literal["timedMessages", "directMessages", "fullDelete", "reactio
 GroupFeatureEnabled = Literal["on", "off"]
 
 class GroupInfo(TypedDict):
-    groupId: int
+    groupId: int  # int64
     useRelays: bool
     relayOwnStatus: NotRequired["RelayStatus"]
     localDisplayName: str
@@ -1824,18 +1835,18 @@ class GroupInfo(TypedDict):
     fullGroupPreferences: "FullGroupPreferences"
     membership: "GroupMember"
     chatSettings: "ChatSettings"
-    createdAt: str
-    updatedAt: str
-    chatTs: NotRequired[str]
-    userMemberProfileSentAt: NotRequired[str]
+    createdAt: str  # ISO-8601 timestamp
+    updatedAt: str  # ISO-8601 timestamp
+    chatTs: NotRequired[str]  # ISO-8601 timestamp
+    userMemberProfileSentAt: NotRequired[str]  # ISO-8601 timestamp
     preparedGroup: NotRequired["PreparedGroup"]
-    chatTags: list[int]
-    chatItemTTL: NotRequired[int]
+    chatTags: list[int]  # int64
+    chatItemTTL: NotRequired[int]  # int64
     uiThemes: NotRequired["UIThemeEntityOverrides"]
     customData: NotRequired[dict[str, object]]
     groupSummary: "GroupSummary"
-    rosterVersion: NotRequired[int]
-    membersRequireAttention: int
+    rosterVersion: NotRequired[int]  # int64
+    membersRequireAttention: int  # int
     viaGroupLinkUri: NotRequired[str]
     groupKeys: NotRequired["GroupKeys"]
     groupDomainVerified: NotRequired[bool]
@@ -1846,7 +1857,7 @@ class GroupKeys(TypedDict):
     memberPrivKey: str
 
 class GroupLink(TypedDict):
-    userContactLinkId: int
+    userContactLinkId: int  # int64
     connLinkContact: "CreatedConnLink"
     shortLinkDataSet: bool
     shortLinkLargeDataSet: bool
@@ -1902,9 +1913,9 @@ GroupLinkPlan = (
 GroupLinkPlan_Tag = Literal["ok", "ownLink", "connectingConfirmReconnect", "connectingProhibit", "known", "noRelays", "updateRequired"]
 
 class GroupMember(TypedDict):
-    groupMemberId: int
-    groupId: int
-    indexInGroup: int
+    groupMemberId: int  # int64
+    groupId: int  # int64
+    indexInGroup: int  # int64
     memberId: str
     memberRole: "GroupMemberRole"
     memberCategory: "GroupMemberCategory"
@@ -1912,15 +1923,15 @@ class GroupMember(TypedDict):
     memberSettings: "GroupMemberSettings"
     blockedByAdmin: bool
     invitedBy: "InvitedBy"
-    invitedByGroupMemberId: NotRequired[int]
+    invitedByGroupMemberId: NotRequired[int]  # int64
     localDisplayName: str
     memberProfile: "LocalProfile"
-    memberContactId: NotRequired[int]
-    memberContactProfileId: int
+    memberContactId: NotRequired[int]  # int64
+    memberContactProfileId: int  # int64
     activeConn: NotRequired["Connection"]
     memberChatVRange: "VersionRange"
-    createdAt: str
-    updatedAt: str
+    createdAt: str  # ISO-8601 timestamp
+    updatedAt: str  # ISO-8601 timestamp
     supportChat: NotRequired["GroupSupportChat"]
     memberPubKey: NotRequired[str]
     relayLink: NotRequired[str]
@@ -1932,7 +1943,7 @@ class GroupMemberAdmission(TypedDict):
 GroupMemberCategory = Literal["user", "invitee", "host", "pre", "post"]
 
 class GroupMemberRef(TypedDict):
-    groupMemberId: int
+    groupMemberId: int  # int64
     profile: "Profile"
 
 GroupMemberRole = Literal["relay", "observer", "author", "member", "moderator", "admin", "owner"]
@@ -1972,8 +1983,8 @@ class GroupProfile(TypedDict):
     memberAdmission: NotRequired["GroupMemberAdmission"]
 
 class GroupRelay(TypedDict):
-    groupRelayId: int
-    groupMemberId: int
+    groupRelayId: int  # int64
+    groupMemberId: int  # int64
     userChatRelay: "UserChatRelay"
     relayStatus: "RelayStatus"
     relayLink: NotRequired[str]
@@ -2001,15 +2012,15 @@ class GroupShortLinkInfo(TypedDict):
     publicGroupId: NotRequired[str]
 
 class GroupSummary(TypedDict):
-    currentMembers: int
-    publicMemberCount: NotRequired[int]
+    currentMembers: int  # int64
+    publicMemberCount: NotRequired[int]  # int64
 
 class GroupSupportChat(TypedDict):
-    chatTs: str
-    unread: int
-    memberAttention: int
-    mentions: int
-    lastMsgFromMemberTs: NotRequired[str]
+    chatTs: str  # ISO-8601 timestamp
+    unread: int  # int64
+    memberAttention: int  # int64
+    mentions: int  # int64
+    lastMsgFromMemberTs: NotRequired[str]  # ISO-8601 timestamp
 
 GroupType = Literal["channel", "group"]
 
@@ -2044,7 +2055,7 @@ InvitationLinkPlan_Tag = Literal["ok", "ownLink", "connecting", "known"]
 
 class InvitedBy_contact(TypedDict):
     type: Literal["contact"]
-    byContactId: int
+    byContactId: int  # int64
 
 class InvitedBy_user(TypedDict):
     type: Literal["user"]
@@ -2064,7 +2075,7 @@ class LinkContent_image(TypedDict):
 
 class LinkContent_video(TypedDict):
     type: Literal["video"]
-    duration: NotRequired[int]
+    duration: NotRequired[int]  # int
 
 class LinkContent_unknown(TypedDict):
     type: Literal["unknown"]
@@ -2092,7 +2103,7 @@ class LocalBadge(TypedDict):
     status: "BadgeStatus"
 
 class LocalProfile(TypedDict):
-    profileId: int
+    profileId: int  # int64
     displayName: str
     fullName: str
     shortDescr: NotRequired[str]
@@ -2107,6 +2118,8 @@ class LocalProfile(TypedDict):
     contactDomainVerified: NotRequired[bool]
 
 MemberCriteria = Literal["all"]
+
+# Connection link sent in a message - only short links are allowed.
 
 class MsgChatLink_contact(TypedDict):
     type: Literal["contact"]
@@ -2146,12 +2159,12 @@ class MsgContent_video(TypedDict):
     type: Literal["video"]
     text: str
     image: str
-    duration: int
+    duration: int  # int
 
 class MsgContent_voice(TypedDict):
     type: Literal["voice"]
     text: str
-    duration: int
+    duration: int  # int
 
 class MsgContent_file(TypedDict):
     type: Literal["file"]
@@ -2194,12 +2207,12 @@ MsgDirection = Literal["rcv", "snd"]
 
 class MsgErrorType_msgSkipped(TypedDict):
     type: Literal["msgSkipped"]
-    fromMsgId: int
-    toMsgId: int
+    fromMsgId: int  # int64
+    toMsgId: int  # int64
 
 class MsgErrorType_msgBadId(TypedDict):
     type: Literal["msgBadId"]
-    msgId: int
+    msgId: int  # int64
 
 class MsgErrorType_msgBadHash(TypedDict):
     type: Literal["msgBadHash"]
@@ -2299,11 +2312,11 @@ class NewUser(TypedDict):
     clientService: bool
 
 class NoteFolder(TypedDict):
-    noteFolderId: int
-    userId: int
-    createdAt: str
-    updatedAt: str
-    chatTs: str
+    noteFolderId: int  # int64
+    userId: int  # int64
+    createdAt: str  # ISO-8601 timestamp
+    updatedAt: str  # ISO-8601 timestamp
+    chatTs: str  # ISO-8601 timestamp
     favorite: bool
     unread: bool
 
@@ -2320,27 +2333,28 @@ OwnerVerification_Tag = Literal["verified", "failed"]
 
 class PaginationByTime_last(TypedDict):
     type: Literal["last"]
-    count: int
+    count: int  # int
 
 PaginationByTime = PaginationByTime_last
 
 PaginationByTime_Tag = Literal["last"]
 
+
 def PaginationByTime_cmd_string(self: PaginationByTime) -> str:
-    return 'count=' + str(self['count'])
+    return 'count=' + str(self['count'])  # type: ignore[typeddict-item]
 
 class PendingContactConnection(TypedDict):
-    pccConnId: int
+    pccConnId: int  # int64
     pccAgentConnId: str
     pccConnStatus: "ConnStatus"
     viaContactUri: bool
-    viaUserContactLink: NotRequired[int]
+    viaUserContactLink: NotRequired[int]  # int64
     groupLinkId: NotRequired[str]
-    customUserProfileId: NotRequired[int]
+    customUserProfileId: NotRequired[int]  # int64
     connLinkInv: NotRequired["CreatedConnLink"]
     localAlias: str
-    createdAt: str
-    updatedAt: str
+    createdAt: str  # ISO-8601 timestamp
+    updatedAt: str  # ISO-8601 timestamp
 
 PlanResolveMode = Literal["allGroups", "unknown", "never"]
 
@@ -2428,7 +2442,7 @@ class PublicGroupAccess(TypedDict):
     allowEmbedding: bool
 
 class PublicGroupData(TypedDict):
-    publicMemberCount: int
+    publicMemberCount: int  # int64
 
 class PublicGroupProfile(TypedDict):
     groupType: "GroupType"
@@ -2556,9 +2570,9 @@ RcvDirectEvent = (
 RcvDirectEvent_Tag = Literal["contactDeleted", "profileUpdated", "groupInvLinkReceived"]
 
 class RcvFileDescr(TypedDict):
-    fileDescrId: int
+    fileDescrId: int  # int64
     fileDescrText: str
-    fileDescrPartNo: int
+    fileDescrPartNo: int  # int
     fileDescrComplete: bool
 
 class RcvFileStatus_new(TypedDict):
@@ -2591,21 +2605,21 @@ RcvFileStatus = (
 RcvFileStatus_Tag = Literal["new", "accepted", "connected", "complete", "cancelled"]
 
 class RcvFileTransfer(TypedDict):
-    fileId: int
+    fileId: int  # int64
     xftpRcvFile: NotRequired["XFTPRcvFile"]
     fileInvitation: "FileInvitation"
     fileStatus: "RcvFileStatus"
     fileType: "FileType"
     rcvFileInline: NotRequired["InlineFileMode"]
     senderDisplayName: str
-    chunkSize: int
+    chunkSize: int  # int64
     cancelled: bool
-    grpMemberId: NotRequired[int]
+    grpMemberId: NotRequired[int]  # int64
     cryptoArgs: NotRequired["CryptoFileArgs"]
 
 class RcvGroupEvent_memberAdded(TypedDict):
     type: Literal["memberAdded"]
-    groupMemberId: int
+    groupMemberId: int  # int64
     profile: "Profile"
 
 class RcvGroupEvent_memberConnected(TypedDict):
@@ -2613,7 +2627,7 @@ class RcvGroupEvent_memberConnected(TypedDict):
 
 class RcvGroupEvent_memberAccepted(TypedDict):
     type: Literal["memberAccepted"]
-    groupMemberId: int
+    groupMemberId: int  # int64
     profile: "Profile"
 
 class RcvGroupEvent_userAccepted(TypedDict):
@@ -2624,13 +2638,13 @@ class RcvGroupEvent_memberLeft(TypedDict):
 
 class RcvGroupEvent_memberRole(TypedDict):
     type: Literal["memberRole"]
-    groupMemberId: int
+    groupMemberId: int  # int64
     profile: "Profile"
     role: "GroupMemberRole"
 
 class RcvGroupEvent_memberBlocked(TypedDict):
     type: Literal["memberBlocked"]
-    groupMemberId: int
+    groupMemberId: int  # int64
     profile: "Profile"
     blocked: bool
 
@@ -2640,7 +2654,7 @@ class RcvGroupEvent_userRole(TypedDict):
 
 class RcvGroupEvent_memberDeleted(TypedDict):
     type: Literal["memberDeleted"]
-    groupMemberId: int
+    groupMemberId: int  # int64
     profile: "Profile"
 
 class RcvGroupEvent_userDeleted(TypedDict):
@@ -2694,7 +2708,7 @@ RcvGroupEvent_Tag = Literal["memberAdded", "memberConnected", "memberAccepted", 
 
 class RcvMsgError_dropped(TypedDict):
     type: Literal["dropped"]
-    attempts: int
+    attempts: int  # int
 
 class RcvMsgError_parseError(TypedDict):
     type: Literal["parseError"]
@@ -2761,44 +2775,10 @@ SMPAgentError_Tag = Literal["A_MESSAGE", "A_PROHIBITED", "A_VERSION", "A_LINK", 
 
 class SecurityCode(TypedDict):
     securityCode: str
-    verifiedAt: str
+    verifiedAt: str  # ISO-8601 timestamp
 
 class SimplePreference(TypedDict):
     allow: "FeatureAllowed"
-
-class ZeroDomain(TypedDict):
-    nameTLD: "ZeroTLD"
-    domain: str
-    subDomain: list[str]
-
-class ZeroDomainClaim(TypedDict):
-    domain: str
-    proof: NotRequired["ZeroDomainProof"]
-
-class ZeroDomainError_noValidLink(TypedDict):
-    type: Literal["noValidLink"]
-
-class ZeroDomainError_unknownDomain(TypedDict):
-    type: Literal["unknownDomain"]
-
-ZeroDomainError = ZeroDomainError_noValidLink | ZeroDomainError_unknownDomain
-
-ZeroDomainError_Tag = Literal["noValidLink", "unknownDomain"]
-
-class ZeroDomainProof(TypedDict):
-    linkOwnerId: NotRequired[str]
-    presHeader: str
-    signature: str
-
-ZeroLinkType = Literal["contact", "invitation", "group", "channel", "relay"]
-
-class ZeroNameInfo(TypedDict):
-    nameType: "ZeroNameType"
-    nameDomain: "ZeroDomain"
-
-ZeroNameType = Literal["publicGroup", "contact"]
-
-ZeroTLD = Literal["zero", "testing", "web"]
 
 SndCIStatusProgress = Literal["partial", "complete"]
 
@@ -2860,28 +2840,28 @@ SndError = (
 SndError_Tag = Literal["auth", "quota", "expired", "relay", "proxy", "proxyRelay", "other"]
 
 class SndFileTransfer(TypedDict):
-    fileId: int
+    fileId: int  # int64
     fileName: str
     filePath: str
-    fileSize: int
-    chunkSize: int
+    fileSize: int  # int64
+    chunkSize: int  # int64
     recipientDisplayName: str
-    connId: int
+    connId: int  # int64
     agentConnId: str
-    groupMemberId: NotRequired[int]
+    groupMemberId: NotRequired[int]  # int64
     fileStatus: "FileStatus"
-    fileDescrId: NotRequired[int]
+    fileDescrId: NotRequired[int]  # int64
     fileInline: NotRequired["InlineFileMode"]
 
 class SndGroupEvent_memberRole(TypedDict):
     type: Literal["memberRole"]
-    groupMemberId: int
+    groupMemberId: int  # int64
     profile: "Profile"
     role: "GroupMemberRole"
 
 class SndGroupEvent_memberBlocked(TypedDict):
     type: Literal["memberBlocked"]
-    groupMemberId: int
+    groupMemberId: int  # int64
     profile: "Profile"
     blocked: bool
 
@@ -2891,7 +2871,7 @@ class SndGroupEvent_userRole(TypedDict):
 
 class SndGroupEvent_memberDeleted(TypedDict):
     type: Literal["memberDeleted"]
-    groupMemberId: int
+    groupMemberId: int  # int64
     profile: "Profile"
 
 class SndGroupEvent_userLeft(TypedDict):
@@ -2903,7 +2883,7 @@ class SndGroupEvent_groupUpdated(TypedDict):
 
 class SndGroupEvent_memberAccepted(TypedDict):
     type: Literal["memberAccepted"]
-    groupMemberId: int
+    groupMemberId: int  # int64
     profile: "Profile"
 
 class SndGroupEvent_userPendingReview(TypedDict):
@@ -2941,7 +2921,7 @@ class StoreError_duplicateName(TypedDict):
 
 class StoreError_userNotFound(TypedDict):
     type: Literal["userNotFound"]
-    userId: int
+    userId: int  # int64
 
 class StoreError_relayUserNotFound(TypedDict):
     type: Literal["relayUserNotFound"]
@@ -2952,23 +2932,23 @@ class StoreError_userNotFoundByName(TypedDict):
 
 class StoreError_userNotFoundByContactId(TypedDict):
     type: Literal["userNotFoundByContactId"]
-    contactId: int
+    contactId: int  # int64
 
 class StoreError_userNotFoundByGroupId(TypedDict):
     type: Literal["userNotFoundByGroupId"]
-    groupId: int
+    groupId: int  # int64
 
 class StoreError_userNotFoundByFileId(TypedDict):
     type: Literal["userNotFoundByFileId"]
-    fileId: int
+    fileId: int  # int64
 
 class StoreError_userNotFoundByContactRequestId(TypedDict):
     type: Literal["userNotFoundByContactRequestId"]
-    contactRequestId: int
+    contactRequestId: int  # int64
 
 class StoreError_contactNotFound(TypedDict):
     type: Literal["contactNotFound"]
-    contactId: int
+    contactId: int  # int64
 
 class StoreError_contactNotFoundByName(TypedDict):
     type: Literal["contactNotFoundByName"]
@@ -2976,7 +2956,7 @@ class StoreError_contactNotFoundByName(TypedDict):
 
 class StoreError_contactNotFoundByMemberId(TypedDict):
     type: Literal["contactNotFoundByMemberId"]
-    groupMemberId: int
+    groupMemberId: int  # int64
 
 class StoreError_contactNotReady(TypedDict):
     type: Literal["contactNotReady"]
@@ -2990,7 +2970,7 @@ class StoreError_userContactLinkNotFound(TypedDict):
 
 class StoreError_contactRequestNotFound(TypedDict):
     type: Literal["contactRequestNotFound"]
-    contactRequestId: int
+    contactRequestId: int  # int64
 
 class StoreError_contactRequestNotFoundByName(TypedDict):
     type: Literal["contactRequestNotFoundByName"]
@@ -2998,14 +2978,14 @@ class StoreError_contactRequestNotFoundByName(TypedDict):
 
 class StoreError_invalidContactRequestEntity(TypedDict):
     type: Literal["invalidContactRequestEntity"]
-    contactRequestId: int
+    contactRequestId: int  # int64
 
 class StoreError_invalidBusinessChatContactRequest(TypedDict):
     type: Literal["invalidBusinessChatContactRequest"]
 
 class StoreError_groupNotFound(TypedDict):
     type: Literal["groupNotFound"]
-    groupId: int
+    groupId: int  # int64
 
 class StoreError_groupNotFoundByName(TypedDict):
     type: Literal["groupNotFoundByName"]
@@ -3013,24 +2993,24 @@ class StoreError_groupNotFoundByName(TypedDict):
 
 class StoreError_groupMemberNameNotFound(TypedDict):
     type: Literal["groupMemberNameNotFound"]
-    groupId: int
+    groupId: int  # int64
     groupMemberName: str
 
 class StoreError_groupMemberNotFound(TypedDict):
     type: Literal["groupMemberNotFound"]
-    groupMemberId: int
+    groupMemberId: int  # int64
 
 class StoreError_groupMemberNotFoundByIndex(TypedDict):
     type: Literal["groupMemberNotFoundByIndex"]
-    groupMemberIndex: int
+    groupMemberIndex: int  # int64
 
 class StoreError_memberRelationsVectorNotFound(TypedDict):
     type: Literal["memberRelationsVectorNotFound"]
-    groupMemberId: int
+    groupMemberId: int  # int64
 
 class StoreError_groupHostMemberNotFound(TypedDict):
     type: Literal["groupHostMemberNotFound"]
-    groupId: int
+    groupId: int  # int64
 
 class StoreError_groupMemberNotFoundByMemberId(TypedDict):
     type: Literal["groupMemberNotFoundByMemberId"]
@@ -3038,7 +3018,7 @@ class StoreError_groupMemberNotFoundByMemberId(TypedDict):
 
 class StoreError_memberContactGroupMemberNotFound(TypedDict):
     type: Literal["memberContactGroupMemberNotFound"]
-    contactId: int
+    contactId: int  # int64
 
 class StoreError_invalidMemberRelationUpdate(TypedDict):
     type: Literal["invalidMemberRelationUpdate"]
@@ -3060,49 +3040,49 @@ class StoreError_groupInvitationNotFound(TypedDict):
 
 class StoreError_noteFolderAlreadyExists(TypedDict):
     type: Literal["noteFolderAlreadyExists"]
-    noteFolderId: int
+    noteFolderId: int  # int64
 
 class StoreError_noteFolderNotFound(TypedDict):
     type: Literal["noteFolderNotFound"]
-    noteFolderId: int
+    noteFolderId: int  # int64
 
 class StoreError_userNoteFolderNotFound(TypedDict):
     type: Literal["userNoteFolderNotFound"]
 
 class StoreError_sndFileNotFound(TypedDict):
     type: Literal["sndFileNotFound"]
-    fileId: int
+    fileId: int  # int64
 
 class StoreError_sndFileInvalid(TypedDict):
     type: Literal["sndFileInvalid"]
-    fileId: int
+    fileId: int  # int64
 
 class StoreError_rcvFileNotFound(TypedDict):
     type: Literal["rcvFileNotFound"]
-    fileId: int
+    fileId: int  # int64
 
 class StoreError_rcvFileDescrNotFound(TypedDict):
     type: Literal["rcvFileDescrNotFound"]
-    fileId: int
+    fileId: int  # int64
 
 class StoreError_fileNotFound(TypedDict):
     type: Literal["fileNotFound"]
-    fileId: int
+    fileId: int  # int64
 
 class StoreError_rcvFileInvalid(TypedDict):
     type: Literal["rcvFileInvalid"]
-    fileId: int
+    fileId: int  # int64
 
 class StoreError_rcvFileInvalidDescrPart(TypedDict):
     type: Literal["rcvFileInvalidDescrPart"]
 
 class StoreError_localFileNoTransfer(TypedDict):
     type: Literal["localFileNoTransfer"]
-    fileId: int
+    fileId: int  # int64
 
 class StoreError_sharedMsgIdNotFoundByFileId(TypedDict):
     type: Literal["sharedMsgIdNotFoundByFileId"]
-    fileId: int
+    fileId: int  # int64
 
 class StoreError_fileIdNotFoundBySharedMsgId(TypedDict):
     type: Literal["fileIdNotFoundBySharedMsgId"]
@@ -3122,15 +3102,15 @@ class StoreError_connectionNotFound(TypedDict):
 
 class StoreError_connectionNotFoundById(TypedDict):
     type: Literal["connectionNotFoundById"]
-    connId: int
+    connId: int  # int64
 
 class StoreError_connectionNotFoundByMemberId(TypedDict):
     type: Literal["connectionNotFoundByMemberId"]
-    groupMemberId: int
+    groupMemberId: int  # int64
 
 class StoreError_pendingConnectionNotFound(TypedDict):
     type: Literal["pendingConnectionNotFound"]
-    connId: int
+    connId: int  # int64
 
 class StoreError_uniqueID(TypedDict):
     type: Literal["uniqueID"]
@@ -3152,12 +3132,12 @@ class StoreError_dBBusyError(TypedDict):
 
 class StoreError_badChatItem(TypedDict):
     type: Literal["badChatItem"]
-    itemId: int
-    itemTs: NotRequired[str]
+    itemId: int  # int64
+    itemTs: NotRequired[str]  # ISO-8601 timestamp
 
 class StoreError_chatItemNotFound(TypedDict):
     type: Literal["chatItemNotFound"]
-    itemId: int
+    itemId: int  # int64
 
 class StoreError_chatItemNotFoundByText(TypedDict):
     type: Literal["chatItemNotFoundByText"]
@@ -3169,19 +3149,19 @@ class StoreError_chatItemSharedMsgIdNotFound(TypedDict):
 
 class StoreError_chatItemNotFoundByFileId(TypedDict):
     type: Literal["chatItemNotFoundByFileId"]
-    fileId: int
+    fileId: int  # int64
 
 class StoreError_chatItemNotFoundByContactId(TypedDict):
     type: Literal["chatItemNotFoundByContactId"]
-    contactId: int
+    contactId: int  # int64
 
 class StoreError_chatItemNotFoundByGroupId(TypedDict):
     type: Literal["chatItemNotFoundByGroupId"]
-    groupId: int
+    groupId: int  # int64
 
 class StoreError_profileNotFound(TypedDict):
     type: Literal["profileNotFound"]
-    profileId: int
+    profileId: int  # int64
 
 class StoreError_duplicateGroupLink(TypedDict):
     type: Literal["duplicateGroupLink"]
@@ -3193,27 +3173,27 @@ class StoreError_groupLinkNotFound(TypedDict):
 
 class StoreError_hostMemberIdNotFound(TypedDict):
     type: Literal["hostMemberIdNotFound"]
-    groupId: int
+    groupId: int  # int64
 
 class StoreError_contactNotFoundByFileId(TypedDict):
     type: Literal["contactNotFoundByFileId"]
-    fileId: int
+    fileId: int  # int64
 
 class StoreError_noGroupSndStatus(TypedDict):
     type: Literal["noGroupSndStatus"]
-    itemId: int
-    groupMemberId: int
+    itemId: int  # int64
+    groupMemberId: int  # int64
 
 class StoreError_duplicateGroupMessage(TypedDict):
     type: Literal["duplicateGroupMessage"]
-    groupId: int
+    groupId: int  # int64
     sharedMsgId: str
-    authorGroupMemberId: NotRequired[int]
-    forwardedByGroupMemberId: NotRequired[int]
+    authorGroupMemberId: NotRequired[int]  # int64
+    forwardedByGroupMemberId: NotRequired[int]  # int64
 
 class StoreError_remoteHostNotFound(TypedDict):
     type: Literal["remoteHostNotFound"]
-    remoteHostId: int
+    remoteHostId: int  # int64
 
 class StoreError_remoteHostUnknown(TypedDict):
     type: Literal["remoteHostUnknown"]
@@ -3223,34 +3203,34 @@ class StoreError_remoteHostDuplicateCA(TypedDict):
 
 class StoreError_remoteCtrlNotFound(TypedDict):
     type: Literal["remoteCtrlNotFound"]
-    remoteCtrlId: int
+    remoteCtrlId: int  # int64
 
 class StoreError_remoteCtrlDuplicateCA(TypedDict):
     type: Literal["remoteCtrlDuplicateCA"]
 
 class StoreError_prohibitedDeleteUser(TypedDict):
     type: Literal["prohibitedDeleteUser"]
-    userId: int
-    contactId: int
+    userId: int  # int64
+    contactId: int  # int64
 
 class StoreError_operatorNotFound(TypedDict):
     type: Literal["operatorNotFound"]
-    serverOperatorId: int
+    serverOperatorId: int  # int64
 
 class StoreError_usageConditionsNotFound(TypedDict):
     type: Literal["usageConditionsNotFound"]
 
 class StoreError_userChatRelayNotFound(TypedDict):
     type: Literal["userChatRelayNotFound"]
-    chatRelayId: int
+    chatRelayId: int  # int64
 
 class StoreError_groupRelayNotFound(TypedDict):
     type: Literal["groupRelayNotFound"]
-    groupRelayId: int
+    groupRelayId: int  # int64
 
 class StoreError_groupRelayNotFoundByMemberId(TypedDict):
     type: Literal["groupRelayNotFoundByMemberId"]
-    groupMemberId: int
+    groupMemberId: int  # int64
 
 class StoreError_invalidQuote(TypedDict):
     type: Literal["invalidQuote"]
@@ -3260,19 +3240,19 @@ class StoreError_invalidMention(TypedDict):
 
 class StoreError_invalidDeliveryTask(TypedDict):
     type: Literal["invalidDeliveryTask"]
-    taskId: int
+    taskId: int  # int64
 
 class StoreError_deliveryTaskNotFound(TypedDict):
     type: Literal["deliveryTaskNotFound"]
-    taskId: int
+    taskId: int  # int64
 
 class StoreError_invalidDeliveryJob(TypedDict):
     type: Literal["invalidDeliveryJob"]
-    jobId: int
+    jobId: int  # int64
 
 class StoreError_deliveryJobNotFound(TypedDict):
     type: Literal["deliveryJobNotFound"]
-    jobId: int
+    jobId: int  # int64
 
 class StoreError_workItemError(TypedDict):
     type: Literal["workItemError"]
@@ -3401,11 +3381,11 @@ SwitchPhase = Literal["started", "confirmed", "secured", "completed"]
 
 class TimedMessagesGroupPreference(TypedDict):
     enable: "GroupFeatureEnabled"
-    ttl: NotRequired[int]
+    ttl: NotRequired[int]  # int
 
 class TimedMessagesPreference(TypedDict):
     allow: "FeatureAllowed"
-    ttl: NotRequired[int]
+    ttl: NotRequired[int]  # int
 
 class TransportError_badBlock(TypedDict):
     type: Literal["badBlock"]
@@ -3464,29 +3444,29 @@ class UIThemeEntityOverrides(TypedDict):
 
 class UpdatedMessage(TypedDict):
     msgContent: "MsgContent"
-    mentions: dict[str, int]
+    mentions: dict[str, int]  # str : int64
 
 class User(TypedDict):
-    userId: int
-    agentUserId: int
-    userContactId: int
+    userId: int  # int64
+    agentUserId: int  # int64
+    userContactId: int  # int64
     localDisplayName: str
     profile: "LocalProfile"
     fullPreferences: "FullPreferences"
     activeUser: bool
-    activeOrder: int
+    activeOrder: int  # int64
     viewPwdHash: NotRequired["UserPwdHash"]
     showNtfs: bool
     sendRcptsContacts: bool
     sendRcptsSmallGroups: bool
     autoAcceptMemberContacts: bool
-    userMemberProfileUpdatedAt: NotRequired[str]
+    userMemberProfileUpdatedAt: NotRequired[str]  # ISO-8601 timestamp
     userChatRelay: bool
     clientService: bool
     uiThemes: NotRequired["UIThemeEntityOverrides"]
 
 class UserChatRelay(TypedDict):
-    chatRelayId: int
+    chatRelayId: int  # int64
     address: str
     relayProfile: "RelayProfile"
     domains: list[str]
@@ -3496,29 +3476,29 @@ class UserChatRelay(TypedDict):
     deleted: bool
 
 class UserContact(TypedDict):
-    userContactLinkId: int
+    userContactLinkId: int  # int64
     connReqContact: str
-    groupId: NotRequired[int]
+    groupId: NotRequired[int]  # int64
 
 class UserContactLink(TypedDict):
-    userContactLinkId: int
+    userContactLinkId: int  # int64
     connLinkContact: "CreatedConnLink"
     shortLinkDataSet: bool
     shortLinkLargeDataSet: bool
     addressSettings: "AddressSettings"
 
 class UserContactRequest(TypedDict):
-    contactRequestId: int
+    contactRequestId: int  # int64
     agentInvitationId: str
-    contactId_: NotRequired[int]
-    businessGroupId_: NotRequired[int]
-    userContactLinkId_: NotRequired[int]
+    contactId_: NotRequired[int]  # int64
+    businessGroupId_: NotRequired[int]  # int64
+    userContactLinkId_: NotRequired[int]  # int64
     cReqChatVRange: "VersionRange"
     localDisplayName: str
-    profileId: int
+    profileId: int  # int64
     profile: "LocalProfile"
-    createdAt: str
-    updatedAt: str
+    createdAt: str  # ISO-8601 timestamp
+    updatedAt: str  # ISO-8601 timestamp
     xContactId: NotRequired[str]
     pqSupport: bool
     welcomeSharedMsgId: NotRequired[str]
@@ -3526,11 +3506,11 @@ class UserContactRequest(TypedDict):
 
 class UserInfo(TypedDict):
     user: "User"
-    unreadCount: int
+    unreadCount: int  # int
 
 class UserProfileUpdateSummary(TypedDict):
-    updateSuccesses: int
-    updateFailures: int
+    updateSuccesses: int  # int
+    updateFailures: int  # int
     changedContacts: list["Contact"]
 
 class UserPwdHash(TypedDict):
@@ -3538,8 +3518,8 @@ class UserPwdHash(TypedDict):
     salt: str
 
 class VersionRange(TypedDict):
-    minVersion: int
-    maxVersion: int
+    minVersion: int  # int
+    maxVersion: int  # int
 
 class XFTPErrorType_BLOCK(TypedDict):
     type: Literal["BLOCK"]
@@ -3623,3 +3603,37 @@ class XFTPSndFile(TypedDict):
     privateSndFileDescr: NotRequired[str]
     agentSndFileDeleted: bool
     cryptoArgs: NotRequired["CryptoFileArgs"]
+
+class ZeroDomain(TypedDict):
+    nameTLD: "ZeroTLD"
+    domain: str
+    subDomain: list[str]
+
+class ZeroDomainClaim(TypedDict):
+    domain: str
+    proof: NotRequired["ZeroDomainProof"]
+
+class ZeroDomainError_noValidLink(TypedDict):
+    type: Literal["noValidLink"]
+
+class ZeroDomainError_unknownDomain(TypedDict):
+    type: Literal["unknownDomain"]
+
+ZeroDomainError = ZeroDomainError_noValidLink | ZeroDomainError_unknownDomain
+
+ZeroDomainError_Tag = Literal["noValidLink", "unknownDomain"]
+
+class ZeroDomainProof(TypedDict):
+    linkOwnerId: NotRequired[str]
+    presHeader: str
+    signature: str
+
+ZeroLinkType = Literal["contact", "invitation", "group", "channel", "relay"]
+
+class ZeroNameInfo(TypedDict):
+    nameType: "ZeroNameType"
+    nameDomain: "ZeroDomain"
+
+ZeroNameType = Literal["publicGroup", "contact"]
+
+ZeroTLD = Literal["zero", "testing", "web"]

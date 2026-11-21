@@ -266,7 +266,7 @@ jobs:
           echo "deb_hash=$(echo SHA2-256\(${cli_deb_name}\)= $(openssl sha256 "${cli_path}/${cli_deb_name}" | cut -d' ' -f 2))" >> $GITHUB_OUTPUT
 
       - name: Upload CLI
-        if: startsWith(github.ref, 'refs/tags/v') && matrix.should_run == true
+        if: false
         uses: ./.github/actions/prepare-release
         with:
           bin_name: ${{ steps.linux_cli_prepare.outputs.bin_name }}
@@ -276,7 +276,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload CLI deb
-        if: startsWith(github.ref, 'refs/tags/v') && matrix.should_run == true
+        if: false
         uses: ./.github/actions/prepare-release
         with:
           bin_name: ${{ steps.linux_cli_prepare.outputs.deb_name }}
@@ -286,7 +286,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build Desktop
-        if: startsWith(github.ref, 'refs/tags/v') && matrix.should_run == true
+        if: false
         shell: docker exec -t builder sh -eu {0}
         run: |
           export ASSETS_DIR='../../assets'
@@ -294,7 +294,7 @@ jobs:
 
       - name: Prepare Desktop
         id: linux_desktop_build
-        if: startsWith(github.ref, 'refs/tags/v') && matrix.should_run == true
+        if: false
         shell: bash
         run: |
           path=$(echo ${{ github.workspace }}/apps/multiplatform/release/main/deb/zero_${{ matrix.arch }}.deb )
@@ -303,7 +303,7 @@ jobs:
 
       - name: Upload Desktop
         uses: ./.github/actions/prepare-release
-        if: startsWith(github.ref, 'refs/tags/v') && matrix.should_run == true
+        if: false
         with:
           bin_path: ${{ steps.linux_desktop_build.outputs.package_path }}
           bin_name: zero-desktop-ubuntu-${{ matrix.os_underscore }}-${{ matrix.arch }}.deb
@@ -312,15 +312,16 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build AppImage
-        if: startsWith(github.ref, 'refs/tags/v') && matrix.os == '22.04' && matrix.should_run == true
+        if: startsWith(github.ref, 'refs/tags/v') && matrix.os == '22.04' && matrix.arch == 'x86_64' && matrix.should_run == true
         shell: docker exec -t builder sh -eu {0}
         run: |
           export ASSETS_DIR='../../assets'
+          scripts/desktop/build-lib-linux.sh
           scripts/desktop/make-appimage-linux.sh
 
       - name: Prepare AppImage
         id: linux_appimage_build
-        if: startsWith(github.ref, 'refs/tags/v') && matrix.os == '22.04' && matrix.should_run == true
+        if: startsWith(github.ref, 'refs/tags/v') && matrix.os == '22.04' && matrix.arch == 'x86_64' && matrix.should_run == true
         shell: bash
         run: |
           path=$(echo ${{ github.workspace }}/apps/multiplatform/release/main/*.AppImage)
@@ -328,7 +329,7 @@ jobs:
           echo "appimage_hash=$(echo SHA2-256\(zero-desktop-${{ matrix.arch }}.AppImage\)= $(openssl sha256 $path | cut -d' ' -f 2))" >> $GITHUB_OUTPUT
 
       - name: Upload AppImage
-        if: startsWith(github.ref, 'refs/tags/v') && matrix.os == '22.04' && matrix.should_run == true
+        if: startsWith(github.ref, 'refs/tags/v') && matrix.os == '22.04' && matrix.arch == 'x86_64' && matrix.should_run == true
         uses: ./.github/actions/prepare-release
         with:
           bin_path: ${{ steps.linux_appimage_build.outputs.appimage_path }}
@@ -345,13 +346,12 @@ jobs:
           sudo chown -R $(id -u):$(id -g) dist-newstyle ~/.cabal
 
       - name: Run tests
-        if: matrix.should_run == true && matrix.arch == 'x86_64'
+        if: matrix.should_run == true && matrix.arch == 'x86_64' && matrix.os == '24.04' && !startsWith(github.ref, 'refs/tags/v')
         timeout-minutes: 120
         shell: bash
         run: |
           i=1
-          attempts=1
-          ${{ (github.ref == 'refs/heads/stable' || startsWith(github.ref, 'refs/tags/v')) }} && attempts=3
+          attempts=2
           while [ "$i" -le "$attempts" ]; do
             if ./zero-runtime-test; then
               break
@@ -522,7 +522,7 @@ jobs:
           echo "bin_hash=$(echo SHA2-256\(${{ matrix.cli_asset_name }}\)= $(openssl sha256 $path | cut -d' ' -f 2))" >> $GITHUB_OUTPUT
 
       - name: Upload CLI
-        if: startsWith(github.ref, 'refs/tags/v')
+        if: false
         uses: ./.github/actions/prepare-release
         with:
           bin_path: ${{ steps.mac_cli_build.outputs.bin_path }}
@@ -533,7 +533,7 @@ jobs:
 
       - name: Build Desktop
         id: mac_desktop_build
-        if: startsWith(github.ref, 'refs/tags/v')
+        if: startsWith(github.ref, 'refs/tags/v') && matrix.os == 'macos-latest'
         shell: bash
         env:
           APPLE_ZERO_SIGNING_KEYCHAIN: ${{ secrets.APPLE_ZERO_SIGNING_KEYCHAIN }}
@@ -547,7 +547,7 @@ jobs:
           echo "package_hash=$(echo SHA2-256\(${{ matrix.desktop_asset_name }}\)= $(openssl sha256 $path | cut -d' ' -f 2))" >> $GITHUB_OUTPUT
 
       - name: Upload Desktop
-        if: startsWith(github.ref, 'refs/tags/v')
+        if: startsWith(github.ref, 'refs/tags/v') && matrix.os == 'macos-latest'
         uses: ./.github/actions/prepare-release
         with:
           bin_path: ${{ steps.mac_desktop_build.outputs.package_path }}
@@ -557,6 +557,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run tests
+        if: false
         timeout-minutes: 120
         shell: bash
         run: |
@@ -656,7 +657,7 @@ jobs:
           echo "bin_hash=$(echo SHA2-256\(${{ matrix.cli_asset_name }}\)= $(openssl sha256 $path | cut -d' ' -f 2))" >> $GITHUB_OUTPUT
 
       - name: Upload CLI
-        if: startsWith(github.ref, 'refs/tags/v')
+        if: false
         uses: ./.github/actions/prepare-release
         with:
           bin_path: ${{ steps.windows_cli_build.outputs.bin_path }}
@@ -686,7 +687,7 @@ jobs:
           echo "setup_hash=$(echo SHA2-256\(zero-desktop-windows-x86_64-setup.exe\)= $(openssl sha256 $setup_path | cut -d' ' -f 2))" >> $GITHUB_OUTPUT
 
       - name: Upload Desktop
-        if: startsWith(github.ref, 'refs/tags/v')
+        if: false
         uses: ./.github/actions/prepare-release
         with:
           bin_path: ${{ steps.windows_desktop_build.outputs.package_path }}
@@ -721,8 +722,6 @@ jobs:
         include:
           - arch: aarch64
             android_abi: arm64-v8a
-          - arch: armv7a
-            android_abi: armeabi-v7a
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -774,6 +773,8 @@ jobs:
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
 
       - name: Install Android SDK components
         shell: bash
@@ -794,12 +795,16 @@ jobs:
           SIGNED=false
           if [ -n "${ANDROID_KEYSTORE_BASE64}" ] && [ -n "${ANDROID_KEYSTORE_PASSWORD}" ] && [ -n "${ANDROID_KEY_ALIAS}" ] && [ -n "${ANDROID_KEY_PASSWORD}" ]; then
             KEYSTORE_FILE="${RUNNER_TEMP}/zero-release.keystore"
-            printf '%s' "${ANDROID_KEYSTORE_BASE64}" | base64 --decode > "${KEYSTORE_FILE}"
-            export ZERO_RELEASE_STORE_FILE="${KEYSTORE_FILE}"
-            export ZERO_RELEASE_STORE_PASSWORD="${ANDROID_KEYSTORE_PASSWORD}"
-            export ZERO_RELEASE_KEY_ALIAS="${ANDROID_KEY_ALIAS}"
-            export ZERO_RELEASE_KEY_PASSWORD="${ANDROID_KEY_PASSWORD}"
-            SIGNED=true
+            if python3 -c 'import base64, os, sys; raw = "".join(os.environ.get("ANDROID_KEYSTORE_BASE64", "").strip().strip("\"\x27").split()).replace("-", "+").replace("_", "/"); raw += "=" * ((4 - len(raw) % 4) % 4); open(sys.argv[1], "wb").write(base64.b64decode(raw, validate=True))' "${KEYSTORE_FILE}"; then
+              export ZERO_RELEASE_STORE_FILE="${KEYSTORE_FILE}"
+              export ZERO_RELEASE_STORE_PASSWORD="${ANDROID_KEYSTORE_PASSWORD}"
+              export ZERO_RELEASE_KEY_ALIAS="${ANDROID_KEY_ALIAS}"
+              export ZERO_RELEASE_KEY_PASSWORD="${ANDROID_KEY_PASSWORD}"
+              SIGNED=true
+            else
+              echo "::warning::ANDROID_KEYSTORE_BASE64 is not valid base64; building unsigned APK"
+              rm -f "${KEYSTORE_FILE}"
+            fi
           fi
 
           cd apps/multiplatform

@@ -40,7 +40,14 @@ fun IncomingCallAlertView(invitation: RcvCallInvitation, chatModel: ChatModel) {
       chatModel.activeCallInvitation.value = null
       ntfManager.cancelCallNotification()
     },
-    acceptCall = { cm.acceptIncomingCall(invitation = invitation) }
+    acceptCall = {
+      app.zero.core.common.views.helpers.AlertManager.shared.showAlertDialog(
+        title = "Encrypted P2P call",
+        text = "Calls and video calls are end-to-end encrypted, but connect peer-to-peer rather than through Tor and may temporarily expose your device's IP address.",
+        confirmText = "Answer",
+        onConfirm = { cm.acceptIncomingCall(invitation = invitation) }
+      )
+    }
   )
 }
 

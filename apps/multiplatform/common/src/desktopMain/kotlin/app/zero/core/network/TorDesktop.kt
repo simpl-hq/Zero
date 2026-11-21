@@ -10,6 +10,7 @@ import java.io.File
  */
 object TorDesktop {
   private var process: Process? = null
+  @Volatile private var hookRegistered = false
 
   private fun exeName() = if (System.getProperty("os.name").lowercase().contains("win")) "tor.exe" else "tor"
 
@@ -55,11 +56,14 @@ object TorDesktop {
       }
     }
     process = pb.start()
-    Runtime.getRuntime().addShutdownHook(Thread { process?.destroy() })
-    repeat(60) {
+    if (!hookRegistered) {
+      hookRegistered = true
+      Runtime.getRuntime().addShutdownHook(Thread { process?.destroy() })
+    }
+    repeat(200) {
       if (TorRuntime.isProxyUp()) return true
       if (process?.isAlive != true) return false
-      delay(500)
+      delay(150)
     }
     return TorRuntime.isProxyUp()
   }

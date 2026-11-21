@@ -87,7 +87,7 @@ fun ChatHelpView(addContact: (() -> Unit)? = null) {
       Text("4-Word Phrase: Zero uses no email or phone number. Share your 4-word phrase or simpl.global/add link when someone wants to reach you.", lineHeight = 20.sp)
       Text("6-Digit In-Person Code: Mint a 5-minute code from the guide or add-contact menu when pairing side by side or over a call.", lineHeight = 20.sp)
       Text("2-Hop Private Routing: Enable Private routing in Network & servers so your IP address never touches a contact's relay.", lineHeight = 20.sp)
-      Text("Local Device Security: Messages stay encrypted only on your device with SQLCipher. Configure app lock in Your privacy and back up your phrase.", lineHeight = 20.sp)
+      Text("Local Device Security: Messages stay encrypted only on your device with SQLCipher. Configure app lock in Privacy and back up your phrase.", lineHeight = 20.sp)
     }
 
     ReadableTextWithLink(MR.strings.you_can_connect_to_zero_core_runtime_founder, "https://github.com/simpl-hq/zero/issues", zeroLink = false)

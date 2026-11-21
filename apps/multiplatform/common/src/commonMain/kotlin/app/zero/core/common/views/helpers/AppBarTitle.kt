@@ -24,7 +24,7 @@ fun AppBarTitle(
   bottomPadding: Dp = DEFAULT_PADDING * 1.5f + 8.dp,
   enableAlphaChanges: Boolean = true,
   overrideTitleColor: Color? = null,
-  textAlign: TextAlign = TextAlign.Start,
+  textAlign: TextAlign = TextAlign.Center,
   lineHeight: TextUnit = TextUnit.Unspecified
 ) {
   val handler = LocalAppBarHandler.current
@@ -44,10 +44,11 @@ fun AppBarTitle(
     Brush.linearGradient(listOf(titleColor.darker(0.2f), titleColor.lighter(0.35f)), Offset(0f, Float.POSITIVE_INFINITY), Offset(Float.POSITIVE_INFINITY, 0f))
   else
     Brush.linearGradient(listOf(titleColor, titleColor), Offset(0f, Float.POSITIVE_INFINITY), Offset(Float.POSITIVE_INFINITY, 0f))
-  Column {
+  Column(Modifier.fillMaxWidth()) {
     Text(
       title,
       Modifier
+        .fillMaxWidth()
         .padding(start = if (withPadding) DEFAULT_PADDING else 0.dp, top = DEFAULT_PADDING_HALF, end = if (withPadding) DEFAULT_PADDING else 0.dp,)
         .graphicsLayer {
           alpha = bottomTitleAlpha(connection)
@@ -58,7 +59,7 @@ fun AppBarTitle(
       textAlign = textAlign
     )
     if (hostDevice != null) {
-      Box(Modifier.padding(start = if (withPadding) DEFAULT_PADDING else 0.dp, end = if (withPadding) DEFAULT_PADDING else 0.dp).graphicsLayer {
+      Box(Modifier.fillMaxWidth().padding(start = if (withPadding) DEFAULT_PADDING else 0.dp, end = if (withPadding) DEFAULT_PADDING else 0.dp).graphicsLayer {
         alpha = bottomTitleAlpha(connection)
       }) {
         HostDeviceTitle(hostDevice)
@@ -75,7 +76,7 @@ private fun bottomTitleAlpha(connection: CollapsingAppBarNestedScrollConnection?
 
 @Composable
 private fun HostDeviceTitle(hostDevice: Pair<Long?, String>, extraPadding: Boolean = false) {
-  Row(Modifier.fillMaxWidth().padding(top = 5.dp, bottom = if (extraPadding) DEFAULT_PADDING * 2 else DEFAULT_PADDING_HALF), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start) {
+  Row(Modifier.fillMaxWidth().padding(top = 5.dp, bottom = if (extraPadding) DEFAULT_PADDING * 2 else DEFAULT_PADDING_HALF), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
     DevicePill(
       active = true,
       onClick = {},

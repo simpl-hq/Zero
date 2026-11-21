@@ -174,9 +174,9 @@ fun ZeroGuidedTutorialView(
             icon = MR.images.ic_lock,
             heading = if (isDesktop) "Passcode & Screen Privacy" else "Biometric Lock & Screen Blur",
             detail = if (isDesktop) {
-              "Enable passcode lock in Your privacy and keep OS disk encryption active."
+              "Enable passcode lock in Privacy and keep OS disk encryption active."
             } else {
-              "Enable biometric unlock and hide previews in recent apps under Your privacy."
+              "Enable biometric unlock and hide previews in recent apps under Privacy."
             }
           ),
           GuidedTutorialHighlight(
@@ -596,7 +596,7 @@ fun ZeroGuidedTutorialView(
                       color = MaterialTheme.colors.onSurface
                     )
                     Text(
-                      "Check it anytime under Settings -> Help & support -> About Zero.",
+                      "Check it anytime under Settings -> Help -> About Zero.",
                       fontSize = 12.sp,
                       color = MaterialTheme.colors.secondary
                     )

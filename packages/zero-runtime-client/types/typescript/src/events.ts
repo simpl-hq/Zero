@@ -1,6 +1,9 @@
+// API Events
+// This file is generated automatically.
+
 import * as T from "./types"
 
-export type ChatEvent =
+export type ChatEvent = 
   | CEvt.ContactConnected
   | CEvt.ContactUpdated
   | CEvt.ContactDeletedByContact
@@ -53,7 +56,7 @@ export type ChatEvent =
   | CEvt.ChatErrors
 
 export namespace CEvt {
-  export type Tag =
+  export type Tag = 
     | "contactConnected"
     | "contactUpdated"
     | "contactDeletedByContact"
@@ -181,7 +184,7 @@ export namespace CEvt {
     type: "groupChatItemsDeleted"
     user: T.User
     groupInfo: T.GroupInfo
-    chatItemIDs: number[]
+    chatItemIDs: number[] // int64
     byUser: boolean
     member_?: T.GroupMember
   }

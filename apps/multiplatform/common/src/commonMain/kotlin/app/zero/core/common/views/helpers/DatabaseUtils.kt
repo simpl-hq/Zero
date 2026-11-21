@@ -13,10 +13,12 @@ object DatabaseUtils {
   private const val DATABASE_PASSWORD_ALIAS: String = "databasePassword"
   private const val APP_PASSWORD_ALIAS: String = "appPassword"
   private const val SELF_DESTRUCT_PASSWORD_ALIAS: String = "selfDestructPassword"
+  private const val DISPOSABLE_PARENT_USER_ID_ALIAS: String = "disposableParentUserId"
 
   val ksDatabasePassword = KeyStoreItem(DATABASE_PASSWORD_ALIAS, appPreferences.encryptedDBPassphrase, appPreferences.initializationVectorDBPassphrase)
   val ksAppPassword = KeyStoreItem(APP_PASSWORD_ALIAS, appPreferences.encryptedAppPassphrase, appPreferences.initializationVectorAppPassphrase)
   val ksSelfDestructPassword = KeyStoreItem(SELF_DESTRUCT_PASSWORD_ALIAS, appPreferences.encryptedSelfDestructPassphrase, appPreferences.initializationVectorSelfDestructPassphrase)
+  val ksDisposableParentUserId = KeyStoreItem(DISPOSABLE_PARENT_USER_ID_ALIAS, appPreferences.encryptedDisposableParentUserId, appPreferences.initializationVectorDisposableParentUserId)
 
   class KeyStoreItem(private val alias: String, val passphrase: SharedPreference<String?>, val initVector: SharedPreference<String?>) {
     fun get(): String? {

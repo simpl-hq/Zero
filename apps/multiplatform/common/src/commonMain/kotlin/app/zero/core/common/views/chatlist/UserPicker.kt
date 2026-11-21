@@ -14,6 +14,7 @@ import androidx.compose.ui.*
 import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import dev.icerock.moko.resources.compose.painterResource
 import androidx.compose.ui.text.capitalize
@@ -38,6 +39,7 @@ import app.zero.core.res.MR
 import dev.icerock.moko.resources.compose.stringResource
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import kotlin.random.Random
 
 private val USER_PICKER_SECTION_SPACING = 32.dp
 
@@ -197,16 +199,7 @@ fun UserPicker(
         )
       }
       val currentUser = remember { chatModel.currentUser }.value
-      if (appPlatform.isAndroid) {
-        Column(modifier = Modifier.padding(top = USER_PICKER_SECTION_SPACING, bottom = USER_PICKER_SECTION_SPACING - DEFAULT_MIN_SECTION_ITEM_PADDING_VERTICAL - 3.dp)) {
-          UserPickerUsersSection(
-            users = users,
-            onUserClicked = onUserClicked,
-            iconColor = iconColor,
-            stopped = stopped
-          )
-        }
-      } else if (currentUser != null) {
+      if (currentUser != null) {
         SectionItemView({ onUserClicked(currentUser) }, 80.dp, padding = PaddingValues(start = 16.dp, end = DEFAULT_PADDING), disabled = stopped) {
           ProfilePreview(currentUser.profile, iconColor = iconColor, stopped = stopped, badge = currentUser.profile.localBadge)
         }
@@ -230,70 +223,36 @@ fun UserPicker(
         }),
         disabled = stopped
       )
-      if (appPlatform.isDesktop) {
-        Divider(Modifier.padding(DEFAULT_PADDING))
-
-        val inactiveUsers = users.filter { !it.user.activeUser }
-
-        if (inactiveUsers.isNotEmpty()) {
-          Column(modifier = Modifier.padding(vertical = DEFAULT_MIN_SECTION_ITEM_PADDING_VERTICAL)) {
-            UserPickerUsersSection(
-              users = inactiveUsers,
-              iconColor = iconColor,
-              onUserClicked = onUserClicked,
-              stopped = stopped
+      val currentUser = remember { chatModel.currentUser }.value
+      val parentUserId = remember(currentUser?.userId) { DatabaseUtils.ksDisposableParentUserId.get()?.toLongOrNull() }
+      val hasDisposableParent = parentUserId != null && currentUser != null && currentUser.userId != parentUserId && users.any { it.user.userId == parentUserId }
+      if (hasDisposableParent && parentUserId != null) {
+        UserPickerOptionRow(
+          painterResource(MR.images.ic_delete_forever),
+          "Burn identity",
+          click = {
+            AlertManager.shared.showAlertDialog(
+              title = "Burn identity?",
+              text = "This burner identity, its chats, and its address will be permanently deleted, and you will return to your main identity.",
+              confirmText = "Burn",
+              onConfirm = {
+                userPickerState.value = AnimatedViewState.HIDING
+                burnDisposableIdentity(chatModel, parentUserId)
+              },
+              destructive = true
             )
-          }
-        }
-      }
-
-      if (chatModel.desktopNoUserNoRemote) {
-        UserPickerOptionRow(
-          painterResource(MR.images.ic_manage_accounts),
-          generalGetString(MR.strings.create_chat_profile),
-          {
-            doWithAuth(generalGetString(MR.strings.auth_open_chat_profiles), generalGetString(MR.strings.auth_log_in_using_credential)) {
-              ModalManager.center.showModalCloseable { close ->
-                LaunchedEffect(Unit) {
-                  userPickerState.value = AnimatedViewState.HIDING
-                }
-                CreateProfile(app.zero.core.common.platform.chatModel, close)
-              }
-            }
-          }
+          },
+          disabled = stopped,
+          iconTint = MaterialTheme.colors.error,
+          textColor = MaterialTheme.colors.error,
         )
-      } else {
+      }
+      if (!chatModel.desktopNoUserNoRemote && currentUser != null) {
         UserPickerOptionRow(
-          painterResource(MR.images.ic_manage_accounts),
-          stringResource(MR.strings.your_chat_profiles),
-          {
-            ModalManager.start.showCustomModal(keyboardCoversBar = false) { close ->
-              val search = rememberSaveable { mutableStateOf("") }
-              val profileHidden = rememberSaveable { mutableStateOf(false) }
-              val authorized = remember { stateGetOrPut("authorized") { false } }
-              ModalView(
-                { close() },
-                showSearch = true,
-                searchAlwaysVisible = true,
-                onSearchValueChanged = {
-                  search.value = it
-                },
-                content = {
-                  UserProfilesView(chatModel, search, profileHidden) { block ->
-                      if (authorized.value) {
-                        block()
-                      } else {
-                        doWithAuth(
-                          generalGetString(MR.strings.auth_open_chat_profiles),
-                          generalGetString(MR.strings.auth_log_in_using_credential)
-                        ) {
-                          authorized.value = true
-                          block()
-                        }
-                      }
-                    }
-                })
-            }
+          painterResource(MR.images.ic_refresh),
+          "New identity",
+          click = {
+            showNewIdentityDialog(chatModel, userPickerState)
           },
           disabled = stopped
         )
@@ -479,11 +438,18 @@ fun UserProfileRow(u: User, enabled: Boolean = remember { chatModel.chatRunning 
 }
 
 @Composable
-fun UserPickerOptionRow(icon: Painter, text: String, click: (() -> Unit)? = null, disabled: Boolean = false) {
+fun UserPickerOptionRow(
+  icon: Painter,
+  text: String,
+  click: (() -> Unit)? = null,
+  disabled: Boolean = false,
+  iconTint: Color? = null,
+  textColor: Color? = null,
+) {
   SectionItemView(click, disabled = disabled, extraPadding = appPlatform.isDesktop) {
-    Icon(icon, text, tint = if (disabled) MaterialTheme.colors.secondary else MaterialTheme.colors.secondary)
+    Icon(icon, text, tint = if (disabled) MaterialTheme.colors.secondary else (iconTint ?: MaterialTheme.colors.secondary))
     TextIconSpaced()
-    Text(text = text, color = if (disabled) MaterialTheme.colors.secondary else Color.Unspecified)
+    Text(text = text, color = if (disabled) MaterialTheme.colors.secondary else (textColor ?: Color.Unspecified))
   }
 }
 
@@ -676,5 +642,92 @@ private fun switchToRemoteHost(h: RemoteHostInfo, connecting: MutableState<Boole
     }
   } else {
     connectMobileDevice(h, connecting)
+  }
+}
+
+private fun randomIdentitySuffix(): String {
+  val hex = "0123456789abcdef"
+  return buildString(6) {
+    repeat(6) { append(hex[Random.nextInt(hex.length)]) }
+  }
+}
+
+private fun showNewIdentityDialog(chatModel: ChatModel, userPickerState: MutableStateFlow<AnimatedViewState>) {
+  AlertManager.shared.showAlertDialogButtonsColumn(
+    title = "New identity",
+    text = AnnotatedString("Start a temporary burner session you can destroy anytime, or permanently replace your current identity."),
+    buttons = {
+      Column {
+        SectionItemView({
+          AlertManager.shared.hideAlert()
+          userPickerState.value = AnimatedViewState.HIDING
+          rotateZeroIdentity(chatModel, disposable = true)
+        }) {
+          Text("Burner identity", Modifier.fillMaxWidth(), textAlign = TextAlign.Center, color = MaterialTheme.colors.primary)
+        }
+        SectionItemView({
+          AlertManager.shared.hideAlert()
+          userPickerState.value = AnimatedViewState.HIDING
+          rotateZeroIdentity(chatModel, disposable = false)
+        }) {
+          Text("New identity", Modifier.fillMaxWidth(), textAlign = TextAlign.Center, color = MaterialTheme.colors.error)
+        }
+        SectionItemView({
+          AlertManager.shared.hideAlert()
+        }) {
+          Text(generalGetString(MR.strings.cancel_verb), Modifier.fillMaxWidth(), textAlign = TextAlign.Center, color = MaterialTheme.colors.secondary)
+        }
+      }
+    }
+  )
+}
+
+private fun rotateZeroIdentity(chatModel: ChatModel, disposable: Boolean) {
+  withBGApi {
+    controller.showProgressIfNeeded {
+      val rhId = chatModel.remoteHostId()
+      val prevUser = chatModel.currentUser.value
+      val existingParentId = DatabaseUtils.ksDisposableParentUserId.get()?.toLongOrNull()
+      val suffix = randomIdentitySuffix()
+      val prefix = if (disposable) "anon" else "zero"
+      val newUser = chatModel.controller.apiCreateActiveUser(rhId, Profile("${prefix}_$suffix", "", null, null))
+        ?: return@showProgressIfNeeded
+      runCatching { chatModel.controller.apiCreateUserAddress(rhId) }
+      ModalManager.closeAllModalsEverywhere()
+      chatModel.controller.changeActiveUser_(rhId, newUser.userId, null)
+      if (disposable) {
+        if (existingParentId == null && prevUser != null) {
+          DatabaseUtils.ksDisposableParentUserId.set(prevUser.userId.toString())
+        } else if (existingParentId != null && prevUser != null && prevUser.userId != existingParentId) {
+          runCatching { chatModel.controller.apiDeleteUser(prevUser, delSMPQueues = true, viewPwd = null) }
+        }
+      } else {
+        DatabaseUtils.ksDisposableParentUserId.remove()
+        if (prevUser != null && prevUser.userId != newUser.userId) {
+          runCatching { chatModel.controller.apiDeleteUser(prevUser, delSMPQueues = true, viewPwd = null) }
+        }
+        if (existingParentId != null && existingParentId != prevUser?.userId && existingParentId != newUser.userId) {
+          val parentUser = chatModel.users.firstOrNull { it.user.userId == existingParentId }?.user
+          if (parentUser != null) {
+            runCatching { chatModel.controller.apiDeleteUser(parentUser, delSMPQueues = true, viewPwd = null) }
+          }
+        }
+      }
+    }
+  }
+}
+
+private fun burnDisposableIdentity(chatModel: ChatModel, parentUserId: Long) {
+  withBGApi {
+    controller.showProgressIfNeeded {
+      val rhId = chatModel.remoteHostId()
+      val disposableUser = chatModel.currentUser.value
+      ModalManager.closeAllModalsEverywhere()
+      chatModel.controller.changeActiveUser_(rhId, parentUserId, null)
+      DatabaseUtils.ksDisposableParentUserId.remove()
+      if (disposableUser != null && disposableUser.userId != parentUserId) {
+        runCatching { chatModel.controller.apiDeleteUser(disposableUser, delSMPQueues = true, viewPwd = null) }
+      }
+    }
   }
 }

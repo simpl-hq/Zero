@@ -79,9 +79,6 @@ struct UserAddressView: View {
             } else if !onboarding {
                 Section {
                     createAddressButton()
-                } header: {
-                    Text("Zero Address")
-                        .foregroundColor(theme.colors.secondary)
                 }
 
                 Section {
@@ -101,10 +98,7 @@ struct UserAddressView: View {
             case .deleteAddress:
                 return Alert(
                     title: Text("Delete address?"),
-                    message:
-                        shareViaProfile
-                    ? Text("All your contacts will remain connected. Profile update will be sent to your contacts.")
-                    : Text("All your contacts will remain connected."),
+                    message: Text("All your contacts will remain connected."),
                     primaryButton: .destructive(Text("Delete")) {
                         progressIndicator = true
                         Task {
@@ -129,7 +123,7 @@ struct UserAddressView: View {
             case .shareOnCreate:
                 return Alert(
                     title: Text("Share address with Zero contacts?"),
-                    message: Text("Add address to your profile, so that your Zero contacts can share it with other people. Profile update will be sent to your Zero contacts."),
+                    message: Text("Add address to your profile."),
                     primaryButton: .default(Text("Share")) {
                         setProfileAddress($progressIndicator, true)
                         shareViaProfile = true
@@ -150,24 +144,9 @@ struct UserAddressView: View {
             }
             shareAddressButton(userAddress)
             shareViaChatButton(userAddress)
-            settingsRow("briefcase", color: theme.colors.secondary) {
-                Toggle("Business address", isOn: $settings.businessAddress)
-                    .onChange(of: settings.businessAddress) { ba in
-                        if ba {
-                            settings.autoAccept = true
-                            settings.autoAcceptIncognito = false
-                        }
-                        saveAddressSettings(settings, $savedSettings)
-                    }
-            }
             addressSettingsButton(userAddress)
         } header: {
-            ToggleShortLinkHeader(text: Text("Zero Address"), link: userAddress.connLinkContact, short: $showShortLink)
-        } footer: {
-            if settings.businessAddress {
-                Text("Add your team members to the conversations.")
-                    .foregroundColor(theme.colors.secondary)
-            }
+            ToggleShortLinkHeader(text: Text(""), link: userAddress.connLinkContact, short: $showShortLink)
         }
 
         Section {
@@ -178,7 +157,7 @@ struct UserAddressView: View {
                     footer: "Let people connect to you via name registered with your Zero address.",
                     prompt: "@yourname.testing",
                     zeroName: zeroName,
-                    broadcastWarning: NSLocalizedString("Profile update will be sent to your Zero contacts.", comment: "alert title"),
+                    broadcastWarning: nil,
                     save: { zeroDomain in
                         do {
                             let u = try await apiSetUserDomain(zeroDomain)
@@ -193,7 +172,7 @@ struct UserAddressView: View {
                 if let d = chatModel.currentUser?.profile.contactDomain?.domain {
                     Label("\(d)", systemImage: "at")
                 } else {
-                    Label("Get Zero name (BETA)", systemImage: "at")
+                    Label("Zero Name (Coming Soon)", systemImage: "at")
                 }
             }
         } header: {
@@ -596,184 +575,45 @@ private func setProfileAddress(_ progressIndicator: Binding<Bool>, _ on: Bool) {
 
 struct UserAddressSettingsView: View {
     @Environment(\.dismiss) var dismiss: DismissAction
+    @EnvironmentObject var chatModel: ChatModel
     @EnvironmentObject var theme: AppTheme
     @Binding var shareViaProfile: Bool
-    @State private var settings = AddressSettingsState()
-    @State private var savedSettings = AddressSettingsState()
-    @State private var ignoreShareViaProfileChange = false
-    @State private var progressIndicator = false
+    @State private var rotating = false
 
     var body: some View {
-        ZStack {
-            if let userAddress = ChatModel.shared.userAddress {
-                userAddressSettingsView()
-                    .onAppear {
-                        settings = AddressSettingsState(settings: userAddress.addressSettings)
-                        savedSettings = AddressSettingsState(settings: userAddress.addressSettings)
-                    }
-                    .onChange(of: settings.autoAccept) { autoAccept in
-                        if !autoAccept {
-                            settings.businessAddress = false
-                            settings.autoReply = ""
-                        }
-                    }
-                    .onDisappear {
-                        if savedSettings != settings {
-                            showAlert(
-                                title: NSLocalizedString("Zero address settings", comment: "alert title"),
-                                message: NSLocalizedString("Settings were changed.", comment: "alert message"),
-                                buttonTitle: NSLocalizedString("Save", comment: "alert button"),
-                                buttonAction: { saveAddressSettings(settings, $savedSettings) },
-                                cancelButton: true
-                            )
-                        }
-                    }
-            } else {
-                Text(String("Error opening address settings"))
-            }
-            if progressIndicator {
-                ProgressView().scaleEffect(2)
-            }
-        }
-    }
-
-    private func userAddressSettingsView() -> some View {
         List {
-            Section {
-                shareWithContactsButton()
-                autoAcceptToggle().disabled(settings.businessAddress)
-                if settings.autoAccept && !ChatModel.shared.addressShortLinkDataSet && !settings.businessAddress {
-                    acceptIncognitoToggle()
-                }
+            Section(header: Text("Current address").foregroundColor(theme.colors.secondary)) {
+                Text(chatModel.userAddress?.connLinkContact.zeroChatUri(short: false) ?? "None")
+                    .font(.footnote)
+                    .textSelection(.enabled)
             }
 
             Section {
-                messageEditor(placeholder: NSLocalizedString("Enter welcome message… (optional)", comment: "placeholder"), text: $settings.autoReply)
-            } header: {
-                Text("Welcome message")
-                    .foregroundColor(theme.colors.secondary)
-            }
-
-            Section {
-                saveAddressSettingsButton()
-                    .disabled(settings == savedSettings)
-            }
-        }
-    }
-
-    private func shareWithContactsButton() -> some View {
-        settingsRow("person", color: theme.colors.secondary) {
-            Toggle("Share with Zero contacts", isOn: $shareViaProfile)
-                .onChange(of: shareViaProfile) { on in
-                    if ignoreShareViaProfileChange {
-                        ignoreShareViaProfileChange = false
-                    } else {
-                        if on {
-                            showAlert(
-                                NSLocalizedString("Share address with Zero contacts?", comment: "alert title"),
-                                message: NSLocalizedString("Profile update will be sent to your Zero contacts.", comment: "alert message"),
-                                actions: {[
-                                    UIAlertAction(
-                                        title: NSLocalizedString("Cancel", comment: "alert action"),
-                                        style: .cancel,
-                                        handler: { _ in
-                                            ignoreShareViaProfileChange = true
-                                            shareViaProfile = !on
-                                        }
-                                    ),
-                                    UIAlertAction(
-                                        title: NSLocalizedString("Share", comment: "alert action"),
-                                        style: .default,
-                                        handler: { _ in
-                                            setProfileAddress($progressIndicator, on)
-                                        }
-                                    )
-                                ]}
-                            )
-                        } else {
-                            showAlert(
-                                NSLocalizedString("Stop sharing address?", comment: "alert title"),
-                                message: NSLocalizedString("Profile update will be sent to your Zero contacts.", comment: "alert message"),
-                                actions: {[
-                                    UIAlertAction(
-                                        title: NSLocalizedString("Cancel", comment: "alert action"),
-                                        style: .cancel,
-                                        handler: { _ in
-                                            ignoreShareViaProfileChange = true
-                                            shareViaProfile = !on
-                                        }
-                                    ),
-                                    UIAlertAction(
-                                        title: NSLocalizedString("Stop sharing", comment: "alert action"),
-                                        style: .default,
-                                        handler: { _ in
-                                            setProfileAddress($progressIndicator, on)
-                                        }
-                                    )
-                                ]}
-                            )
-                        }
+                Button {
+                    rotateAddress()
+                } label: {
+                    settingsRow("arrow.triangle.2.circlepath", color: theme.colors.primary) {
+                        Text(rotating ? "Generating..." : "New address")
+                            .foregroundColor(theme.colors.primary)
                     }
                 }
-        }
-    }
-
-    private func autoAcceptToggle() -> some View {
-        settingsRow("checkmark", color: theme.colors.secondary) {
-            Toggle("Auto-accept", isOn: $settings.autoAccept)
-                .onChange(of: settings.autoAccept) { _ in
-                    saveAddressSettings(settings, $savedSettings)
-                }
-        }
-    }
-
-    private func acceptIncognitoToggle() -> some View {
-        settingsRow(
-            settings.autoAcceptIncognito ? "theatermasks.fill" : "theatermasks",
-            color: settings.autoAcceptIncognito ? .indigo : theme.colors.secondary
-        ) {
-            Toggle("Accept incognito", isOn: $settings.autoAcceptIncognito)
-        }
-    }
-
-    private func messageEditor(placeholder: String, text: Binding<String>) -> some View {
-        ZStack {
-            Group {
-                if text.wrappedValue.isEmpty {
-                    TextEditor(text: Binding.constant(placeholder))
-                        .foregroundColor(theme.colors.secondary)
-                        .disabled(true)
-                }
-                TextEditor(text: text)
+                .disabled(rotating)
             }
-            .padding(.horizontal, -5)
-            .padding(.top, -8)
-            .frame(height: 90, alignment: .topLeading)
-            .frame(maxWidth: .infinity, alignment: .leading)
         }
+        .navigationTitle("Address settings")
     }
 
-    private func saveAddressSettingsButton() -> some View {
-        Button {
-            hideKeyboard()
-            saveAddressSettings(settings, $savedSettings)
-        } label: {
-            Text("Save")
-        }
-    }
-}
-
-private func saveAddressSettings(_ settings: AddressSettingsState, _ savedSettings: Binding<AddressSettingsState>) {
-    Task {
-        do {
-            if let address = try await apiSetUserAddressSettings(settings.addressSettings) {
+    private func rotateAddress() {
+        guard !rotating else { return }
+        rotating = true
+        Task {
+            _ = try? await apiDeleteUserAddress()
+            if let created = try? await apiCreateUserAddress() {
                 await MainActor.run {
-                    ChatModel.shared.userAddress = address
-                    savedSettings.wrappedValue = settings
+                    chatModel.userAddress = UserContactLink(created)
                 }
             }
-        } catch let error {
-            logger.error("apiSetUserAddressSettings error: \(responseError(error))")
+            await MainActor.run { rotating = false }
         }
     }
 }

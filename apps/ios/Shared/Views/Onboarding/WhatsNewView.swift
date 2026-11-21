@@ -110,8 +110,8 @@ private let versionDescriptions: [VersionDescription] = [
             )),
             .feature(Description(
                 icon: "network.badge.shield.half.filled",
-                title: "SOCKS5 proxy isolation",
-                description: "Per-profile Tor / SOCKS5 circuit isolation and SPKI TLS pinning."
+                title: "Tor circuit isolation",
+                description: "Per-profile Tor circuit isolation and SPKI TLS pinning."
             )),
         ]
     ),

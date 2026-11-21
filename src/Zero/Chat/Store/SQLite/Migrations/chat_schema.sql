@@ -4,11 +4,10 @@ CREATE TABLE migrations(
   down TEXT
 ) STRICT;
 CREATE TABLE contact_profiles(
-  -- remote user profile
   contact_profile_id INTEGER PRIMARY KEY,
-  display_name TEXT NOT NULL, -- contact name set by remote user(not unique), this name must not contain spaces
+  display_name TEXT NOT NULL,
   full_name TEXT NOT NULL,
-  properties TEXT NOT NULL DEFAULT '{}' -- JSON with contact profile properties
+  properties TEXT NOT NULL DEFAULT '{}'
   ,
   created_at TEXT CHECK(created_at NOT NULL),
   updated_at TEXT CHECK(updated_at NOT NULL),
@@ -53,7 +52,7 @@ CREATE TABLE users(
   active_order INTEGER NOT NULL DEFAULT 0,
   auto_accept_member_contacts INTEGER NOT NULL DEFAULT 0,
   is_user_chat_relay INTEGER NOT NULL DEFAULT 0,
-  client_service INTEGER NOT NULL DEFAULT 0, -- 1 for active user
+  client_service INTEGER NOT NULL DEFAULT 0,
   FOREIGN KEY(user_id, local_display_name)
   REFERENCES display_names(user_id, local_display_name)
   ON DELETE RESTRICT
@@ -75,7 +74,7 @@ CREATE TABLE contacts(
   contact_profile_id INTEGER REFERENCES contact_profiles ON DELETE SET NULL,
   user_id INTEGER NOT NULL REFERENCES users ON DELETE CASCADE,
   local_display_name TEXT NOT NULL,
-  is_user INTEGER NOT NULL DEFAULT 0, -- 1 if this contact is a user
+  is_user INTEGER NOT NULL DEFAULT 0,
   created_at TEXT NOT NULL DEFAULT(datetime('now')),
   updated_at TEXT CHECK(updated_at NOT NULL),
   xcontact_id BLOB,
@@ -123,11 +122,10 @@ CREATE TABLE known_servers(
   UNIQUE(user_id, host, port)
 ) WITHOUT ROWID, STRICT;
 CREATE TABLE group_profiles(
-  -- shared group profiles
   group_profile_id INTEGER PRIMARY KEY,
-  display_name TEXT NOT NULL, -- this name must not contain spaces
+  display_name TEXT NOT NULL,
   full_name TEXT NOT NULL,
-  properties TEXT NOT NULL DEFAULT '{}' -- JSON with user or contact profile
+  properties TEXT NOT NULL DEFAULT '{}'
   ,
   created_at TEXT CHECK(created_at NOT NULL),
   updated_at TEXT CHECK(updated_at NOT NULL),
@@ -147,10 +145,10 @@ CREATE TABLE group_profiles(
   group_domain_proof TEXT
 ) STRICT;
 CREATE TABLE groups(
-  group_id INTEGER PRIMARY KEY, -- local group ID
+  group_id INTEGER PRIMARY KEY,
   user_id INTEGER NOT NULL REFERENCES users ON DELETE CASCADE,
-  local_display_name TEXT NOT NULL, -- local group name without spaces
-  group_profile_id INTEGER REFERENCES group_profiles ON DELETE SET NULL, -- shared group profile
+  local_display_name TEXT NOT NULL,
+  group_profile_id INTEGER REFERENCES group_profiles ON DELETE SET NULL,
   inv_queue_info BLOB,
   created_at TEXT CHECK(created_at NOT NULL),
   updated_at TEXT CHECK(updated_at NOT NULL),
@@ -207,7 +205,7 @@ CREATE TABLE groups(
   roster_blob BLOB,
   group_domain_verified INTEGER,
   stored_roster_version INTEGER,
-  applied_complete_roster_version INTEGER, -- received
+  applied_complete_roster_version INTEGER,
   FOREIGN KEY(user_id, local_display_name)
   REFERENCES display_names(user_id, local_display_name)
   ON DELETE CASCADE
@@ -216,19 +214,18 @@ CREATE TABLE groups(
   UNIQUE(user_id, group_profile_id)
 ) STRICT;
 CREATE TABLE group_members(
-  -- group members, excluding the local user
   group_member_id INTEGER PRIMARY KEY,
   group_id INTEGER NOT NULL REFERENCES groups ON DELETE CASCADE,
-  member_id BLOB NOT NULL, -- shared member ID, unique per group
-  member_role TEXT NOT NULL, -- owner, admin, member
-  member_category TEXT NOT NULL, -- see GroupMemberCategory
-  member_status TEXT NOT NULL, -- see GroupMemberStatus
-  invited_by INTEGER REFERENCES contacts(contact_id) ON DELETE SET NULL, -- NULL for the members who joined before the current user and for the group creator
-  sent_inv_queue_info BLOB, -- sent
-  group_queue_info BLOB, -- received
-  direct_queue_info BLOB, -- received
+  member_id BLOB NOT NULL,
+  member_role TEXT NOT NULL,
+  member_category TEXT NOT NULL,
+  member_status TEXT NOT NULL,
+  invited_by INTEGER REFERENCES contacts(contact_id) ON DELETE SET NULL,
+  sent_inv_queue_info BLOB,
+  group_queue_info BLOB,
+  direct_queue_info BLOB,
   user_id INTEGER NOT NULL REFERENCES users ON DELETE CASCADE,
-  local_display_name TEXT NOT NULL, -- should be the same as contact
+  local_display_name TEXT NOT NULL,
   contact_profile_id INTEGER NOT NULL REFERENCES contact_profiles ON DELETE CASCADE,
   contact_id INTEGER REFERENCES contacts ON DELETE CASCADE,
   created_at TEXT CHECK(created_at NOT NULL),
@@ -270,7 +267,7 @@ CREATE TABLE group_member_intros(
   intro_status TEXT NOT NULL,
   created_at TEXT CHECK(created_at NOT NULL),
   updated_at TEXT CHECK(updated_at NOT NULL),
-  intro_chat_protocol_version INTEGER NOT NULL DEFAULT 3, -- see GroupMemberIntroStatus
+  intro_chat_protocol_version INTEGER NOT NULL DEFAULT 3,
   UNIQUE(re_group_member_id, to_group_member_id)
 ) STRICT;
 CREATE TABLE files(
@@ -305,7 +302,7 @@ CREATE TABLE files(
 CREATE TABLE snd_files(
   file_id INTEGER NOT NULL REFERENCES files ON DELETE CASCADE,
   connection_id INTEGER NOT NULL REFERENCES connections ON DELETE CASCADE,
-  file_status TEXT NOT NULL, -- new, accepted, connected, completed
+  file_status TEXT NOT NULL,
   group_member_id INTEGER REFERENCES group_members ON DELETE CASCADE,
   created_at TEXT CHECK(created_at NOT NULL),
   updated_at TEXT CHECK(updated_at NOT NULL),
@@ -317,7 +314,7 @@ CREATE TABLE snd_files(
 ) WITHOUT ROWID, STRICT;
 CREATE TABLE rcv_files(
   file_id INTEGER PRIMARY KEY REFERENCES files ON DELETE CASCADE,
-  file_status TEXT NOT NULL, -- new, accepted, connected, completed
+  file_status TEXT NOT NULL,
   group_member_id INTEGER REFERENCES group_members ON DELETE CASCADE,
   file_queue_info BLOB
   ,
@@ -338,17 +335,16 @@ CREATE TABLE rcv_file_chunks(
   chunk_agent_msg_id INTEGER NOT NULL,
   chunk_stored INTEGER NOT NULL DEFAULT 0,
   created_at TEXT CHECK(created_at NOT NULL),
-  updated_at TEXT CHECK(updated_at NOT NULL), -- 0(received), 1(appended to file)
+  updated_at TEXT CHECK(updated_at NOT NULL),
   PRIMARY KEY(file_id, chunk_number)
 ) WITHOUT ROWID, STRICT;
 CREATE TABLE connections(
-  -- all SMP agent connections
   connection_id INTEGER PRIMARY KEY,
   agent_conn_id BLOB NOT NULL UNIQUE,
   conn_level INTEGER NOT NULL DEFAULT 0,
   via_contact INTEGER REFERENCES contacts(contact_id) ON DELETE SET NULL,
   conn_status TEXT NOT NULL,
-  conn_type TEXT NOT NULL, -- contact, member, rcv_file, snd_file
+  conn_type TEXT NOT NULL,
   user_contact_link_id INTEGER REFERENCES user_contact_links ON DELETE CASCADE,
   contact_id INTEGER REFERENCES contacts ON DELETE CASCADE,
   group_member_id INTEGER REFERENCES group_members ON DELETE CASCADE,
@@ -438,9 +434,9 @@ CREATE TABLE contact_requests(
 ) STRICT;
 CREATE TABLE messages(
   message_id INTEGER PRIMARY KEY,
-  msg_sent INTEGER NOT NULL, -- 0 for received, 1 for sent
-  chat_msg_event TEXT NOT NULL, -- message event tag(the constructor of CMEventTag)
-  msg_body BLOB, -- agent message body as received or sent
+  msg_sent INTEGER NOT NULL,
+  chat_msg_event TEXT NOT NULL,
+  msg_body BLOB,
   created_at TEXT NOT NULL DEFAULT(datetime('now'))
   ,
   updated_at TEXT CHECK(updated_at NOT NULL),
@@ -466,14 +462,14 @@ CREATE TABLE chat_items(
   user_id INTEGER NOT NULL REFERENCES users ON DELETE CASCADE,
   contact_id INTEGER REFERENCES contacts ON DELETE CASCADE,
   group_id INTEGER REFERENCES groups ON DELETE CASCADE,
-  group_member_id INTEGER REFERENCES group_members ON DELETE SET NULL, -- NULL for sent even if group_id is not
-  chat_msg_id INTEGER, -- sent as part of the message that created the item
+  group_member_id INTEGER REFERENCES group_members ON DELETE SET NULL,
+  chat_msg_id INTEGER,
   created_by_msg_id INTEGER UNIQUE REFERENCES messages(message_id) ON DELETE SET NULL,
-  item_sent INTEGER NOT NULL, -- 0 for received, 1 for sent
-  item_ts TEXT NOT NULL, -- broker_ts of creating message for received, created_at for sent
-  item_deleted INTEGER NOT NULL DEFAULT 0, -- 1 for deleted
-  item_content TEXT NOT NULL, -- JSON
-  item_text TEXT NOT NULL, -- textual representation
+  item_sent INTEGER NOT NULL,
+  item_ts TEXT NOT NULL,
+  item_deleted INTEGER NOT NULL DEFAULT 0,
+  item_content TEXT NOT NULL,
+  item_text TEXT NOT NULL,
   created_at TEXT NOT NULL DEFAULT(datetime('now')),
   updated_at TEXT NOT NULL DEFAULT(datetime('now'))
   ,
@@ -523,7 +519,6 @@ CREATE TABLE chat_item_messages(
   UNIQUE(chat_item_id, message_id)
 ) STRICT;
 CREATE TABLE calls(
-  -- stores call invitations state for communicating state between NSE and app when call notification comes
   call_id INTEGER PRIMARY KEY,
   contact_id INTEGER NOT NULL REFERENCES contacts ON DELETE CASCADE,
   shared_call_id BLOB NOT NULL,
@@ -537,7 +532,7 @@ CREATE TABLE calls(
   call_uuid TEXT NOT NULL DEFAULT ""
 ) STRICT;
 CREATE TABLE commands(
-  command_id INTEGER PRIMARY KEY AUTOINCREMENT, -- used as ACorrId
+  command_id INTEGER PRIMARY KEY AUTOINCREMENT,
   connection_id INTEGER REFERENCES connections ON DELETE CASCADE,
   command_function TEXT NOT NULL,
   command_status TEXT NOT NULL,
@@ -588,7 +583,6 @@ CREATE TABLE extra_xftp_file_descriptions(
   updated_at TEXT NOT NULL DEFAULT(datetime('now'))
 ) STRICT;
 CREATE TABLE chat_item_versions(
-  -- contains versions only for edited chat items, including current version
   chat_item_version_id INTEGER PRIMARY KEY AUTOINCREMENT,
   chat_item_id INTEGER NOT NULL REFERENCES chat_items ON DELETE CASCADE,
   msg_content TEXT NOT NULL,
@@ -602,11 +596,11 @@ CREATE TABLE chat_item_reactions(
   shared_msg_id BLOB NOT NULL,
   contact_id INTEGER REFERENCES contacts ON DELETE CASCADE,
   group_id INTEGER REFERENCES groups ON DELETE CASCADE,
-  group_member_id INTEGER REFERENCES group_members ON DELETE SET NULL, -- member that sent reaction, NULL for items in direct chats
+  group_member_id INTEGER REFERENCES group_members ON DELETE SET NULL,
   created_by_msg_id INTEGER REFERENCES messages(message_id) ON DELETE SET NULL,
-  reaction TEXT NOT NULL, -- JSON of MsgReaction
-  reaction_sent INTEGER NOT NULL, -- 0 for received, 1 for sent
-  reaction_ts TEXT NOT NULL, -- broker_ts of creating message for received, created_at for sent
+  reaction TEXT NOT NULL,
+  reaction_sent INTEGER NOT NULL,
+  reaction_ts TEXT NOT NULL,
   created_at TEXT NOT NULL DEFAULT(datetime('now')),
   updated_at TEXT NOT NULL DEFAULT(datetime('now'))
 ) STRICT;
@@ -617,7 +611,7 @@ CREATE TABLE chat_item_moderations(
   item_member_id BLOB NOT NULL,
   shared_msg_id BLOB NOT NULL,
   created_by_msg_id INTEGER REFERENCES messages(message_id) ON DELETE SET NULL,
-  moderated_at TEXT NOT NULL, -- broker_ts of creating message
+  moderated_at TEXT NOT NULL,
   created_at TEXT NOT NULL DEFAULT(datetime('now')),
   updated_at TEXT NOT NULL DEFAULT(datetime('now'))
 ) STRICT;
@@ -661,41 +655,39 @@ CREATE TABLE IF NOT EXISTS "received_probes"(
   updated_at TEXT CHECK(updated_at NOT NULL)
 ) STRICT;
 CREATE TABLE remote_hosts(
-  -- e.g., mobiles known to a desktop app
   remote_host_id INTEGER PRIMARY KEY AUTOINCREMENT,
   host_device_name TEXT NOT NULL,
-  store_path TEXT NOT NULL, -- relative folder name for host files
+  store_path TEXT NOT NULL,
   ca_key BLOB NOT NULL,
   ca_cert BLOB NOT NULL,
-  id_key BLOB NOT NULL, -- long-term/identity signing key
-  host_fingerprint BLOB NOT NULL, -- remote host CA cert fingerprint, set when connected
-  host_dh_pub BLOB NOT NULL -- last session DH key
+  id_key BLOB NOT NULL,
+  host_fingerprint BLOB NOT NULL,
+  host_dh_pub BLOB NOT NULL
   ,
   bind_addr TEXT,
   bind_iface TEXT,
   bind_port INTEGER
 ) STRICT;
 CREATE TABLE remote_controllers(
-  -- e.g., desktops known to a mobile app
   remote_ctrl_id INTEGER PRIMARY KEY AUTOINCREMENT,
   ctrl_device_name TEXT NOT NULL,
   ca_key BLOB NOT NULL,
   ca_cert BLOB NOT NULL,
-  ctrl_fingerprint BLOB NOT NULL, -- remote controller CA cert fingerprint, set when connected
-  id_pub BLOB NOT NULL, -- remote controller long-term/identity key to verify signatures
-  dh_priv_key BLOB NOT NULL, -- last session DH key
-  prev_dh_priv_key BLOB -- previous session DH key
+  ctrl_fingerprint BLOB NOT NULL,
+  id_pub BLOB NOT NULL,
+  dh_priv_key BLOB NOT NULL,
+  prev_dh_priv_key BLOB
 ) STRICT;
 CREATE TABLE IF NOT EXISTS "msg_deliveries"(
   msg_delivery_id INTEGER PRIMARY KEY,
-  message_id INTEGER NOT NULL REFERENCES messages ON DELETE CASCADE, -- non UNIQUE for group messages and for batched messages
+  message_id INTEGER NOT NULL REFERENCES messages ON DELETE CASCADE,
   connection_id INTEGER NOT NULL REFERENCES connections ON DELETE CASCADE,
-  agent_msg_id INTEGER, -- internal agent message ID(NULL while pending), non UNIQUE for batched messages
-  agent_msg_meta TEXT, -- JSON with timestamps etc. sent in MSG, NULL for sent
+  agent_msg_id INTEGER,
+  agent_msg_meta TEXT,
   chat_ts TEXT NOT NULL DEFAULT(datetime('now')),
   created_at TEXT CHECK(created_at NOT NULL),
   updated_at TEXT CHECK(updated_at NOT NULL),
-  delivery_status TEXT -- MsgDeliveryStatus
+  delivery_status TEXT
 ) STRICT;
 CREATE TABLE note_folders(
   note_folder_id INTEGER PRIMARY KEY AUTOINCREMENT,
